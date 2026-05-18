@@ -1,6 +1,7 @@
 package clasesCompartidas;
 
 import pong.MenuConfig;
+import spaceinvaders.MenuConfigSpace;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -10,7 +11,7 @@ import java.awt.event.*;
 
 import com.entropyinteractive.*;
 import pong.Pong;
-
+import spaceinvaders.SpaceInvaders;
 
 public class LanzadorJuego extends JFrame implements ActionListener {
     private JGame juego;
@@ -32,7 +33,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         // Lista de juegos
         listaJuegos = new DefaultListModel<>();
         listaJuegos.addElement("Pong");
-        listaJuegos.addElement("Lemmings");
+        listaJuegos.addElement("SpaceInvaders");
         listaJuegos.addElement("Counter-Strike");
         // Bottones
         botonConfig = new JButton("Configuración");
@@ -56,7 +57,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                     panelImg.removeAll();
                     panelImg.setLayout(new BorderLayout());
 
-                    if ("Lemmings".equals(selected)) {
+                    if ("SpaceInvaders".equals(selected)) {
                         panelImg.add(new JPanelImage("/lemmings/portada_lemmings.png"));
                     } else if ("Pong".equals(selected)) {
                         panelImg.add(new JPanelImage("/pong/portada_pong.png"));
@@ -94,15 +95,15 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                     }
                 };
                 t.start();
-            } else if ("Lemming".equals(juegoSeleccionado)) {
+            } else if ("SpaceInvaders".equals(juegoSeleccionado)) {
                 //Nuevo (modifique lo de adentro del else if por equals para mas mejor)
-                /*juego = new Lemming("Lemming",800,600);
+                juego = new SpaceInvaders("SpaceInvaders",800,600);
                 t = new Thread() {
                     public void run() {
                         juego.run(1.0 / 60.0);
                     }
                 };
-                t.start();*/
+                t.start();
             } else if ("Counter-Strike".equals(juegoSeleccionado))
             {
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "No somos tan buenos, todavia no sabemos hacer este");
@@ -114,7 +115,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
             String juegoSeleccionado = juegos.getSelectedValue();
             if (juegoSeleccionado == null) {
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "Error, seleccione un juego para configurar");
-            } else if (juegoSeleccionado.equals("Lemmings") ) {
+            } else if (juegoSeleccionado.equals("SpaceInvaders") ) {
                 //new MenuConfigLem();
             } else if (juegoSeleccionado.equals("Pong") ) {
                 new MenuConfig();
