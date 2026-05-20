@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.Map;
 
-public class MenuConfig extends Object implements ActionListener {
+public class MenuConfigSpace extends Object implements ActionListener {
     private JFrame frame;
     private JPanel panelCompleto;
     
@@ -30,7 +30,7 @@ public class MenuConfig extends Object implements ActionListener {
     private Map<String, JComponent> componentes;
     private String rutaArchivo = "spaceinvaders.properties";
 
-    public MenuConfig() {
+    public MenuConfigSpace() {
         componentes = new HashMap<>();
         defaultProps = new Properties();
         setPropertiesPorDefecto();
