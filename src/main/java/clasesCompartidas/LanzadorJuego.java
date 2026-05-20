@@ -11,7 +11,12 @@ import java.awt.event.*;
 
 import com.entropyinteractive.*;
 import pong.Pong;
+<<<<<<< HEAD
 import spaceinvaders.SpaceInvaders;
+=======
+import lodeRunner.LodeRunner; //agregué
+
+>>>>>>> feature/loderunner-sistema
 
 public class LanzadorJuego extends JFrame implements ActionListener {
     private JGame juego;
@@ -33,7 +38,11 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         // Lista de juegos
         listaJuegos = new DefaultListModel<>();
         listaJuegos.addElement("Pong");
+<<<<<<< HEAD
         listaJuegos.addElement("SpaceInvaders");
+=======
+        listaJuegos.addElement("Lode Runner"); // <-- AGREGÉ ESTA LÍNEA
+>>>>>>> feature/loderunner-sistema
         listaJuegos.addElement("Counter-Strike");
         // Bottones
         botonConfig = new JButton("Configuración");
@@ -61,7 +70,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                         panelImg.add(new JPanelImage("/lemmings/portada_lemmings.png"));
                     } else if ("Pong".equals(selected)) {
                         panelImg.add(new JPanelImage("/pong/portada_pong.png"));
-                    }
+                    } 
                     panelImg.revalidate();
                     panelImg.repaint();
                 }
