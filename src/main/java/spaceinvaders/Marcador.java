@@ -1,7 +1,6 @@
 package spaceinvaders;
 
 import clasesCompartidas.ObjetoGrafico;
-
 import java.awt.*;
 
 class Marcador extends ObjetoGrafico {
@@ -13,8 +12,9 @@ class Marcador extends ObjetoGrafico {
         this.posicionY = posicionY;
     }
 
-    public void incrementarPuntaje() {
-        puntaje++;
+    // MODIFICADO: Ahora recibe los puntos específicos del enemigo destruido
+    public void incrementarPuntaje(int puntos) {
+        this.puntaje += puntos;
     }
 
     public void mostrar(Graphics2D g2) {
@@ -26,8 +26,8 @@ class Marcador extends ObjetoGrafico {
     public int getPuntaje() {
         return puntaje;
     }
+
     @Override
     public void update(double delta) {
     }
-
 }

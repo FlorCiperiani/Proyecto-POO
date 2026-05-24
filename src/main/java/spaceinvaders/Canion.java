@@ -1,16 +1,16 @@
 package spaceinvaders;
 
 import clasesCompartidas.ObjetoGrafico;
-import java.awt.Graphics2D;
+//import java.awt.Graphics2D;
 
 public class Canion extends ObjetoGrafico {
     private double velocidad = 300; // Píxeles por segundo
 
     public Canion(double x, double y) {
-        super();
+        super("/AssetsSpace/player.png");
         this.posicionX = x;
         this.posicionY = y;
-        // Si tienen una imagen, pueden usar: cargarImagen("ruta/canion.png");
+       
     }
 
     public void moverIzquierda(double delta) {

@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.Properties;
 import java.util.Map;
 
@@ -31,23 +31,45 @@ public class MenuConfigSpace extends Object implements ActionListener {
     private String rutaArchivo = "spaceinvaders.properties";
 
     public MenuConfigSpace() {
-        componentes = new HashMap<>();
-        defaultProps = new Properties();
-        setPropertiesPorDefecto();
-        
-        frame = new JFrame("Configuración - Space Invaders");
+
+        // ===== Frame =====
+        frame = new JFrame("Config Space Invaders");
         frame.setSize(400, 500);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
-        // Aquí armarías el panel visual con GridBagLayout o BoxLayot
-        // (Reutilizando la lógica estética que ya tenían con JPanelImage)
-        
-        inicializarComponentes();
-        cargarConfiguracion();
-        
         frame.setLocationRelativeTo(null);
+
+        // ===== PROPERTIES =====
+        defaultProps = new Properties();
+        componentes = new java.util.HashMap<>();
+
+        setPropertiesPorDefecto();
+
+        // ===== Panel principal con fondo =====
+        panelCompleto = new JPanel(new BorderLayout()) {
+            Image fondo = new ImageIcon(
+                MenuConfigSpace.class.getResource("/AssetsSpace/Galaxia.webp")
+            ).getImage();
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+
+        frame.setContentPane(panelCompleto);
+
+        // ===== Inicializar componentes =====
+        inicializarComponentes();
+
+        // ===== Cargar configuración existente =====
+        cargarConfiguracion();
+
+        // ===== Mostrar =====
         frame.setVisible(true);
     }
+
+
 
     private void setPropertiesPorDefecto() {
         defaultProps.setProperty("pantallaCompleta", "false");

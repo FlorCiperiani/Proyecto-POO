@@ -12,19 +12,25 @@ public abstract class ObjetoGrafico implements ObjetoMovible{
     protected  double posicionY = 0;
 
     public ObjetoGrafico(){}
-    public ObjetoGrafico(String filename) {
-        try {
-            imagen = ImageIO.read(getClass().getClassLoader().getResourceAsStream(filename));
-
-        } catch (IOException e) {
-            System.out.println("Excepción en ObjectoGrafico "+e);
+   public ObjetoGrafico(String filename) {
+    try {
+        InputStream is = getClass().getResourceAsStream(filename);
+        if (is == null) {
+            System.out.println("NO SE ENCONTRÓ: " + filename);
+        } else {
+            imagen = ImageIO.read(is);
         }
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
 
-    public int getAncho(){
-        return imagen.getWidth();
+    public int getAncho() {
+    return imagen != null ? imagen.getWidth() : 0;
     }
-    public int getAlto(){return imagen.getHeight();}
+    public int getAlto() {
+    return imagen != null ? imagen.getHeight() : 0;
+    }
 
     public void setPosicion(double x,double y){
         this.posicionX = x;

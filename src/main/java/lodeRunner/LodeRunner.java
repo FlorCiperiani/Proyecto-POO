@@ -43,7 +43,7 @@ public class LodeRunner extends JGame {
     @Override
     public void gameUpdate(double delta) {
         Keyboard teclado = this.getKeyboard();
-
+        /* 
         // Procesar las entradas del teclado para el jugador
         jugador.procesarEntrada(teclado, delta);
         jugador.update(delta);
@@ -56,7 +56,7 @@ public class LodeRunner extends JGame {
         // Si presionan ESCAPE, se cierra la ventana del juego y vuelve al lanzador
         if (teclado.isPressed(KeyEvent.VK_ESCAPE)) {
             stop();
-        }
+        }*/
     }
 
     @Override

@@ -2,12 +2,17 @@ package spaceinvaders;
 
 import clasesCompartidas.ObjetoGrafico;
 
-public class Enemigo extends ObjetoGrafico {
-    private double velocidadX = 100;
+public abstract class Enemigo extends ObjetoGrafico {
+    protected double velocidadX;
+    protected int puntos;
 
-    public Enemigo(double x, double y) {
+    public Enemigo(double x, double y, String rutaImagen, int puntos, double velocidadInicial) {
+        // Llama al constructor de ObjetoGrafico(String filename) que nos mostraste antes
+        super(rutaImagen); 
         this.posicionX = x;
         this.posicionY = y;
+        this.puntos = puntos;
+        this.velocidadX = velocidadInicial;
     }
 
     @Override
@@ -18,6 +23,18 @@ public class Enemigo extends ObjetoGrafico {
 
     public void invertirDireccionYBajar() {
         velocidadX = -velocidadX;
-        this.posicionY += 20; // Baja un escalón al tocar un borde
+        this.posicionY += 20; 
+    }
+
+    public int getPuntos() {
+        return this.puntos;
+    }
+    
+    public void setVelocidadX(double nuevaVelocidad) {
+        this.velocidadX = nuevaVelocidad;
+    }
+    
+    public double getVelocidadX() {
+        return this.velocidadX;
     }
 }

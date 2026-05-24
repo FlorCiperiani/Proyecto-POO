@@ -1,21 +1,16 @@
 package clasesCompartidas;
 
+import clasesCompartidas.JPanelImage;
 import pong.MenuConfig;
 import spaceinvaders.MenuConfigSpace;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import java.awt.event.*;
-
 import com.entropyinteractive.*;
 import pong.Pong;
-
 import spaceinvaders.SpaceInvaders;
-
-import lodeRunner.LodeRunner; 
-
 
 public class LanzadorJuego extends JFrame implements ActionListener {
     private JGame juego;
@@ -34,26 +29,26 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
 
-        // Lista de juegos
+        // 1. Lista de juegos (Fijate bien los nombres exactos)
         listaJuegos = new DefaultListModel<>();
         listaJuegos.addElement("Pong");
         listaJuegos.addElement("SpaceInvaders");
-        listaJuegos.addElement("Lode Runner");
+        listaJuegos.addElement("Lode Runner"); // Mantenemos el espacio
         listaJuegos.addElement("Counter-Strike");
-        // Bottones
+
+        // Botones
         botonConfig = new JButton("Configuración");
         botonConfig.addActionListener(this);
         botonIniciar = new JButton("Iniciar juego");
         botonIniciar.addActionListener(this);
 
-        // Añado los juegos a la barra de juegos
         juegos = new JList<>(listaJuegos);
         scrollPane = new JScrollPane(juegos);
         add(scrollPane, BorderLayout.WEST);
 
-        // Creo el panel de la imagen
         panelImg = new JPanel();
-        //Cargo las imagenes segun aprete los juegos de la lista 
+        
+        // Listener de la lista corregido en rutas y cadenas
         juegos.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -62,87 +57,84 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                     panelImg.removeAll();
                     panelImg.setLayout(new BorderLayout());
 
+                    // CORRECCIÓN DE RUTAS: Usar rutas de Classpath uniformes (con /)
                     if ("SpaceInvaders".equals(selected)) {
-                        panelImg.add(new JPanelImage("/lemmings/portada_lemmings.png"));
+                        // Cambiado de src\\main\\... a la ruta relativa del recurso empaquetado
+                        panelImg.add(new JPanelImage("/AssetsSpace/Galaxia.png"));
                     } else if ("Pong".equals(selected)) {
                         panelImg.add(new JPanelImage("/pong/portada_pong.png"));
-                    } else if ("LodeRunner".equals(selected)) {
-                        panelImg.add(new JPanelImage("/pong/portada_pong.png"));
+                    } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
+                        panelImg.add(new JPanelImage("/pong/portada_pong.png")); 
                     } 
+                    
                     panelImg.revalidate();
                     panelImg.repaint();
                 }
             }
         });
 
-        // Meto el panel al frame
         add(panelImg, BorderLayout.CENTER);
 
-        // Creo un panel para los botones
         JPanel panelBotones = new JPanel();
         panelBotones.add(botonIniciar);
         panelBotones.add(botonConfig);
 
-        // Unifico y agrego panel al frame
         add(panelBotones, BorderLayout.SOUTH);
         setVisible(true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == botonIniciar) {
-            // Agarra el valor del juego seleccionado en la barra
             String juegoSeleccionado = juegos.getSelectedValue();
             if (juegoSeleccionado == null) {
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "Error, seleccione un juego para jugar");
-            }else if ("Pong".equals(juegoSeleccionado)) {
+                return;
+            }
+
+            if ("Pong".equals(juegoSeleccionado)) {
                 juego = new Pong("Pong", 800, 600);
-                t = new Thread() {
-                    public void run() {
-                        juego.run(1.0 / 60.0);
-                    }
-                };
-                t.start();
+                iniciarHiloJuego();
             } else if ("SpaceInvaders".equals(juegoSeleccionado)) {
-                //Nuevo (modifique lo de adentro del else if por equals para mas mejor)
-                juego = new SpaceInvaders("SpaceInvaders",800,600);
-                t = new Thread() {
-                    public void run() {
-                        juego.run(1.0 / 60.0);
-                    }
-                };
-                t.start();
-            }else if ("LodeRunner".equals(juegoSeleccionado)) {
-                //Nuevo (modifique lo de adentro del else if por equals para mas mejor)
-                juego = new SpaceInvaders("Lode Runner",800,600);
-                t = new Thread() {
-                    public void run() {
-                        juego.run(1.0 / 60.0);
-                    }
-                };
-                t.start();} 
-            else if ("Counter-Strike".equals(juegoSeleccionado))
-            {
+                juego = new SpaceInvaders("SpaceInvaders", 800, 600);
+                iniciarHiloJuego();
+            } else if ("Lode Runner".equals(juegoSeleccionado)) { // CORREGIDO: Sincronizado con la lista
+                // Aquí deberías llamar a tu juego LodeRunner real cuando esté listo
+                JOptionPane.showMessageDialog(LanzadorJuego.this, "Lode Runner en desarrollo.");
+            } else if ("Counter-Strike".equals(juegoSeleccionado)) {
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "No somos tan buenos, todavia no sabemos hacer este");
             }
-            //Nuevo
         }
+        
         if (e.getSource() == botonConfig) {
-            // Agarra el valor del juego seleccionado en la barra
             String juegoSeleccionado = juegos.getSelectedValue();
             if (juegoSeleccionado == null) {
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "Error, seleccione un juego para configurar");
-            } else if (juegoSeleccionado.equals("SpaceInvaders") ) {
+                return;
+            } 
+            
+            if ("SpaceInvaders".equals(juegoSeleccionado)) {
                 new MenuConfigSpace();
-            } else if (juegoSeleccionado.equals("Pong") ) {
+            } else if ("Pong".equals(juegoSeleccionado)) {
                 new MenuConfig();
-            } else if (juegoSeleccionado.equals("Counter-Strike")) {
+            } else if ("Counter-Strike".equals(juegoSeleccionado)) {
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "Configuración en proceso... (Jugate otro juego)");
             }
         }
     }
 
+    // Método auxiliar para evitar repetir código de hilos repetidas veces
+    private void iniciarHiloJuego() {
+        t = new Thread() {
+            @Override
+            public void run() {
+                juego.run(1.0 / 60.0);
+            }
+        };
+        t.start();
+    }
+
     public static void main(String[] args) {
         new LanzadorJuego();
     }
-
 }
