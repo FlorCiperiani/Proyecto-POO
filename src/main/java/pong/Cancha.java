@@ -21,11 +21,11 @@ public class Cancha extends ObjetoGrafico {
         String ruta = "/pong/";
 
         switch (estilo) {
-            case "Futbol":
-                imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha-fondo.png")).getImage();
+            case "Disco":
+                imagenCancha = new ImageIcon(getClass().getResource(ruta + "fondoDisco.jpg")).getImage();
                 break;
-            case "Ciudad":
-                imagenCancha = new ImageIcon(getClass().getResource(ruta + "ciudad-fondo.jpg")).getImage();
+            case "Estrellas":
+                imagenCancha = new ImageIcon(getClass().getResource(ruta + "fondoEstrellas.avif")).getImage();
                 break;
             case "Original":
             default:
