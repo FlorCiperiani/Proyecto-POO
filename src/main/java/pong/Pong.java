@@ -95,33 +95,33 @@ public class Pong extends JGame {
         pelota.update(delta);
         // colisión con paleta izquierda
         if (pelota.colisiona(paletaIzquierda)) {
-            Sonido.reproducir("golpe_audio.wav");
+            Sonido.reproducir("colisionPelota.wav");
             pelota.setVelocidadX((Math.abs(pelota.getVelocidadX()))*1.15); // Rebota a la derecha y aumenta velocidad
         }
         // colisión con paleta derecha
         if (pelota.colisiona(paletaDerecha)) {
-            Sonido.reproducir("golpe_audio.wav");
+            Sonido.reproducir("colisionPelota.wav");
             pelota.setVelocidadX((-Math.abs(pelota.getVelocidadX()))*1.15); // Rebota a la izquierda y aumenta velocidad
         }
 
         // Colisión de pelota con la parte superior e inferior
         if (pelota.getY() <= 37) {
             // Toca el borde superior
-            Sonido.reproducir("golpe_audio.wav");
+            Sonido.reproducir("colisionPelota.wav");
             pelota.setY(37);
             pelota.invertirDireccionY();
         }
         // colision de pelota con parte inferior
         if (pelota.getY() + pelota.getAlto() >= getHeight()) {
             // Toca el borde inferior
-            Sonido.reproducir("golpe_audio.wav");
+            Sonido.reproducir("colisionPelota.wav");
             pelota.setY(getHeight() - pelota.getAlto()); // La pega al borde inferior
             pelota.invertirDireccionY();
         }
 
         // verificar si hubo gol
         if (arcoIzquierdo.detectaGol(pelota) || arcoDerecho.detectaGol(pelota)) {
-            Sonido.reproducir("gol_audio.wav");
+            Sonido.reproducir("gameOver.wav");
             esperandoReinicio = true;
             pelota.setVelocidadX(0); // La detenemos
             pelota.setVelocidadY(0);

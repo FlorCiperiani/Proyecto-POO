@@ -62,7 +62,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                         // Cambiado de src\\main\\... a la ruta relativa del recurso empaquetado
                         panelImg.add(new JPanelImage("/AssetsSpace/Galaxia.png"));
                     } else if ("Pong".equals(selected)) {
-                        panelImg.add(new JPanelImage("/pong/jugarPong.png"));
+                        panelImg.add(new JPanelImage("/pong/fondoP.jpg"));
                     } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
                         panelImg.add(new JPanelImage("/pong/portada_pong.png")); 
                     } 
