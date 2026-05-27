@@ -22,10 +22,10 @@ public class Cancha extends ObjetoGrafico {
 
         switch (estilo) {
             case "cancha 1":
-                imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha1.jpg")).getImage();
+                imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha1.png")).getImage();
                 break;
             case "Cancha 2":
-                imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha2.jpg")).getImage();
+                imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha2.png")).getImage();
                 break;
             case "Original":
             default:
