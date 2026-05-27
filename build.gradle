@@ -1,0 +1,38 @@
+plugins {
+	id "java"
+	id "application"
+}
+
+version = '0.1.0'
+mainClassName = 'clasesCompartidas.LanzadorJuego'
+
+// ── Versión de Java ──────────────────────────────────────────────────────────
+// bucleJuego.jar fue compilado con Java 25 (class file version 69).
+// Ambos valores deben coincidir con el JDK que tenés instalado.
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// El JAR del bucle de juego debe estar en src/main/resources/libs/
+	implementation fileTree(dir: 'src/main/resources/libs', include: '*.jar')
+}
+
+// Incluye los recursos (imágenes, sonidos) en el classpath al ejecutar
+sourceSets {
+	main {
+		resources {
+			srcDirs = ['src/main/resources']
+		}
+	}
+}
+
+// Para poder ejecutar con: ./gradlew run
+application {
+	mainClass = 'clasesCompartidas.LanzadorJuego'
+}
