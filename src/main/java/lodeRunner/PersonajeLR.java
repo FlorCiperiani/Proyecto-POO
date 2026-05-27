@@ -2,11 +2,6 @@ package lodeRunner;
 
 import clasesCompartidas.ObjetoGrafico;
 
-<<<<<<< HEAD
-public abstract class PersonajeLR extends ObjetoGrafico {
-    protected double velocidad;
-
-=======
 /**
  * Clase base para todos los personajes del juego (jugador y enemigos).
  * Gestiona movimiento, gravedad y consultas de colisión al mapa.
@@ -27,20 +22,12 @@ public abstract class PersonajeLR extends ObjetoGrafico {
 
     protected MapaLR mapa;
 
->>>>>>> Agregando-LodeRunner
     public PersonajeLR(String rutaRecurso, double x, double y, double velocidad) {
         super(rutaRecurso);
         setPosicion(x, y);
         this.velocidad = velocidad;
     }
 
-<<<<<<< HEAD
-    public void moverIzquierda(double delta) { posicionX -= velocidad * delta; }
-    public void moverDerecha(double delta) { posicionX += velocidad * delta; }
-    public void moverArriba(double delta) { posicionY -= velocidad * delta; }
-    public void moverAbajo(double delta) { posicionY += velocidad * delta; }
-}
-=======
     public void setMapa(MapaLR mapa) { this.mapa = mapa; }
 
     // ── Movimientos básicos ──────────────────────────────────────────────
@@ -311,4 +298,3 @@ public abstract class PersonajeLR extends ObjetoGrafico {
     public double  getX()        { return posicionX;  }
     public double  getY()        { return posicionY;  }
 }
->>>>>>> Agregando-LodeRunner

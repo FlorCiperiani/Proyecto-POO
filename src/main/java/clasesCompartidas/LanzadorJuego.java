@@ -1,6 +1,6 @@
 package clasesCompartidas;
 
-import clasesCompartidas.JPanelImage;
+//import clasesCompartidas.JPanelImage;
 import pong.MenuConfig;
 import spaceinvaders.MenuConfigSpace;
 import java.awt.*;

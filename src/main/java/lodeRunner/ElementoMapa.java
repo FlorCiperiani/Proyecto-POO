@@ -2,11 +2,6 @@ package lodeRunner;
 
 import clasesCompartidas.ObjetoGrafico;
 
-<<<<<<< HEAD
-public abstract class ElementoMapa extends ObjetoGrafico {
-    public ElementoMapa(String rutaRecurso, double x, double y) {
-        super(rutaRecurso); // Llama al constructor de ObjetoGrafico que busca en recursos
-=======
 /**
  * Clase base abstracta para todos los elementos del mapa (tiles).
  */
@@ -14,36 +9,10 @@ public abstract class ElementoMapa extends ObjetoGrafico {
 
     public ElementoMapa(String rutaRecurso, double x, double y) {
         super(rutaRecurso);
->>>>>>> Agregando-LodeRunner
         setPosicion(x, y);
     }
 }
 
-<<<<<<< HEAD
-// Bloque de ladrillo común (rompible)
-class Ladrillo extends ElementoMapa {
-    public Ladrillo(double x, double y) {
-        super("loderunner/ladrillo.png", x, y);
-    }
-    @Override
-    public void update(double delta) {}
-}
-
-// Bloque de piedra (indestructible)
-class Piedra extends ElementoMapa {
-    public Piedra(double x, double y) {
-        super("loderunner/piedra.png", x, y);
-    }
-    @Override
-    public void update(double delta) {}
-}
-
-// Escalera para trepar
-class Escalera extends ElementoMapa {
-    public Escalera(double x, double y) {
-        super("loderunner/escalera.png", x, y);
-    }
-=======
 // ─── Ladrillo (rompible) ───────────────────────────────────────────────────
 class Ladrillo extends ElementoMapa {
     private boolean roto = false;
@@ -165,30 +134,10 @@ class Escalera extends ElementoMapa {
         }
     }
 
->>>>>>> Agregando-LodeRunner
     @Override
     public void update(double delta) {}
 }
 
-<<<<<<< HEAD
-// Barra de mono / cuerda para colgarse
-class Barra extends ElementoMapa {
-    public Barra(double x, double y) {
-        super("loderunner/barra.png", x, y);
-    }
-    @Override
-    public void update(double delta) {}
-}
-
-// El oro que el jugador debe recolectar
-class Oro extends ElementoMapa {
-    public Oro(double x, double y) {
-        super("loderunner/oro.png", x, y);
-    }
-    @Override
-    public void update(double delta) {}
-}
-=======
 // ─── Barra horizontal ─────────────────────────────────────────────────────
 class Barra extends ElementoMapa {
     public Barra(double x, double y) {
@@ -223,4 +172,3 @@ class Oro extends ElementoMapa {
 
     @Override public void update(double delta) {}
 }
->>>>>>> Agregando-LodeRunner
