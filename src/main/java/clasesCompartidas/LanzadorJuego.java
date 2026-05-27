@@ -60,11 +60,13 @@ public class LanzadorJuego extends JFrame implements ActionListener {
 
                     // CORRECCIÓN DE RUTAS: Usar rutas de Classpath uniformes (con /)
                     if ("SpaceInvaders".equals(selected)) {
+                        // Cambiado de src\\main\\... a la ruta relativa del recurso empaquetado
                         panelImg.add(new JPanelImage("/AssetsSpace/Galaxia.png"));
                     } else if ("Pong".equals(selected)) {
                         panelImg.add(new JPanelImage("/pong/portada_pong.png"));
-                    } else if ("Lode Runner".equals(selected)) {
+                    } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
                         panelImg.add(new JPanelImage("/lodeRunner/portada_loderunner.png"));
+                        panelImg.add(new JPanelImage("/pong/fondoP.jpg"));
                     } 
                     
                     panelImg.revalidate();
@@ -101,9 +103,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
             } else if ("Lode Runner".equals(juegoSeleccionado)) {
                 juego = new LodeRunner("Lode Runner", 800, 600);
                 iniciarHiloJuego();
-            } else if ("Counter-Strike".equals(juegoSeleccionado)) {
-                JOptionPane.showMessageDialog(LanzadorJuego.this, "No somos tan buenos, todavia no sabemos hacer este");
-            }
+            } 
         }
         
         if (e.getSource() == botonConfig) {
@@ -117,8 +117,8 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                 new MenuConfigSpace();
             } else if ("Pong".equals(juegoSeleccionado)) {
                 new MenuConfig();
-            } else if ("Counter-Strike".equals(juegoSeleccionado)) {
-                JOptionPane.showMessageDialog(LanzadorJuego.this, "Configuración en proceso... (Jugate otro juego)");
+            } else if ("Lode Runner".equals(juegoSeleccionado)) {
+            
             }
         }
     }
