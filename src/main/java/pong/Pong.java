@@ -37,6 +37,7 @@ public class Pong extends JGame {
     private final int ESTADO_GANADOR = 3;
     private final int ESTADO_PAUSA = 4;
     private String ganador;
+    private boolean contraBot = false;
 
     public Pong(String title, int width, int height) {
         super(title, width, height);
@@ -66,9 +67,11 @@ public class Pong extends JGame {
         }
 
         if (estado == ESTADO_MENU) {
-           if (key.isKeyPressed(KeyEvent.VK_2)) {
-                iniciarJuego2Jugadores();
-           }
+            if (key.isKeyPressed(KeyEvent.VK_1)) {
+                iniciarJuego(true);
+            } else if (key.isKeyPressed(KeyEvent.VK_2)) {
+                iniciarJuego(false);
+            }
         }
 
         if (estado != ESTADO_JUEGO) {
@@ -95,33 +98,33 @@ public class Pong extends JGame {
         pelota.update(delta);
         // colisión con paleta izquierda
         if (pelota.colisiona(paletaIzquierda)) {
-            Sonido.reproducir("golpe_audio.wav");
+            Sonido.reproducir("colisionPelota.wav");
             pelota.setVelocidadX((Math.abs(pelota.getVelocidadX()))*1.15); // Rebota a la derecha y aumenta velocidad
         }
         // colisión con paleta derecha
         if (pelota.colisiona(paletaDerecha)) {
-            Sonido.reproducir("golpe_audio.wav");
+            Sonido.reproducir("colisionPelota.wav");
             pelota.setVelocidadX((-Math.abs(pelota.getVelocidadX()))*1.15); // Rebota a la izquierda y aumenta velocidad
         }
 
         // Colisión de pelota con la parte superior e inferior
         if (pelota.getY() <= 37) {
             // Toca el borde superior
-            Sonido.reproducir("golpe_audio.wav");
+            Sonido.reproducir("colisionPelota.wav");
             pelota.setY(37);
             pelota.invertirDireccionY();
         }
         // colision de pelota con parte inferior
         if (pelota.getY() + pelota.getAlto() >= getHeight()) {
             // Toca el borde inferior
-            Sonido.reproducir("golpe_audio.wav");
+            Sonido.reproducir("colisionPelota.wav");
             pelota.setY(getHeight() - pelota.getAlto()); // La pega al borde inferior
             pelota.invertirDireccionY();
         }
 
         // verificar si hubo gol
         if (arcoIzquierdo.detectaGol(pelota) || arcoDerecho.detectaGol(pelota)) {
-            Sonido.reproducir("gol_audio.wav");
+            Sonido.reproducir("gameOver.wav");
             esperandoReinicio = true;
             pelota.setVelocidadX(0); // La detenemos
             pelota.setVelocidadY(0);
@@ -144,9 +147,11 @@ public class Pong extends JGame {
         if (estado == ESTADO_MENU) {
             dibuje.setColor(Color.WHITE);
             dibuje.setFont(new Font("SansSerif", Font.BOLD, 32));
-            dibuje.drawString("2 Jugadores", 312, 300);
+            dibuje.drawString("1 Jugador", 312, 280);
+            dibuje.drawString("2 Jugadores", 312, 340);
             dibuje.setFont(new Font("SansSerif", Font.BOLD, 16));
-            dibuje.drawString("Presione 2", 366, 325);
+            dibuje.drawString("Presione 1", 366, 305);
+            dibuje.drawString("Presione 2", 366, 365);
         } else if (estado == ESTADO_JUEGO || estado == ESTADO_PAUSA) {
             // Agrego un if por si se produce un error la cancha quedara negra (default)
             if (cancha != null) {
@@ -165,7 +170,7 @@ public class Pong extends JGame {
             dibuje.setFont(new Font("SansSerif", Font.BOLD, 25));
             dibuje.drawString("El ganador es: ", 200, 200);
             if (arcoIzquierdo.getMarcador().getPuntaje() == 10) {
-                ganador = "Jugador 2";
+                ganador = contraBot ? "CPU" : "Jugador 2";
             } else {
                 ganador = "Jugador 1";
             }
@@ -179,7 +184,8 @@ public class Pong extends JGame {
     public void gameShutdown() {
     }
 
-    private void iniciarJuego2Jugadores() {
+    private void iniciarJuego(boolean conBot) {
+            contraBot = conBot;
             estado = ESTADO_JUEGO;
             cancha = new Cancha();
             pelota = new Pelota(10, 400, 300, 250, 250);
@@ -192,19 +198,6 @@ public class Pong extends JGame {
             MenuConfig.cargarEnArchivo(appProperties2, rutaArchivo2);
             // Leer propiedades de teclas, cancha, pista musical
             try {
-                // Leo propiedades
-                // Seteo si la pantalla sera en ventana o completa
-                /*
-                boolean pantallaCompleta = Boolean.parseBoolean(appProperties2.getProperty("fullScreen", "true"));
-                boolean ventana = Boolean.parseBoolean(appProperties2.getProperty("fullScreen", "true")); // valor por defecto
-                if (pantallaCompleta) {
-                    appProperties2.setProperty("fullScreen", "true");
-                    MenuConfig.guardarEnArchivo(appProperties2,rutaArchivo2);
-                } else if (ventana) {
-                    appProperties2.setProperty("fullScreen", "false");
-                    MenuConfig.guardarEnArchivo(appProperties2,rutaArchivo2);
-                }*/
-
                 String t1Arriba = appProperties.getProperty("movArriba1", "W");
                 String t1Abajo = appProperties.getProperty("movAbajo1", "S");
                 String t2Arriba = appProperties.getProperty("movArriba2", "\u2191");
@@ -228,7 +221,11 @@ public class Pong extends JGame {
                 e.printStackTrace();
             }
             paletaIzquierda = new Paleta(10, 90, 30, 270, teclado, teclaArribaJ1, teclaAbajoJ1);
-            paletaDerecha = new Paleta(10, 90, 760, 270, teclado, teclaArribaJ2, teclaAbajoJ2);
+            if (conBot) {
+                paletaDerecha = new BotPaleta(10, 90, 760, 270, pelota);
+            } else {
+                paletaDerecha = new Paleta(10, 90, 760, 270, teclado, teclaArribaJ2, teclaAbajoJ2);
+            }
             arcoIzquierdo = new Arco(0, true);
             arcoDerecho = new Arco(getWidth(), false);
             // Leo las propiedades y seteo estilos
