@@ -2,25 +2,102 @@ package lodeRunner;
 
 import com.entropyinteractive.JGame;
 import com.entropyinteractive.Keyboard;
-<<<<<<< HEAD
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 
-public class LodeRunner extends JGame {
-=======
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 /**
- * Clase principal del juego Lode Runner.
- *
- * Por ahora solo hay UN nivel activo para mantener el código simple
- * mientras se define el diseño final.
+ * Juego Lode Runner – versión base funcional
  */
 public class LodeRunner extends JGame {
+
+    // ================== NIVEL ==================
+    private static final int[][] NIVEL_1 = {
+        {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
+        {2,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
+        {2,0,5,0,0,0,0,0,0,0,0,0,5,3,0,0,0,0,0,0,0,0,0,0,5,0,0,2},
+        {2,1,1,1,1,3,0,0,0,0,1,1,1,3,3,1,0,0,0,1,1,1,1,1,1,3,0,2},
+        {2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,3,0,2},
+        {2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2}
+    };
+
+    // ================== COMPONENTES ==================
+    private MapaLR mapa;
+    private JugadorLR jugador;
+    private ArrayList<EnemigoLR> enemigos;
+
+    // ================== ESTADO ==================
+    private boolean gameOver = false;
+
+    // ================== CONSTRUCTOR ==================
+    public LodeRunner(String titulo, int ancho, int alto) {
+        super(titulo, ancho, alto);
+    }
+
+    // ================== CICLO JGAME ==================
+    @Override
+    public void gameStartup() {
+        inicializarNivel();
+    }
+
+    @Override
+    public void gameUpdate(double delta) {
+        Keyboard teclado = getKeyboard();
+
+        if (teclado.isKeyPressed(KeyEvent.VK_ESCAPE)) {
+            stop();
+            return;
+        }
+
+        if (gameOver) return;
+
+        jugador.procesarEntrada(teclado, delta);
+        jugador.update(delta);
+
+        for (EnemigoLR e : enemigos) {
+            e.update(delta);
+        }
+    }
+
+    @Override
+    public void gameDraw(Graphics2D g2) {
+        g2.setColor(Color.BLACK);
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        if (mapa != null) mapa.dibujar(g2);
+        if (jugador != null) jugador.mostrar(g2);
+        if (enemigos != null) {
+            for (EnemigoLR e : enemigos) {
+                e.mostrar(g2);
+            }
+        }
+    }
+
+    @Override
+    public void gameShutdown() {
+        // limpieza si hiciera falta
+    }
+
+    // ================== INICIALIZACIÓN ==================
+    private void inicializarNivel() {
+        mapa = new MapaLR(NIVEL_1);
+        jugador = new JugadorLR(64, 64);
+        jugador.setMapa(mapa);
+
+        enemigos = new ArrayList<>();
+        EnemigoLR enemigo = new EnemigoLR(256, 64);
+        enemigo.setMapa(mapa);
+        enemigo.setObjetivo(jugador);
+        enemigos.add(enemigo);
+
+        gameOver = false;
+    }
+}
+
+
+/*public class LodeRunner extends JGame {
 
     // ── Diseño del único nivel activo ────────────────────────────────────
     // Grilla 28 columnas × 16 filas, igual que el Lode Runner original
@@ -53,14 +130,14 @@ public class LodeRunner extends JGame {
     };
 
     // ── Componentes ──────────────────────────────────────────────────────
->>>>>>> Agregando-LodeRunner
+
     private MapaLR mapa;
     private JugadorLR jugador;
     private ArrayList<EnemigoLR> enemigos;
 
-<<<<<<< HEAD
+
     // El constructor que llama tu LanzadorJuego
-=======
+
     // ── Escala y offset para ajustar el mapa a la ventana ────────────────
     private double escala  = 1.0;
     private int    offsetX = 0;
@@ -78,12 +155,12 @@ public class LodeRunner extends JGame {
 
     private int puntajeTotal = 0;
 
->>>>>>> Agregando-LodeRunner
+
     public LodeRunner(String titulo, int ancho, int alto) {
         super(titulo, ancho, alto);
     }
 
-<<<<<<< HEAD
+    /* 
     @Override
     public void gameStartup() {
         // Matriz de prueba para el Nivel 1: 
@@ -105,19 +182,19 @@ public class LodeRunner extends JGame {
         jugador = new JugadorLR(64, 64);
         enemigos = new ArrayList<>();
         enemigos.add(new EnemigoLR(250, 64));
-=======
+        */
     // ── Ciclo JGame ──────────────────────────────────────────────────────
 
     @Override
     public void gameStartup() {
         inicializarNivel();
->>>>>>> Agregando-LodeRunner
+
     }
 
     @Override
     public void gameUpdate(double delta) {
         Keyboard teclado = this.getKeyboard();
-<<<<<<< HEAD
+
         /* 
         // Procesar las entradas del teclado para el jugador
         jugador.procesarEntrada(teclado, delta);
@@ -132,7 +209,7 @@ public class LodeRunner extends JGame {
         if (teclado.isPressed(KeyEvent.VK_ESCAPE)) {
             stop();
         }*/
-=======
+
 
         if (teclado.isKeyPressed(KeyEvent.VK_ESCAPE)) { stop(); return; }
 
@@ -200,12 +277,12 @@ public class LodeRunner extends JGame {
             jugador.ganarVida();
             victoria = true;
         }
->>>>>>> Agregando-LodeRunner
+
     }
 
     @Override
     public void gameDraw(Graphics2D g2) {
-<<<<<<< HEAD
+
         // Pintamos el fondo de negro para que resalten los bloques
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, getWidth(), getHeight());
@@ -232,8 +309,8 @@ public class LodeRunner extends JGame {
     public void gameShutdown() {
         // Código de limpieza si llegan a usar recursos del sistema pesados
     }
-}
-=======
+
+
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, getWidth(), getHeight());
 
@@ -350,5 +427,4 @@ public class LodeRunner extends JGame {
         int ws = g2.getFontMetrics().stringWidth(sub);
         g2.drawString(sub, (getWidth() - ws) / 2, getHeight() / 2 + 30);
     }
-}
->>>>>>> Agregando-LodeRunner
+}*/
