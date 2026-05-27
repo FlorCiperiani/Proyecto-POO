@@ -11,6 +11,10 @@ import java.awt.event.*;
 import com.entropyinteractive.*;
 import pong.Pong;
 import spaceinvaders.SpaceInvaders;
+<<<<<<< HEAD
+=======
+import lodeRunner.LodeRunner;
+>>>>>>> Agregando-LodeRunner
 
 public class LanzadorJuego extends JFrame implements ActionListener {
     private JGame juego;
@@ -62,9 +66,16 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                         // Cambiado de src\\main\\... a la ruta relativa del recurso empaquetado
                         panelImg.add(new JPanelImage("/AssetsSpace/Galaxia.png"));
                     } else if ("Pong".equals(selected)) {
+<<<<<<< HEAD
                         panelImg.add(new JPanelImage("/pong/fondoP.png"));
                     } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
                         panelImg.add(new JPanelImage("/pong/portada_pong.png")); 
+=======
+                        panelImg.add(new JPanelImage("/pong/portada_pong.png"));
+                    } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
+                        panelImg.add(new JPanelImage("/lodeRunner/portada_loderunner.png"));
+                        panelImg.add(new JPanelImage("/pong/fondoP.jpg"));
+>>>>>>> Agregando-LodeRunner
                     } 
                     
                     panelImg.revalidate();
@@ -98,12 +109,19 @@ public class LanzadorJuego extends JFrame implements ActionListener {
             } else if ("SpaceInvaders".equals(juegoSeleccionado)) {
                 juego = new SpaceInvaders("SpaceInvaders", 800, 600);
                 iniciarHiloJuego();
+<<<<<<< HEAD
             } else if ("Lode Runner".equals(juegoSeleccionado)) { // CORREGIDO: Sincronizado con la lista
                 // Aquí deberías llamar a tu juego LodeRunner real cuando esté listo
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "Lode Runner en desarrollo.");
             } else if ("Counter-Strike".equals(juegoSeleccionado)) {
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "No somos tan buenos, todavia no sabemos hacer este");
             }
+=======
+            } else if ("Lode Runner".equals(juegoSeleccionado)) {
+                juego = new LodeRunner("Lode Runner", 800, 600);
+                iniciarHiloJuego();
+            } 
+>>>>>>> Agregando-LodeRunner
         }
         
         if (e.getSource() == botonConfig) {
@@ -117,8 +135,13 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                 new MenuConfigSpace();
             } else if ("Pong".equals(juegoSeleccionado)) {
                 new MenuConfig();
+<<<<<<< HEAD
             } else if ("Counter-Strike".equals(juegoSeleccionado)) {
                 JOptionPane.showMessageDialog(LanzadorJuego.this, "Configuración en proceso... (Jugate otro juego)");
+=======
+            } else if ("Lode Runner".equals(juegoSeleccionado)) {
+            
+>>>>>>> Agregando-LodeRunner
             }
         }
     }

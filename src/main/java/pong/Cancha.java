@@ -21,11 +21,19 @@ public class Cancha extends ObjetoGrafico {
         String ruta = "/pong/";
 
         switch (estilo) {
+<<<<<<< HEAD
             case "cancha 1":
                 imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha1.png")).getImage();
                 break;
             case "Cancha 2":
                 imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha2.png")).getImage();
+=======
+            case "Futbol":
+                imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha-fondo.png")).getImage();
+                break;
+            case "Ciudad":
+                imagenCancha = new ImageIcon(getClass().getResource(ruta + "ciudad-fondo.jpg")).getImage();
+>>>>>>> Agregando-LodeRunner
                 break;
             case "Original":
             default:

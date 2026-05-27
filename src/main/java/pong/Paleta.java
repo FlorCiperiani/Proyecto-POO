@@ -36,6 +36,11 @@ public class Paleta extends ObjetoGrafico{
 
     @Override
     public void update(double delta) {
+<<<<<<< HEAD
+=======
+        // Controles para jugador izquierdo (W/S)
+
+>>>>>>> Agregando-LodeRunner
         // Limitar movimiento de la paleta dentro de la ventana
         if (posicionY < 37) {
             posicionY = 37;
@@ -44,6 +49,7 @@ public class Paleta extends ObjetoGrafico{
             posicionY = 600 - alto;
         }
 
+<<<<<<< HEAD
         if (keyboard != null) {
             if (posicionX < 400) {
                 if (keyboard.isKeyPressed(teclaArriba)) {
@@ -65,6 +71,27 @@ public class Paleta extends ObjetoGrafico{
                 } else {
                     setVelocidad(0);
                 }
+=======
+        if (posicionX < 400) {
+            if (keyboard.isKeyPressed(teclaArriba)) {
+                setVelocidad(-400);
+            } else if (keyboard.isKeyPressed(teclaAbajo)) {
+                setVelocidad(400);
+            } else {
+                setVelocidad(0);
+            }
+
+        }
+
+        // Controles para jugador derecho (Arriba/Abajo)
+        if (posicionX > 400) {
+            if (keyboard.isKeyPressed(teclaArriba)) {
+                setVelocidad(-400);
+            } else if (keyboard.isKeyPressed(teclaAbajo)) {
+                setVelocidad(400);
+            } else {
+                setVelocidad(0);
+>>>>>>> Agregando-LodeRunner
             }
         }
 
