@@ -239,13 +239,11 @@ public class JugadorLR extends PersonajeLR {
                 break;
             }
 
-            case ESTADO_BARRA: {
-                double periodo = 1.0 / FPS_BARRA;
-                tiempoAnim = tiempoAnim % periodo;
-                frameAnim  = (int)(tiempoAnim / (periodo / 2)) % 2;
-                imagen = (frameAnim == 0) ? imgBarraA : imgBarraB;
+            case ESTADO_BARRA:
+                // A = mirando izquierda (último botón fue ←)
+                // B = mirando derecha   (último botón fue →)
+                imagen = (ultimaDireccionCavar < 0) ? imgBarraA : imgBarraB;
                 break;
-            }
 
             default: // ESTADO_SUELO
                 // Sin animación: pose estática según dirección
