@@ -185,7 +185,7 @@ public class LodeRunner extends JGame {
         */
     // ── Ciclo JGame ──────────────────────────────────────────────────────
 
-    @Override
+   /*  @Override
     public void gameStartup() {
         inicializarNivel();
 
@@ -210,7 +210,7 @@ public class LodeRunner extends JGame {
             stop();
         }*/
 
-
+/* 
         if (teclado.isKeyPressed(KeyEvent.VK_ESCAPE)) { stop(); return; }
 
         if (gameOver) {
@@ -427,4 +427,5 @@ public class LodeRunner extends JGame {
         int ws = g2.getFontMetrics().stringWidth(sub);
         g2.drawString(sub, (getWidth() - ws) / 2, getHeight() / 2 + 30);
     }
-}*/
+}
+ */
