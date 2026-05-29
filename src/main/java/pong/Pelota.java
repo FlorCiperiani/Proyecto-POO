@@ -35,19 +35,11 @@ class Pelota extends ObjetoGrafico {
         String ruta = "/pong/";
 
         switch (estilo) {
-<<<<<<< HEAD
             case "Planeta":
                 imagenPelota = new ImageIcon(getClass().getResource(ruta + "planeta-tierra.png")).getImage();
                 break;
             case "Disco":
                 imagenPelota = new ImageIcon(getClass().getResource(ruta + "bola-de-disco.png")).getImage();
-=======
-            case "Futbol":
-                imagenPelota = new ImageIcon(getClass().getResource(ruta + "SoccerBall.png")).getImage();
-                break;
-            case "Basquet":
-                imagenPelota = new ImageIcon(getClass().getResource(ruta + "Basketball.png")).getImage();
->>>>>>> Agregando-LodeRunner
                 break;
             case "Original":
             default:

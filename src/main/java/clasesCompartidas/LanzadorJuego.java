@@ -66,11 +66,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                     } else if ("Pong".equals(selected)) {
                         panelImg.add(new JPanelImage("/pong/fondoP.png"));
                     } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
-                        panelImg.add(new JPanelImage("/pong/portada_pong.png")); 
-                        panelImg.add(new JPanelImage("/pong/portada_pong.png"));
-                    } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
                         panelImg.add(new JPanelImage("/lodeRunner/portada_loderunner.png"));
-                        panelImg.add(new JPanelImage("/pong/fondoP.jpg"));
                     } 
                     
                     panelImg.revalidate();
