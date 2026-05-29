@@ -44,7 +44,7 @@ public class MenuConfig implements ActionListener {
 
         // Crear el panel principal del menú de configuración con fondo de imagen
         panelCompleto = new JPanel(new BorderLayout()) {
-            Image pongFondo = new ImageIcon(getClass().getResource("/pong/menuConf.png")).getImage();
+            Image pongFondo = new ImageIcon(getClass().getResource("/pong/fondoConfig.jpg")).getImage();
 
             @Override
             protected void paintComponent(Graphics g) {
@@ -69,7 +69,7 @@ public class MenuConfig implements ActionListener {
         movArriba1 = new JTextField("W", 5);
         movAbajo1 = new JTextField("S", 5);
         pistaMusical = new JComboBox<>(new String[] { "pong_cancion.wav", "homero.wav", "undertale.wav" });
-        pelota = new JComboBox<>(new String[] { "Original", "Disco", "Estrellas"});
+        pelota = new JComboBox<>(new String[] { "Original", "Disco", "Planeta"});
         paleta = new JComboBox<>(new String[] { "Original", "Paleta azul", "Paleta roja"});
         cancha = new JComboBox<>(new String[] { "Original", "Cancha 1", "Cancha 2"});
         reset = new JButton("Restablecer");
