@@ -36,7 +36,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         listaJuegos.addElement("Pong");
         listaJuegos.addElement("SpaceInvaders");
         listaJuegos.addElement("Lode Runner"); // Mantenemos el espacio
-        listaJuegos.addElement("Counter-Strike");
+
 
         // Botones
         botonConfig = new JButton("Configuración");
@@ -45,8 +45,35 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         botonIniciar.addActionListener(this);
 
         juegos = new JList<>(listaJuegos);
+        juegos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        juegos.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        juegos.setVisibleRowCount(1);
+        juegos.setFixedCellWidth(140);
+        juegos.setFixedCellHeight(140);
+        juegos.setPreferredSize(new Dimension(listaJuegos.size() * 150, 140));
+        juegos.setCellRenderer(new IconListRenderer());
+        juegos.setOpaque(false);
+
         scrollPane = new JScrollPane(juegos);
-        add(scrollPane, BorderLayout.WEST);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(null);
+        scrollPane.setPreferredSize(new Dimension(listaJuegos.size() * 150, 150));
+
+        JPanel cardsWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        cardsWrapper.setBackground(Color.white);
+        cardsWrapper.add(scrollPane);
+
+        JLabel pregunta = new JLabel("¿Qué quieres jugar?", SwingConstants.CENTER);
+        pregunta.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        pregunta.setForeground(Color.black);
+
+        JPanel norte = new JPanel(new BorderLayout());
+        norte.setBackground(Color.white);
+        norte.add(pregunta, BorderLayout.NORTH);
+        norte.add(cardsWrapper, BorderLayout.CENTER);
+
+        add(norte, BorderLayout.NORTH);
 
         panelImg = new JPanel();
         
@@ -62,11 +89,11 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                     // CORRECCIÓN DE RUTAS: Usar rutas de Classpath uniformes (con /)
                     if ("SpaceInvaders".equals(selected)) {
                         // Cambiado de src\\main\\... a la ruta relativa del recurso empaquetado
-                        panelImg.add(new JPanelImage("/AssetsSpace/Galaxia.png"));
+                        panelImg.add(new JPanelImage("/assetsLanzador/portadaSpaceInvaders.png"));
                     } else if ("Pong".equals(selected)) {
-                        panelImg.add(new JPanelImage("/pong/fondoP.png"));
+                        panelImg.add(new JPanelImage("/assetsLanzador/portadaPong.png"));
                     } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
-                        panelImg.add(new JPanelImage("/lodeRunner/portada_loderunner.png"));
+                        panelImg.add(new JPanelImage("/assetsLanzador/portadaLR.png")); 
                     } 
                     
                     panelImg.revalidate();
@@ -83,6 +110,48 @@ public class LanzadorJuego extends JFrame implements ActionListener {
 
         add(panelBotones, BorderLayout.SOUTH);
         setVisible(true);
+    }
+
+    // Renderizador simple: icono arriba, texto abajo (estilo perfiles)
+    private class IconListRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.setOpaque(true);
+            panel.setBackground(isSelected ? Color.DARK_GRAY : list.getBackground());
+
+            String nombre = value == null ? "" : value.toString();
+            ImageIcon ico = getIconForGame(nombre);
+            JLabel iconLabel = new JLabel();
+            if (ico != null) iconLabel.setIcon(ico);
+            iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+            JLabel text = new JLabel(nombre, SwingConstants.CENTER);
+            text.setForeground(isSelected ? Color.YELLOW : Color.WHITE);
+
+            panel.add(iconLabel, BorderLayout.CENTER);
+            panel.add(text, BorderLayout.SOUTH);
+            panel.setBorder(BorderFactory.createEmptyBorder(6,8,6,8));
+            return panel;
+        }
+    }
+
+    // Carga y escala ícono desde recursos empaquetados
+    private ImageIcon getIconForGame(String nombre) {
+        String ruta = null;
+        if ("Pong".equals(nombre)) ruta = "/assetsLanzador/gato.png";
+        else if ("SpaceInvaders".equals(nombre)) ruta = "/assetsLanzador/hombre-lobo.png";
+        else if ("Lode Runner".equals(nombre)) ruta = "/assetsLanzador/oso.png";
+        
+
+        try {
+            java.net.URL url = getClass().getResource(ruta);
+            if (url == null) return null;
+            Image img = new ImageIcon(url).getImage().getScaledInstance(96, 96, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
