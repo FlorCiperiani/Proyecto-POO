@@ -55,15 +55,13 @@ public class JugadorLR extends PersonajeLR {
     private int teclaRomperIzq = KeyEvent.VK_Z;
     private int teclaRomperDer = KeyEvent.VK_X;
 
-    // Última dirección no-cero para saber hacia dónde cavar
-    private int ultimaDireccionCavar = -1; // arranca mirando a la izquierda como el original
+    // Última dirección no-cero: se usa para cavar, sprite de barra y pose general.
+    // Mantiene el último valor -1 o +1 aunque se suelten las teclas.
+    private int ultimaDireccion = -1; // arranca mirando izquierda como el original
 
     // Anti-repetición de teclas de excavación
     private boolean teclaZAnterior = false;
     private boolean teclaXAnterior = false;
-
-    // Última dirección horizontal para mantener la pose cuando se suelta la tecla
-    private int ultimaDireccion = 0; // -1 izq, 0 neutral, +1 der
 
     // Animación: tiempo acumulado, frame actual y estado previo
     private double tiempoAnim   = 0.0;
@@ -111,15 +109,11 @@ public class JugadorLR extends PersonajeLR {
 
         // Actualizar última dirección para la pose y para cavar
         if (presIzq && !presDer) {
-            ultimaDireccion      = -1;
-            ultimaDireccionCavar = -1;
+            ultimaDireccion = -1;
         } else if (presDer && !presIzq) {
-            ultimaDireccion      = +1;
-            ultimaDireccionCavar = +1;
-        } else if (!presIzq && !presDer) {
-            ultimaDireccion = 0;
-            // ultimaDireccionCavar mantiene el último valor no-cero
+            ultimaDireccion = +1;
         }
+        // Si no hay tecla horizontal, ultimaDireccion mantiene el último valor no-cero
 
         // Movimiento (bloqueado durante caída libre y si está en hoyo)
         moviendoVertical = false;
@@ -135,12 +129,12 @@ public class JugadorLR extends PersonajeLR {
         //   → último fue RIGHT  => agujero a la DERECHA
         //   → último fue LEFT   => agujero a la IZQUIERDA
         boolean zActual = teclado.isKeyPressed(teclaRomperIzq);
-        if (zActual && !teclaZAnterior) romperLadrillo(ultimaDireccionCavar);
+        if (zActual && !teclaZAnterior) romperLadrillo(ultimaDireccion);
         teclaZAnterior = zActual;
 
-        // X también cava pero en la dirección CONTRARIA (opcional, compatible NES)
+        // X cava en la dirección contraria
         boolean xActual = teclado.isKeyPressed(teclaRomperDer);
-        if (xActual && !teclaXAnterior) romperLadrillo(-ultimaDireccionCavar);
+        if (xActual && !teclaXAnterior) romperLadrillo(-ultimaDireccion);
         teclaXAnterior = xActual;
 
         aplicarGravedad(delta);
@@ -179,19 +173,59 @@ public class JugadorLR extends PersonajeLR {
 
     // ── Recolección de oro ───────────────────────────────────────────────
 
+    // ── Texto flotante al recoger oro ───────────────────────────────────
+    private final java.util.List<float[]> textosPuntos = new java.util.ArrayList<>();
+    // Cada entrada: {x, y, tiempoRestante} en píxeles del mapa
+
     private void recolectarOro() {
         if (mapa == null) return;
-        int col  = (int)(posicionX + getAncho() / 2.0) / TILE_SIZE;
-        int fila = (int)(posicionY + getAlto() / 2.0)  / TILE_SIZE;
+        int filaTorso = (int)(posicionY + getAlto() / 2.0) / TILE_SIZE;
+        int filaPies  = (int)(posicionY + getAlto())       / TILE_SIZE;
+        int colIzq    = (int)(posicionX)                   / TILE_SIZE;
+        int colDer    = (int)(posicionX + getAncho() - 1)  / TILE_SIZE;
 
-        ElementoMapa tile = mapa.getTileEn(col, fila);
-        if (tile instanceof Oro) {
-            Oro oro = (Oro) tile;
-            if (!oro.isRecolectado()) {
-                oro.recolectar();
-                oroRecolectado++;
-                puntos += 100;
+        // Verificar tanto la fila del torso como la de los pies.
+        // El oro puede estar en la misma fila que el suelo sobre el que camina
+        // el personaje (ej: ladrillos en fila=9 con oro también en fila=9),
+        // en cuyo caso filaTorso apunta a fila=8 y nunca detectaría el oro.
+        for (int fila : new int[]{filaTorso, filaPies}) {
+            for (int col = colIzq; col <= colDer; col++) {
+                ElementoMapa tile = mapa.getTileEn(col, fila);
+                if (tile instanceof Oro) {
+                    Oro oro = (Oro) tile;
+                    if (!oro.isRecolectado()) {
+                        oro.recolectar();
+                        oroRecolectado++;
+                        puntos += 100;
+                        textosPuntos.add(new float[]{
+                            col * MapaLR.TILE_SIZE + MapaLR.TILE_SIZE / 2f,
+                            fila * MapaLR.TILE_SIZE,
+                            0.8f
+                        });
+                    }
+                }
             }
+        }
+    }
+
+    /** Dibujar y actualizar los textos flotantes "+100". Llamar desde mostrar(). */
+    public void dibujarTextosPuntos(java.awt.Graphics2D g2, double delta) {
+        java.util.Iterator<float[]> it = textosPuntos.iterator();
+        while (it.hasNext()) {
+            float[] t = it.next();
+            t[2] -= (float) delta;
+            if (t[2] <= 0) { it.remove(); continue; }
+            // Subir el texto a medida que pasa el tiempo
+            float alpha  = Math.min(1f, t[2] / 0.4f);   // fade out en los últimos 0.4s
+            float drawY  = t[1] - (0.8f - t[2]) * 24f;  // sube 24px durante 0.8s
+            java.awt.AlphaComposite ac = java.awt.AlphaComposite.getInstance(
+                java.awt.AlphaComposite.SRC_OVER, alpha);
+            java.awt.Composite anterior = g2.getComposite();
+            g2.setComposite(ac);
+            g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 10));
+            g2.setColor(java.awt.Color.YELLOW);
+            g2.drawString("+100", t[0] - 10, drawY);
+            g2.setComposite(anterior);
         }
     }
 
@@ -240,13 +274,10 @@ public class JugadorLR extends PersonajeLR {
             }
 
             case ESTADO_BARRA:
-                // A = mirando izquierda (último botón fue ←)
-                // B = mirando derecha   (último botón fue →)
-                imagen = (ultimaDireccionCavar < 0) ? imgBarraA : imgBarraB;
+                imagen = (ultimaDireccion < 0) ? imgBarraA : imgBarraB;
                 break;
 
             default: // ESTADO_SUELO
-                // Sin animación: pose estática según dirección
                 if (ultimaDireccion == -1 && imgIzquierda != null) {
                     imagen = imgIzquierda;
                 } else if (ultimaDireccion == +1 && imgDerecha != null) {

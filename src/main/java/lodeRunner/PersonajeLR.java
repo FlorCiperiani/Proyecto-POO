@@ -45,30 +45,50 @@ public abstract class PersonajeLR extends ObjetoGrafico {
     }
 
     public void moverArriba(double delta) {
-        if (!enEscalera) return;
-        double nuevaY = posicionY - velocidad * delta;
+        // El personaje tiene ancho = 1 tile (32px). Cuando está parado sobre el
+        // ladrillo adyacente a la escalera, colIzq == colDer == colCentro, por lo
+        // que verificar "los bordes" no ayuda. La solución es buscar escalera en
+        // las columnas VECINAS al centro: centro-1, centro, centro+1.
+        int colCentro = (int)(posicionX + getAncho() / 2.0) / TILE_SIZE;
+        int filaPies  = (int)(posicionY + getAlto())        / TILE_SIZE;
+        int filaCuerpoActual = (int)(posicionY + getAlto() / 2.0) / TILE_SIZE;
 
-        int col     = (int)(posicionX + getAncho() / 2.0) / TILE_SIZE;
-        int filaCab = (int)(nuevaY) / TILE_SIZE;
-        ElementoMapa tileArriba = (filaCab >= 0) ? mapa.getTileEn(col, filaCab) : null;
+        // Columna de la escalera a usar (puede ser distinta al centro del personaje)
+        int colEscalera = -1;
+
+        if (enEscalera) {
+            colEscalera = colCentro;
+        } else {
+            // Buscar escalera en las tres columnas vecinas
+            for (int dc : new int[]{0, -1, 1}) {
+                int c = colCentro + dc;
+                if (mapa.getTileEn(c, filaPies)          instanceof Escalera ||
+                    mapa.getTileEn(c, filaCuerpoActual)  instanceof Escalera) {
+                    colEscalera = c;
+                    break;
+                }
+            }
+        }
+
+        if (colEscalera < 0) return;  // no hay escalera accesible
+
+        // Snap horizontal: centrar al personaje en la columna de la escalera
+        if (colEscalera != colCentro) {
+            posicionX = colEscalera * (double) TILE_SIZE;
+        }
+
+        double nuevaY   = posicionY - velocidad * delta;
+        int    filaCab  = (int)(nuevaY) / TILE_SIZE;
+        ElementoMapa tileArriba = (filaCab >= 0) ? mapa.getTileEn(colEscalera, filaCab) : null;
 
         if (esSolido(tileArriba)) {
-            // Sólido arriba: bloquear, snap al borde superior del tile actual
             int filaActual = (int)(posicionY) / TILE_SIZE;
-            double tope    = filaActual * (double) TILE_SIZE;
-            if (nuevaY < tope) nuevaY = tope;
+            if (nuevaY < filaActual * (double) TILE_SIZE) nuevaY = filaActual * (double) TILE_SIZE;
         } else {
-            // Verificar si el TORSO salió del tile de escalera en la nueva posición.
-            // Si es así, snap exacto: pies alineados con el borde superior del tope.
-            // Esto evita que el personaje quede flotando más arriba de la plataforma.
+            // Si el torso salió del tile de escalera: snap al tope
             int filaCuerpoNueva = (int)(nuevaY + getAlto() / 2.0) / TILE_SIZE;
-            boolean torsoEnEscalera = mapa.getTileEn(col, filaCuerpoNueva) instanceof Escalera;
-            if (!torsoEnEscalera) {
-                // El torso salió del tile de escalera: buscar el tope y hacer snap
-                // posicionY snap = fila_tope * TILE - alto
-                // El tope es la fila donde está el tile de escalera más alto que el personaje
-                int filaTope = filaCuerpoNueva + 1; // la fila inmediatamente debajo del torso
-                double snapY = filaTope * (double) TILE_SIZE - getAlto();
+            if (!(mapa.getTileEn(colEscalera, filaCuerpoNueva) instanceof Escalera)) {
+                double snapY = (filaCuerpoNueva + 1) * (double) TILE_SIZE - getAlto();
                 if (nuevaY < snapY) nuevaY = snapY;
             }
         }

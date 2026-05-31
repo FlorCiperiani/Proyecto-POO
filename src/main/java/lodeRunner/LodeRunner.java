@@ -9,62 +9,45 @@ import java.util.ArrayList;
 /**
  * Clase principal del juego Lode Runner.
  *
- * Por ahora solo hay UN nivel activo para mantener el código simple
- * mientras se define el diseño final.
+ * Gestiona el ciclo de juego, el HUD y la progresión entre niveles.
+ * El diseño de cada nivel está en su propia clase (NivelLR1, NivelLR2, NivelLR3...).
+ * Para agregar un nivel: crear NivelLRN extends NivelLR y añadirlo al array NIVELES.
  */
 public class LodeRunner extends JGame {
 
-    // ── Diseño del único nivel activo ────────────────────────────────────
-    // Grilla 28 columnas × 16 filas, igual que el Lode Runner original
-    // 0=Aire  1=Ladrillo  2=Piedra  3=Escalera  4=Barra  5=Oro  6=EscaleraOculta
-
-    private static final int[][] NIVEL_1 = {
-    //   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
-        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // 0  piedra + esc.oculta col13
-        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2}, // 1  escalera de escape col13
-        {2, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 2}, // 2  escalera + oro
-        {2, 1, 1, 1, 1, 3, 0, 0, 0, 0, 1, 1, 1, 3, 3, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 3, 0, 2}, // 3  plataformas; col5,13,14,25=tope escalera
-        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2}, // 4
-        {2, 0, 0, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0, 0, 3, 0, 4, 4, 4, 4, 4, 4, 4, 0, 0, 3, 0, 2}, // 5  barras
-        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2}, // 6
-        {2, 0, 1, 1, 1, 1, 1, 3, 0, 0, 1, 1, 1, 1, 3, 0, 0, 3, 1, 1, 1, 1, 1, 0, 0, 3, 0, 2}, // 7  col7,14,17=tope escalera
-        {2, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 0, 5, 0, 0, 3, 0, 2}, // 8
-        {2, 5, 0, 0, 4, 4, 4, 3, 4, 4, 4, 0, 0, 0, 3, 4, 4, 3, 4, 4, 0, 0, 1, 1, 0, 3, 5, 2}, // 9  barras + escaleras
-        {2, 1, 1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 1, 2}, // 10
-        {2, 0, 0, 0, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, 3, 0, 0, 3, 0, 0, 5, 0, 0, 0, 0, 1, 1, 2}, // 11
-        {2, 0, 1, 1, 1, 3, 0, 3, 1, 1, 1, 1, 1, 1, 3, 1, 0, 3, 1, 1, 1, 3, 0, 0, 0, 0, 0, 2}, // 12 col5,7,14,17,21=tope escalera
-        {2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 2}, // 13
-        {2, 0, 0, 5, 0, 3, 0, 0, 0, 0, 5, 0, 0, 5, 3, 0, 0, 0, 0, 0, 0, 3, 0, 5, 0, 0, 0, 2}, // 14
-        {2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // 15 suelo
-    };
-
-    // Spawn del jugador y enemigos para el nivel 1
-    private static final int[] SPAWN_JUGADOR   = {2, 14};   // col, fila
-    private static final int[][] SPAWN_ENEMIGOS = {
-        {22, 2}, {8, 4}
+    // ── Niveles disponibles (agregar aquí para expandir) ─────────────────
+    private static final NivelLR[] NIVELES = {
+        new NivelLR1(),
+        new NivelLR2(),
+        new NivelLR3(),
     };
 
     // ── Componentes ──────────────────────────────────────────────────────
-    private MapaLR mapa;
-    private JugadorLR jugador;
+    private MapaLR       mapa;
+    private JugadorLR    jugador;
     private ArrayList<EnemigoLR> enemigos;
+    private NivelLR      nivelActual;
+    private int          indiceNivel = 0;
 
-    // ── Escala y offset para ajustar el mapa a la ventana ────────────────
+    // ── Escala y offset ──────────────────────────────────────────────────
     private double escala  = 1.0;
     private int    offsetX = 0;
     private int    offsetY = 0;
     private static final int HUD_ALTO = 30;
 
-    // ── Estado ───────────────────────────────────────────────────────────
+    // ── Estado de juego ──────────────────────────────────────────────────
     private boolean victoria     = false;
     private boolean derrota      = false;
     private boolean gameOver     = false;
     private boolean escaleraList = false;
+    private boolean juegoCompletado = false;
 
     private double tiempoNivel  = 0;
+    private double ultimoDelta  = 0;   // para pasar a dibujarTextosPuntos
     private static final double TIEMPO_MAXIMO = 180.0;
 
     private int puntajeTotal = 0;
+    private int vidasGuardadas = 5;   // vidas que se llevan al siguiente nivel
 
     public LodeRunner(String titulo, int ancho, int alto) {
         super(titulo, ancho, alto);
@@ -74,40 +57,71 @@ public class LodeRunner extends JGame {
 
     @Override
     public void gameStartup() {
+        indiceNivel = 0;
+        puntajeTotal = 0;
         inicializarNivel();
     }
 
     @Override
     public void gameUpdate(double delta) {
         Keyboard teclado = this.getKeyboard();
-
         if (teclado.isKeyPressed(KeyEvent.VK_ESCAPE)) { stop(); return; }
 
+        // ── Atajo de desarrollo: N → siguiente nivel ──────────────────────
+        if (teclado.isKeyPressed(KeyEvent.VK_N)) {
+            vidasGuardadas = jugador != null ? jugador.getVidas() : 5;
+            puntajeTotal  += jugador != null ? jugador.getPuntos() : 0;
+            indiceNivel    = (indiceNivel + 1) % NIVELES.length;
+            inicializarNivel();
+            return;
+        }
+
+
+        if (juegoCompletado) {
+            if (teclado.isKeyPressed(KeyEvent.VK_ENTER)) {
+                indiceNivel  = 0;
+                puntajeTotal = 0;
+                juegoCompletado = false;
+                inicializarNivel();
+            }
+            return;
+        }
+
+        // ── Game Over ─────────────────────────────────────────────────────
         if (gameOver) {
             if (teclado.isKeyPressed(KeyEvent.VK_ENTER)) {
+                indiceNivel  = 0;
                 puntajeTotal = 0;
                 inicializarNivel();
             }
             return;
         }
 
+        // ── Victoria / Derrota ────────────────────────────────────────────
         if (victoria || derrota) {
             if (teclado.isKeyPressed(KeyEvent.VK_ENTER)) {
                 if (victoria) {
-                    // Por ahora solo hay 1 nivel: reiniciar
-                    puntajeTotal += jugador.getPuntos();
-                    inicializarNivel();
+                    // Avanzar al siguiente nivel
+                    puntajeTotal  += jugador.getPuntos();
+                    vidasGuardadas = jugador.getVidas();
+                    indiceNivel++;
+                    if (indiceNivel >= NIVELES.length) {
+                        juegoCompletado = true;
+                    } else {
+                        inicializarNivel();
+                    }
                 } else {
-                    int vidasRestantes = jugador.getVidas();
+                    // Reintentar mismo nivel con las vidas actuales
+                    vidasGuardadas = jugador.getVidas();
                     inicializarNivel();
-                    while (jugador.getVidas() > vidasRestantes) jugador.perderVida();
-                    while (jugador.getVidas() < vidasRestantes) jugador.ganarVida();
                 }
             }
             return;
         }
 
+        // ── Update normal ─────────────────────────────────────────────────
         tiempoNivel += delta;
+        ultimoDelta  = delta;
 
         jugador.procesarEntrada(teclado, delta, escala);
         mapa.update(delta);
@@ -118,13 +132,11 @@ public class LodeRunner extends JGame {
         }
 
         for (EnemigoLR e : enemigos) {
-            if (jugador.colisionaCon(e)) {
-                if (!jugador.estaPisandoCabeza(e)) {
-                    jugador.perderVida();
-                    if (jugador.getVidas() <= 0) gameOver = true;
-                    else                          derrota  = true;
-                    return;
-                }
+            if (jugador.colisionaCon(e) && !jugador.estaPisandoCabeza(e)) {
+                jugador.perderVida();
+                if (jugador.getVidas() <= 0) gameOver = true;
+                else                          derrota  = true;
+                return;
             }
             if (e.isEnHoyo()) jugador.sumarPuntos(200);
         }
@@ -141,7 +153,16 @@ public class LodeRunner extends JGame {
             mapa.revelarEscaleraOculta(jugador.getX());
         }
 
-        if (escaleraList && mapa.jugadorEscapo(jugador.getY())) {
+        // Victoria:
+        // - Si el nivel tiene escalera oculta (tile 6): necesita escaleraList=true
+        //   (haber recogido todo el oro) para que la escalera esté revelada.
+        // - Si no tiene escalera oculta (escalera visible desde el inicio):
+        //   basta con llegar al extremo superior (posicionY < TILE_SIZE).
+        boolean condicionEscape = mapa.tieneEscaleraOculta()
+                ? (escaleraList && mapa.jugadorEscapo(jugador.getY()))
+                : mapa.jugadorEscapo(jugador.getY());
+
+        if (condicionEscape) {
             int tiempoSobrante = (int) Math.max(0, TIEMPO_MAXIMO - tiempoNivel);
             jugador.sumarPuntos(500 + tiempoSobrante * 10);
             jugador.ganarVida();
@@ -162,23 +183,29 @@ public class LodeRunner extends JGame {
         gMapa.translate(offsetX, offsetY + HUD_ALTO);
         gMapa.scale(escala, escala);
 
-        if (mapa    != null) mapa.dibujar(gMapa);
-        if (jugador != null) jugador.mostrar(gMapa);
+        if (mapa     != null) mapa.dibujar(gMapa);
+        if (jugador  != null) jugador.mostrar(gMapa);
         if (enemigos != null) for (EnemigoLR e : enemigos) e.mostrar(gMapa);
+        if (jugador  != null) jugador.dibujarTextosPuntos(gMapa, ultimoDelta);
 
         gMapa.dispose();
 
         dibujarHUD(g2);
 
-        if (gameOver)      dibujarMensajeCentral(g2, "GAME OVER — ENTER para reiniciar", Color.RED);
-        else if (victoria) dibujarMensajeCentral(g2, "¡NIVEL SUPERADO! ENTER para reiniciar", Color.GREEN);
-        else if (derrota)  dibujarMensajeCentral(g2, "¡ATRAPADO!  Vidas: " + jugador.getVidas() + "  ENTER para reintentar", Color.ORANGE);
+        if (juegoCompletado)
+            dibujarMensajeCentral(g2, "¡JUEGO COMPLETADO! — ENTER para reiniciar", new Color(255, 215, 0));
+        else if (gameOver)
+            dibujarMensajeCentral(g2, "GAME OVER — ENTER para reiniciar", Color.RED);
+        else if (victoria)
+            dibujarMensajeCentral(g2, "¡NIVEL SUPERADO! — ENTER para continuar", Color.GREEN);
+        else if (derrota)
+            dibujarMensajeCentral(g2, "¡ATRAPADO! Vidas: " + jugador.getVidas() + " — ENTER para reintentar", Color.ORANGE);
     }
 
     @Override
     public void gameShutdown() {}
 
-    // ── Inicialización ───────────────────────────────────────────────────
+    // ── Inicialización de nivel ───────────────────────────────────────────
 
     private void inicializarNivel() {
         victoria     = false;
@@ -186,36 +213,42 @@ public class LodeRunner extends JGame {
         escaleraList = false;
         tiempoNivel  = 0;
 
-        mapa    = new MapaLR(NIVEL_1);
+        nivelActual  = NIVELES[indiceNivel];
+        int[][] diseño = nivelActual.getDiseño();
+
+        mapa = new MapaLR(diseño);
+
+        int[] spawnJ = nivelActual.getSpawnJugador();
         jugador = new JugadorLR(
-            MapaLR.TILE_SIZE * SPAWN_JUGADOR[0],
-            MapaLR.TILE_SIZE * SPAWN_JUGADOR[1]
+            MapaLR.TILE_SIZE * spawnJ[0],
+            MapaLR.TILE_SIZE * spawnJ[1]
         );
         jugador.setMapa(mapa);
 
+        // Restaurar vidas del nivel anterior (se pierden al morir, no al cambiar nivel)
+        while (jugador.getVidas() > vidasGuardadas) jugador.perderVida();
+        while (jugador.getVidas() < vidasGuardadas) jugador.ganarVida();
+
         enemigos = new ArrayList<>();
-        for (int[] s : SPAWN_ENEMIGOS) {
+        for (int[] s : nivelActual.getSpawnEnemigos()) {
             EnemigoLR e = new EnemigoLR(MapaLR.TILE_SIZE * s[0], MapaLR.TILE_SIZE * s[1]);
             e.setMapa(mapa);
             e.setObjetivo(jugador);
             enemigos.add(e);
         }
 
-        calcularEscala(NIVEL_1);
+        calcularEscala(diseño);
     }
 
-    private void calcularEscala(int[][] diseno) {
-        int mapaPixelesAncho = diseno[0].length * MapaLR.TILE_SIZE;
-        int mapaPixelesAlto  = diseno.length    * MapaLR.TILE_SIZE;
-        int ventanaAncho     = getWidth();
-        int ventanaAlto      = getHeight() - HUD_ALTO;
+    private void calcularEscala(int[][] diseño) {
+        int mapaW = diseño[0].length * MapaLR.TILE_SIZE;
+        int mapaH = diseño.length    * MapaLR.TILE_SIZE;
+        int venW  = getWidth();
+        int venH  = getHeight() - HUD_ALTO;
 
-        double escalaX = (double) ventanaAncho / mapaPixelesAncho;
-        double escalaY = (double) ventanaAlto  / mapaPixelesAlto;
-        escala = Math.min(escalaX, escalaY);
-
-        offsetX = (int)((ventanaAncho - mapaPixelesAncho * escala) / 2);
-        offsetY = (int)((ventanaAlto  - mapaPixelesAlto  * escala) / 2);
+        escala  = Math.min((double) venW / mapaW, (double) venH / mapaH);
+        offsetX = (int)((venW - mapaW * escala) / 2);
+        offsetY = (int)((venH - mapaH * escala) / 2);
     }
 
     // ── HUD ──────────────────────────────────────────────────────────────
@@ -226,26 +259,37 @@ public class LodeRunner extends JGame {
 
         g2.setFont(new Font("Arial", Font.BOLD, 14));
 
+        // Vidas
         g2.setColor(Color.RED);
-        g2.drawString("♥ x" + jugador.getVidas(), 8, 20);
+        g2.drawString("♥ x" + (jugador != null ? jugador.getVidas() : 0), 8, 20);
 
+        // Número de nivel
         g2.setColor(new Color(100, 200, 255));
-        g2.drawString("NIVEL 1", 80, 20);
+        String lvl = "NIVEL " + (nivelActual != null ? nivelActual.getNumero() : 1)
+                   + " / " + NIVELES.length;
+        g2.drawString(lvl, 70, 20);
 
-        g2.setColor(Color.YELLOW);
-        String oro = "ORO: " + jugador.getOroRecolectado() + "/" + mapa.getOroTotal();
-        int wOro = g2.getFontMetrics().stringWidth(oro);
-        g2.drawString(oro, (getWidth() - wOro) / 2, 20);
+        // Oro
+        if (mapa != null && jugador != null) {
+            g2.setColor(Color.YELLOW);
+            String oro = "ORO: " + jugador.getOroRecolectado() + "/" + mapa.getOroTotal();
+            int wOro = g2.getFontMetrics().stringWidth(oro);
+            g2.drawString(oro, (getWidth() - wOro) / 2, 20);
+        }
 
+        // Tiempo
         int tRestante = (int) Math.max(0, TIEMPO_MAXIMO - tiempoNivel);
         g2.setColor(tRestante < 30 ? Color.RED : Color.LIGHT_GRAY);
         g2.drawString(String.format("%02d:%02d", tRestante / 60, tRestante % 60),
                       getWidth() - 160, 20);
 
+        // Puntos
         g2.setColor(Color.WHITE);
-        g2.drawString("PTS: " + (puntajeTotal + jugador.getPuntos()), getWidth() - 90, 20);
+        int pts = puntajeTotal + (jugador != null ? jugador.getPuntos() : 0);
+        g2.drawString("PTS: " + pts, getWidth() - 90, 20);
 
-        if (escaleraList) {
+        // Indicador de escape
+        if (escaleraList && !victoria) {
             g2.setColor(Color.GREEN);
             int wS = g2.getFontMetrics().stringWidth("▲ ¡SUBE!");
             g2.drawString("▲ ¡SUBE!", (getWidth() - wS) / 2 + 80, 20);

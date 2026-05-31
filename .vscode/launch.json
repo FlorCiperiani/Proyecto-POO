@@ -6,6 +6,16 @@
     "configurations": [
         {
             "type": "java",
+<<<<<<< HEAD
+            "name": "LanzadorJuego",
+            "request": "launch",
+            "mainClass": "clasesCompartidas.LanzadorJuego",
+            "projectName": "Proyecto-POO"
+        },
+        {
+            "type": "java",
+=======
+>>>>>>> origin/main
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

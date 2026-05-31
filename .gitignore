@@ -17,10 +17,6 @@ defaultPong.properties
 .mtj.tmp/
 
 # Package Files #
-<<<<<<< HEAD
-*.jar
-=======
->>>>>>> Agregando-LodeRunner
 *.war
 *.nar
 *.ear

@@ -124,9 +124,16 @@ public class MapaLR {
         grilla[fila][col] = esc;
     }
 
-    public boolean isEscaleraVisible() { return escaleraVisible; }
+    /** True si el diseño del nivel tiene un tile tipo 6 (escalera oculta). */
+    public boolean tieneEscaleraOculta() { return colEscaleraOculta >= 0; }
 
-    public boolean jugadorEscapo(double jugadorY) { return jugadorY <= 0; }
+    public boolean jugadorEscapo(double jugadorY) {
+        // El personaje escapa cuando su posicionY (borde superior) llega a fila=0.
+        // Usamos < TILE_SIZE en vez de <= 0 porque el snap de moverArriba
+        // detiene al personaje exactamente en y=0 (borde del mapa) y nunca
+        // llega a valores negativos.
+        return jugadorY < TILE_SIZE;
+    }
 
     // ── Acceso a tiles ──────────────────────────────────────────────────
 
