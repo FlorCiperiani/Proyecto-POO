@@ -1,0 +1,7 @@
+{
+<<<<<<< HEAD
+=======
+    "java.configuration.updateBuildConfiguration": "interactive",
+>>>>>>> Agregando-LodeRunner
+    "java.debug.settings.onBuildFailureProceed": true
+}
