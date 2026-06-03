@@ -13,14 +13,13 @@ public class Proyectil extends ObjetoGrafico {
     private static final int ANCHO = 4;
     private static final int ALTO = 10;
 
-    private boolean disparoJugador; // Reemplaza o añade esta variable
+    private boolean disparoJugador; 
 
     public Proyectil(double x, double y, boolean esJugador) {
         super(); 
         this.posicionX = x;
         this.posicionY = y;
         this.disparoJugador = esJugador;
-        // Si es jugador va hacia arriba (-400), si es enemigo va hacia abajo (400)
         this.velocidadY = esJugador ? -400 : 400; 
         this.activo = true;
     }
@@ -43,12 +42,10 @@ public class Proyectil extends ObjetoGrafico {
             g2.fillRect((int) posicionX, (int) posicionY, ANCHO, ALTO);
         } else {
             g2.setColor(Color.RED); // Bala del enemigo: Roja
-            // La hacemos un poquito diferente (ej: tipo misil cuadrado de 6x8)
             g2.fillRect((int) posicionX - 1, (int) posicionY, 6, 8); 
         }
     }
 
-    // 👉 Importante para colisiones y límites
     @Override
     public int getAncho() {
         return ANCHO;
@@ -67,7 +64,6 @@ public class Proyectil extends ObjetoGrafico {
         activo = false;
     }
      
-    // Método puente para recibir cualquier objeto gráfico (Enemigo, NaveNodriza, etc)
     public boolean colisionaCon(ObjetoGrafico otro) {
     if (otro == null) return false;
 
@@ -75,5 +71,5 @@ public class Proyectil extends ObjetoGrafico {
            posicionX + getAncho() > otro.getX() &&
            posicionY < otro.getY() + otro.getAlto() &&
            posicionY + getAlto() > otro.getY();
-}
+    }
 }

@@ -12,7 +12,6 @@ class Marcador extends ObjetoGrafico {
         this.posicionY = posicionY;
     }
 
-    // MODIFICADO: Ahora recibe los puntos específicos del enemigo destruido
     public void incrementarPuntaje(int puntos) {
         this.puntaje += puntos;
     }

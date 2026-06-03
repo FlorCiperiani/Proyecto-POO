@@ -14,28 +14,26 @@ public class Escudo extends ObjetoGrafico {
     private boolean[][] matriz;
 
     public Escudo(double x, double y) {
-        super(); // No carga ninguna imagen de la clase padre
+        super();
         this.posicionX = x;
         this.posicionY = y;
         this.matriz = new boolean[FILAS][COLUMNAS];
         inicializarFormaBunker();
     }
 
-    // Rellena la matriz dándole la forma clásica de herradura/bunker
+    // Rellena la matriz
     private void inicializarFormaBunker() {
         for (int f = 0; f < FILAS; f++) {
             for (int c = 0; c < COLUMNAS; c++) {
                 // Por defecto todo es sólido
                 matriz[f][c] = true;
 
-                // 1. Cortar las esquinas superiores para hacerlo redondeado
                 if (f < 6) {
                     if (c < 6 - f || c >= COLUMNAS - (6 - f)) {
                         matriz[f][c] = false;
                     }
                 }
 
-                // 2. Cavar el túnel/arco de la parte inferior central
                 if (f >= 18) {
                     if (c >= 12 && c < COLUMNAS - 12) {
                         matriz[f][c] = false;
@@ -47,8 +45,7 @@ public class Escudo extends ObjetoGrafico {
 
     @Override
     public void mostrar(Graphics2D g2) {
-        g2.setColor(Color.GREEN); // Color clásico de los escudos
-
+        g2.setColor(Color.GREEN);
         // Recorremos la matriz para dibujar solo los píxeles que siguen vivos
         for (int f = 0; f < FILAS; f++) {
             for (int c = 0; c < COLUMNAS; c++) {
@@ -61,47 +58,59 @@ public class Escudo extends ObjetoGrafico {
         }
     }
 
-    /**
-     * Verifica si un proyectil impactó en algún píxel activo.
-     * Si impacta, destruye un área pequeña alrededor del choque y devuelve true.
-     */
-    public boolean verificarImpactoYDegradar(ObjetoGrafico proyectil) {
-        // Obtenemos el área rectangular del proyectil
+    /*
+     Verifica si un proyectil impactó en algún píxel activo.
+     Si impacta, destruye un área pequeña alrededor del choque y devuelve true.
+    */
+   public boolean verificarImpactoYDegradar(Proyectil proyectil) {
+
         int pX = (int) proyectil.getX();
         int pY = (int) proyectil.getY();
         int pAncho = proyectil.getAncho();
         int pAlto = proyectil.getAlto();
 
-        // Calculamos los límites del escudo en píxeles reales de la pantalla
         int escX = (int) this.posicionX;
         int escY = (int) this.posicionY;
-        int escAncho = COLUMNAS * TAMANIO_PIXEL;
-        int escAlto = FILAS * TAMANIO_PIXEL;
 
-        // Primero, una comprobación rápida de cajas (AABB) para ver si la bala toca el escudo general
-        if (pX < escX + escAncho && pX + pAncho > escX && pY < escY + escAlto && pY + pAlto > escY) {
-            
-            // Si tocó el escudo, buscamos qué píxeles específicos de la matriz se solapan con la bala
+        // 🔹 Elegimos el orden según QUIÉN disparó
+        if (proyectil.isDisparoJugador()) {
+
+            // DISPARO DEL JUGADOR → buscar desde ABAJO
+            for (int f = FILAS - 1; f >= 0; f--) {
+                for (int c = 0; c < COLUMNAS; c++) {
+                    if (impactaPixel(pX, pY, pAncho, pAlto, escX, escY, f, c)) {
+                        crearCrater(f, c);
+                        return true;
+                    }
+                }
+            }
+
+        } else {
+
+            // DISPARO ENEMIGO → buscar desde ARRIBA
             for (int f = 0; f < FILAS; f++) {
                 for (int c = 0; c < COLUMNAS; c++) {
-                    if (matriz[f][c]) {
-                        // Coordenadas absolutas de este píxel individual en la pantalla
-                        int pixelX = escX + (c * TAMANIO_PIXEL);
-                        int pixelY = escY + (f * TAMANIO_PIXEL);
-
-                        // Si la bala intersecta este píxel individual... ¡Hay colisión real!
-                        if (pX < pixelX + TAMANIO_PIXEL && pX + pAncho > pixelX &&
-                            pY < pixelY + TAMANIO_PIXEL && pY + pAlto > pixelY) {
-                            
-                            // Degradar: Borramos el píxel del impacto y un pequeño radio alrededor (cráter de explosión)
-                            crearCrater(f, c);
-                            return true; // El proyectil colisionó con éxito
-                        }
+                    if (impactaPixel(pX, pY, pAncho, pAlto, escX, escY, f, c)) {
+                        crearCrater(f, c);
+                        return true;
                     }
                 }
             }
         }
+
         return false;
+    }
+    private boolean impactaPixel(int pX, int pY, int pAncho, int pAlto, int escX, int escY, int f, int c) {
+
+    if (!matriz[f][c]) return false;
+
+    int pixelX = escX + c * TAMANIO_PIXEL;
+    int pixelY = escY + f * TAMANIO_PIXEL;
+
+    return pX < pixelX + TAMANIO_PIXEL &&
+           pX + pAncho > pixelX &&
+           pY < pixelY + TAMANIO_PIXEL &&
+           pY + pAlto > pixelY;
     }
 
     // Borra píxeles vecinos para simular un hueco de explosión circular realista

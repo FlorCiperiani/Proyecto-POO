@@ -15,17 +15,16 @@ public class Canion extends ObjetoGrafico {
 
     public void moverIzquierda(double delta) {
         this.posicionX -= velocidad * delta;
-        if (this.posicionX < 0) this.posicionX = 0; // Límite de pantalla izquierdo
+        if (this.posicionX < 0) this.posicionX = 0; 
     }
 
     public void moverDerecha(double delta, int anchoPantalla) {
         this.posicionX += velocidad * delta;
-        // Ajustar restando el ancho del cañón para que no salga
         if (this.posicionX > anchoPantalla - 50) this.posicionX = anchoPantalla - 50; 
     }
 
     @Override
     public void update(double delta) {
-        // Lógica de actualización continua si fuera necesaria
+       
     }
 }

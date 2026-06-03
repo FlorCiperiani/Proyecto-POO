@@ -9,7 +9,6 @@ public class Galaxia extends ObjetoGrafico {
     private String estilo = "Original";
 
     public Galaxia() {
-        // Cargamos la imagen por defecto en la variable 'imagen' heredada de ObjetoGrafico
         super("/AssetsSpace/Galaxia.png");
         this.posicionX = 0;
         this.posicionY = 0;
@@ -19,11 +18,11 @@ public class Galaxia extends ObjetoGrafico {
         this.estilo = estilo;
         String ruta = "/AssetsSpace/";
 
-        /*try {
+        try {
             switch (estilo) {
-                case "Futbol":
+                case "Oceano":
                     // Reutilizamos setImagen() heredado de ObjetoGrafico
-                    setImagen(ImageIO.read(getClass().getResourceAsStream(ruta + "cancha-fondo.png")));
+                    setImagen(ImageIO.read(getClass().getResourceAsStream(ruta + "Oceano.png")));
                     break;
                 case "Ciudad":
                     setImagen(ImageIO.read(getClass().getResourceAsStream(ruta + "ciudad-fondo.jpg")));
@@ -36,12 +35,10 @@ public class Galaxia extends ObjetoGrafico {
         } catch (IOException | NullPointerException e) {
             System.out.println("No se pudo cargar el fondo de estilo: " + estilo + ". Se usará el fondo negro.");
             setImagen(null); // Si falla en encontrar la imagen de la carpeta, la deja en null
-        }*/
+        }
     }
 
-    // Cambiamos el comportamiento de mostrar para que use la variable 'imagen' del padre
     public void mostrar(Graphics2D g2, int ancho, int alto) {
-        // getImagen() viene de ObjetoGrafico
         if (getImagen() != null) {
             // Dibuja estirando la imagen al tamaño total de la ventana
             g2.drawImage(getImagen(), 0, 0, ancho, alto, null);

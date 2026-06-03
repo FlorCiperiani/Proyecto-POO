@@ -13,15 +13,15 @@ public class MenuConfigSpace extends Object implements ActionListener {
     private JFrame frame;
     private JPanel panelCompleto;
     
-    // Componentes de la interfaz adaptados a Space Invaders
+  
     private JRadioButton pantallaCompleta;
     private JCheckBox musicaBox;
     private JComboBox<String> pistaMusical;
-    private JComboBox<String> comboGalaxia; // Reemplaza a 'cancha'
+    private JComboBox<String> comboGalaxia; 
     
-    private JTextField movIzquierda;        // Reemplaza a movArriba1
-    private JTextField movDerecha;          // Reemplaza a movAbajo1
-    private JTextField vidasIniciales;       // Nueva opción útil
+    private JTextField movIzquierda;      
+    private JTextField movDerecha;         
+    private JTextField vidasIniciales;      
     
     private JButton reset;
     private JButton guardar;
@@ -58,6 +58,7 @@ public class MenuConfigSpace extends Object implements ActionListener {
         };
 
         frame.setContentPane(panelCompleto);
+        pistaMusical = new JComboBox<>(new String[] { "Alien Homeworld.mp3", "laser.mp3", "undertale.wav" });
 
         // ===== Inicializar componentes =====
         inicializarComponentes();
@@ -67,6 +68,11 @@ public class MenuConfigSpace extends Object implements ActionListener {
 
         // ===== Mostrar =====
         frame.setVisible(true);
+
+        // =====Configuracion=====
+        
+
+       
     }
 
 
@@ -81,23 +87,46 @@ public class MenuConfigSpace extends Object implements ActionListener {
     }
 
     private void inicializarComponentes() {
-        // Ejemplo de cómo adaptar los campos de texto
         movIzquierda = new JTextField(10);
         movDerecha = new JTextField(10);
         vidasIniciales = new JTextField(5);
         
-        String[] opcionesGalaxia = {"Original", "Ciudad", "Futbol"};
+        String[] opcionesGalaxia = {"Original", "Ciudad", "Futbol", "Oceano"}; // Sumamos Océano por si lo usás
         comboGalaxia = new JComboBox<>(opcionesGalaxia);
         
-        // Registro en el mapa para automatizar guardado/lectura
         componentes.put("teclaIzquierda", movIzquierda);
         componentes.put("teclaDerecha", movDerecha);
         componentes.put("vidas", vidasIniciales);
         componentes.put("fondoGalaxia", comboGalaxia);
+        componentes.put("pistaMusical", pistaMusical);
         
         guardar = new JButton("Guardar");
         guardar.addActionListener(this);
-        // ... añadir botones al frame
+
+        // --- DISEÑO DE LA VENTANA SOBRE EL PANEL DE FONDO ---
+        JPanel panelFormulario = new JPanel(new GridLayout(6, 2, 10, 10));
+        panelFormulario.setOpaque(false); // Clave para que se vea la galaxia de fondo
+
+        // Creamos etiquetas con texto blanco para que resalten sobre el fondo oscuro
+        JLabel lblIzquierda = new JLabel("Mover Izquierda:"); lblIzquierda.setForeground(Color.WHITE);
+        JLabel lblDerecha = new JLabel("Mover Derecha:"); lblDerecha.setForeground(Color.WHITE);
+        JLabel lblVidas = new JLabel("Vidas Iniciales:"); lblVidas.setForeground(Color.WHITE);
+        JLabel lblFondo = new JLabel("Estilo de Fondo:"); lblFondo.setForeground(Color.WHITE);
+        JLabel lblMusica = new JLabel("Pista Musical:"); lblMusica.setForeground(Color.WHITE);
+
+        panelFormulario.add(lblIzquierda);     panelFormulario.add(movIzquierda);
+        panelFormulario.add(lblDerecha);       panelFormulario.add(movDerecha);
+        panelFormulario.add(lblVidas);         panelFormulario.add(vidasIniciales);
+        panelFormulario.add(lblFondo);         panelFormulario.add(comboGalaxia);
+        panelFormulario.add(lblMusica);        panelFormulario.add(pistaMusical);
+        
+        // Espacio vacío y botón Guardar
+        panelFormulario.add(new JLabel());
+        panelFormulario.add(guardar);
+
+        // Añadimos un margen prolijo alrededor del formulario
+        panelCompleto.add(panelFormulario, BorderLayout.CENTER);
+        panelCompleto.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
 
     private void cargarConfiguracion() {
@@ -108,7 +137,7 @@ public class MenuConfigSpace extends Object implements ActionListener {
             System.out.println("No se encontró archivo previo, usando defecto.");
         }
         
-        // Asignar los valores cargados a los componentes visuales
+      
         movIzquierda.setText(props.getProperty("teclaIzquierda"));
         movDerecha.setText(props.getProperty("teclaDerecha"));
         vidasIniciales.setText(props.getProperty("vidas"));
@@ -124,6 +153,8 @@ public class MenuConfigSpace extends Object implements ActionListener {
             props.setProperty("vidas", vidasIniciales.getText());
             props.setProperty("fondoGalaxia", (String) comboGalaxia.getSelectedItem());
             
+            props.setProperty("musicaFondo", (String) pistaMusical.getSelectedItem());
+            
             try (OutputStream output = new FileOutputStream(rutaArchivo)) {
                 props.store(output, "Configuracion de Space Invaders");
                 JOptionPane.showMessageDialog(frame, "Configuración guardada correctamente.");
@@ -133,4 +164,5 @@ public class MenuConfigSpace extends Object implements ActionListener {
             }
         }
     }
+    
 }
