@@ -56,7 +56,6 @@ public class EnemigoLR extends PersonajeLR {
             if (lleva_oro && oroTransportado != null) {
                 soltarOro();
             }
-
             tiempoAtrapado += delta;
             if (tiempoAtrapado >= TIEMPO_ESCAPAR) {
                 tiempoAtrapado = 0;
