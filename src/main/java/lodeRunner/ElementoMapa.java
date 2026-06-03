@@ -85,17 +85,14 @@ class Piedra extends ElementoMapa {
  *  - Todos los tiles de escalera se dibujan en su posición lógica (sin offset).
  *    Esto hace que la BASE llegue exactamente al suelo inferior.
  *
- *  - El tile SUPERIOR de cada columna de escalera (esTope=true) dibuja la imagen
- *    con un pequeño offset de -POKE_PX píxeles hacia arriba, de modo que el remate
- *    sobresale levemente por encima del piso adyacente, tal como en el original.
- *    Ese sobrelapeo es puramente visual y no afecta colisiones.
+ *  - El tile SUPERIOR de cada columna de escalera (esTope=true) puede dibujar
+ *    un sprite más alto que la celda, de modo que el remate sobresalga visualmente
+ *    por encima del ladrillo adyacente.
  *
  *  MapaLR llama a setEsTope(true) al construir la grilla.
  */
 class Escalera extends ElementoMapa {
 
-    /** Píxeles que el tope sobresale por encima del ladrillo adyacente. */
-    private static final int POKE_PX   = 8;
     private static final int TILE_SIZE = MapaLR.TILE_SIZE;
 
     private boolean esTope = false;
@@ -114,23 +111,24 @@ class Escalera extends ElementoMapa {
 
         int dx   = (int) posicionX;
         int dy   = (int) posicionY;
-        int sprH = imagen.getHeight();   // 40 px
+        int sprH = imagen.getHeight();
+        int bodyOffset = Math.max(0, sprH - TILE_SIZE);
 
-        if (esTope) {
-            // Dibujar el sprite COMPLETO (40px) desplazado POKE_PX hacia arriba.
-            // Los primeros POKE_PX sobresalen por encima del ladrillo adyacente,
-            // y los 32px restantes llenan exactamente la celda propia.
-            g2.drawImage(imagen, dx, dy - POKE_PX, null);
-        } else {
-            // Tile normal: saltear los POKE_PX del remate (parte superior del sprite)
-            // y dibujar los 32px del cuerpo exactamente en la celda.
-            // src: (0, POKE_PX, TILE_SIZE, sprH)  →  dst: (dx, dy, dx+TILE_SIZE, dy+TILE_SIZE)
+        if (esTope && bodyOffset > 0) {
+            // Si el sprite es más alto que 32px, dibujamos el remate sobresaliendo
+            // por encima del ladrillo adyacente.
+            g2.drawImage(imagen, dx, dy - bodyOffset, null);
+        } else if (bodyOffset > 0) {
+            // Sprite más alto que la celda: dibujar solo el cuerpo inferior de 32px.
             g2.drawImage(imagen,
-                dx,       dy,
+                dx,             dy,
                 dx + TILE_SIZE, dy + TILE_SIZE,
-                0,        POKE_PX,
-                TILE_SIZE, sprH,
+                0,              bodyOffset,
+                TILE_SIZE,      sprH,
                 null);
+        } else {
+            // Sprite de 32px: dibujar completo en la celda, sin recortes.
+            g2.drawImage(imagen, dx, dy, null);
         }
     }
 
