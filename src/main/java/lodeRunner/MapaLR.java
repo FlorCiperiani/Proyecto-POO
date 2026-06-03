@@ -110,18 +110,65 @@ public class MapaLR {
         if (escaleraVisible) return;
         escaleraVisible = true;
 
-        int col, fila;
+        int col, filaOculta;
         if (colEscaleraOculta >= 0) {
-            col  = colEscaleraOculta;
-            fila = filaEscaleraOculta;
+            col       = colEscaleraOculta;
+            filaOculta = filaEscaleraOculta;
         } else {
-            col  = (int)(jugadorX + TILE_SIZE / 2.0) / TILE_SIZE;
-            col  = Math.max(1, Math.min(col, columnas - 2));
-            fila = 0;
+            col       = (int)(jugadorX + TILE_SIZE / 2.0) / TILE_SIZE;
+            col       = Math.max(1, Math.min(col, columnas - 2));
+            filaOculta = 0;
         }
-        Escalera esc = new Escalera(col * TILE_SIZE, fila * TILE_SIZE);
-        esc.setEsTope(true);
-        grilla[fila][col] = esc;
+
+        // Buscar la fila más baja desde filaOculta hacia abajo que ya tenga
+        // una escalera continua que llegue hasta una plataforma pisable,
+        // para saber hasta dónde hay que completar la columna.
+        // En la práctica el tile 6 está en fila 0 y fila 1 suele tener ya
+        // una escalera visible.  Lo que falta es:
+        //   1. Colocar escalera en todas las filas desde filaOculta hacia abajo
+        //      hasta la primera fila que ya tenga escalera (exclusive), para
+        //      cerrar el hueco.
+        //   2. Actualizar el flag esTope: solo la fila superior debe ser tope.
+
+        // Paso 1a: extender hacia ARRIBA desde filaOculta hasta fila 0,
+        // rellenando celdas null con Escalera para que moverArriba no haga
+        // snap y bloquee al jugador antes de que pueda escapar por el techo.
+        for (int f = filaOculta - 1; f >= 0; f--) {
+            if (grilla[f][col] == null) {
+                grilla[f][col] = new Escalera(col * TILE_SIZE, f * TILE_SIZE);
+            } else {
+                break; // Piedra u otro tile: no continuar
+            }
+        }
+
+        // Paso 1b: colocar escalera en filaOculta y extender hacia ABAJO
+        // hasta la primera Escalera ya existente o tile sólido.
+        int filaInicio = filaOculta;
+        int filaFin    = filaOculta;
+
+        for (int f = filaOculta + 1; f < filas; f++) {
+            if (grilla[f][col] instanceof Escalera) {
+                break;
+            }
+            if (grilla[f][col] == null) {
+                filaFin = f;
+            } else {
+                break;
+            }
+        }
+
+        for (int f = filaInicio; f <= filaFin; f++) {
+            grilla[f][col] = new Escalera(col * TILE_SIZE, f * TILE_SIZE);
+        }
+
+        // Paso 2: recalcular esTope en toda la columna para que solo el tile
+        // más alto sea tope (puede haber escaleras preexistentes debajo).
+        for (int f = 0; f < filas; f++) {
+            if (grilla[f][col] instanceof Escalera) {
+                boolean hayEscaleraArriba = (f > 0) && (grilla[f - 1][col] instanceof Escalera);
+                ((Escalera) grilla[f][col]).setEsTope(!hayEscaleraArriba);
+            }
+        }
     }
 
     /** True si el diseño del nivel tiene un tile tipo 6 (escalera oculta). */

@@ -21,6 +21,11 @@ public class EnemigoLR extends PersonajeLR {
     private double tiempoAtrapado  = 0;
     private static final double TIEMPO_ESCAPAR = 8.0; // segundos
 
+    //
+    public boolean isCaidoEnPozo() {
+        return this.enHoyo;
+    }
+
     // Comportamiento impredecible
     private double tiempoDecision  = 0;
     private int    dirRandomActual = 0;      // -1, 0, +1 (horizontal aleatoria ocasional)
@@ -42,6 +47,11 @@ public class EnemigoLR extends PersonajeLR {
 
         // ── Atrapado en hoyo ─────────────────────────────────────────────
         if (enHoyo) {
+            //Fuerzo al enemigo a que caiga hasta el fondo del bloque porque se buggeaba
+            int tamañoBloque = 32; 
+            int filaActual = (int) ((posicionY + tamañoBloque / 2) / tamañoBloque);
+            this.posicionY = filaActual * tamañoBloque;
+
             // Si llevaba oro, lo suelta en la celda actual
             if (lleva_oro && oroTransportado != null) {
                 soltarOro();

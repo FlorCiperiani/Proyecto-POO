@@ -2,6 +2,8 @@ package lodeRunner;
 
 import com.entropyinteractive.JGame;
 import com.entropyinteractive.Keyboard;
+import clasesCompartidas.Musica;
+import clasesCompartidas.Sonido;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -14,6 +16,9 @@ import java.util.ArrayList;
  * Para agregar un nivel: crear NivelLRN extends NivelLR y añadirlo al array NIVELES.
  */
 public class LodeRunner extends JGame {
+
+    // ── Audio ─────────────────────────────────────────────────────────────
+    private static final String MUSICA_FONDO = "LemmingsV1.wav";
 
     // ── Niveles disponibles (agregar aquí para expandir) ─────────────────
     private static final NivelLR[] NIVELES = {
@@ -41,6 +46,7 @@ public class LodeRunner extends JGame {
     private boolean gameOver     = false;
     private boolean escaleraList = false;
     private boolean juegoCompletado = false;
+    private boolean pausado        = false;
 
     private double tiempoNivel  = 0;
     private double ultimoDelta  = 0;   // para pasar a dibujarTextosPuntos
@@ -59,6 +65,7 @@ public class LodeRunner extends JGame {
     public void gameStartup() {
         indiceNivel = 0;
         puntajeTotal = 0;
+        Musica.iniciarMusica(MUSICA_FONDO);
         inicializarNivel();
     }
 
@@ -66,6 +73,10 @@ public class LodeRunner extends JGame {
     public void gameUpdate(double delta) {
         Keyboard teclado = this.getKeyboard();
         if (teclado.isKeyPressed(KeyEvent.VK_ESCAPE)) { stop(); return; }
+
+        // ── Pausa ─────────────────────────────────────────────────────────
+        if (teclado.isKeyPressed(KeyEvent.VK_P)) pausado = !pausado;
+        if (pausado) return;
 
         // ── Atajo de desarrollo: N → siguiente nivel ──────────────────────
         if (teclado.isKeyPressed(KeyEvent.VK_N)) {
@@ -132,10 +143,10 @@ public class LodeRunner extends JGame {
         }
 
         for (EnemigoLR e : enemigos) {
-            if (jugador.colisionaCon(e) && !jugador.estaPisandoCabeza(e)) {
+            if (jugador.colisionaCon(e) && !jugador.estaPisandoCabeza(e) && !e.isEnHoyo()) {
                 jugador.perderVida();
-                if (jugador.getVidas() <= 0) gameOver = true;
-                else                          derrota  = true;
+                if (jugador.getVidas() <= 0) { Sonido.reproducir("gameOver.wav"); gameOver = true; }
+                else                          { Sonido.reproducir("die.wav");     derrota  = true; }
                 return;
             }
             if (e.isEnHoyo()) jugador.sumarPuntos(200);
@@ -143,8 +154,8 @@ public class LodeRunner extends JGame {
 
         if (jugador.isEnHoyo()) {
             jugador.perderVida();
-            if (jugador.getVidas() <= 0) gameOver = true;
-            else                          derrota  = true;
+            if (jugador.getVidas() <= 0) { Sonido.reproducir("gameOver.wav"); gameOver = true; }
+            else                          { Sonido.reproducir("die.wav");     derrota  = true; }
             return;
         }
 
@@ -192,7 +203,9 @@ public class LodeRunner extends JGame {
 
         dibujarHUD(g2);
 
-        if (juegoCompletado)
+        if (pausado)
+            dibujarMensajeCentral(g2, "— PAUSA —", new Color(100, 200, 255));
+        else if (juegoCompletado)
             dibujarMensajeCentral(g2, "¡JUEGO COMPLETADO! — ENTER para reiniciar", new Color(255, 215, 0));
         else if (gameOver)
             dibujarMensajeCentral(g2, "GAME OVER — ENTER para reiniciar", Color.RED);
@@ -203,7 +216,9 @@ public class LodeRunner extends JGame {
     }
 
     @Override
-    public void gameShutdown() {}
+    public void gameShutdown() {
+        Musica.detenerMusicaFondo();
+    }
 
     // ── Inicialización de nivel ───────────────────────────────────────────
 
@@ -212,6 +227,9 @@ public class LodeRunner extends JGame {
         derrota      = false;
         escaleraList = false;
         tiempoNivel  = 0;
+        pausado      = false;
+        Musica.detenerMusicaFondo();
+        Musica.iniciarMusica(MUSICA_FONDO);
 
         nivelActual  = NIVELES[indiceNivel];
         int[][] diseño = nivelActual.getDiseño();
@@ -236,7 +254,8 @@ public class LodeRunner extends JGame {
             e.setObjetivo(jugador);
             enemigos.add(e);
         }
-
+        jugador.setEnemigos(enemigos);
+        
         calcularEscala(diseño);
     }
 
