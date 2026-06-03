@@ -1,5 +1,6 @@
 package lodeRunner;
 
+import clasesCompartidas.Sonido;
 import com.entropyinteractive.Keyboard;
 import java.awt.event.KeyEvent;
 import java.awt.Graphics2D;
@@ -197,6 +198,7 @@ public class JugadorLR extends PersonajeLR {
                         oro.recolectar();
                         oroRecolectado++;
                         puntos += 100;
+                        Sonido.reproducir("tenton.wav");
                         textosPuntos.add(new float[]{
                             col * MapaLR.TILE_SIZE + MapaLR.TILE_SIZE / 2f,
                             fila * MapaLR.TILE_SIZE,

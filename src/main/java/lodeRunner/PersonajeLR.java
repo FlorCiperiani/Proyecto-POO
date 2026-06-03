@@ -21,6 +21,7 @@ public abstract class PersonajeLR extends ObjetoGrafico {
     protected double velocidadY = 0;
 
     protected MapaLR mapa;
+    protected java.util.ArrayList<EnemigoLR> listaEnemigos;
 
     public PersonajeLR(String rutaRecurso, double x, double y, double velocidad) {
         super(rutaRecurso);
@@ -29,6 +30,8 @@ public abstract class PersonajeLR extends ObjetoGrafico {
     }
 
     public void setMapa(MapaLR mapa) { this.mapa = mapa; }
+
+    public void setEnemigos(java.util.ArrayList<EnemigoLR> enemigos) { this.listaEnemigos = enemigos; }
 
     // ── Movimientos básicos ──────────────────────────────────────────────
 
@@ -129,7 +132,6 @@ public abstract class PersonajeLR extends ObjetoGrafico {
             double nuevaY = posicionY + velocidadY * delta;
 
             if (colisionaVertical(posicionX, nuevaY)) {
-                // Snap preciso: pies en el borde exacto del tile sólido.
                 int filaSolida = (int)(nuevaY + getAlto()) / TILE_SIZE;
                 posicionY  = filaSolida * (double)TILE_SIZE - getAlto();
                 velocidadY = 0;
@@ -141,8 +143,6 @@ public abstract class PersonajeLR extends ObjetoGrafico {
             }
         } else {
             // Re-verificar que el suelo sigue siendo sólido DESPUÉS del movimiento
-            // horizontal de este frame. Si el personaje se movió sobre un hueco o
-            // un ladrillo recién roto, enSuelo era true al inicio pero ya no aplica.
             double piesPx   = posicionY + getAlto();
             int    filaBajo = (int) piesPx / TILE_SIZE;
             int    colIzqP  = (int) posicionX              / TILE_SIZE;
@@ -154,14 +154,24 @@ public abstract class PersonajeLR extends ObjetoGrafico {
                  || esSolido(mapa.getTileEn(colCen,  filaBajo))
                  || esSolido(mapa.getTileEn(colDerP, filaBajo)));
 
-            if (sueloReal) {
-                // Snap exacto para eliminar residuos de punto flotante
-                posicionY  = filaBajo * (double)TILE_SIZE - getAlto();
+            
+            boolean sueloEnemigo = false;
+            if (this instanceof JugadorLR && listaEnemigos != null) {
+                for (EnemigoLR e : listaEnemigos) {
+                    if (e.isEnHoyo() && estaPisandoCabeza(e)) {
+                        sueloEnemigo = true;
+                        break;
+                    }
+                }
+            }
+
+            if (sueloReal || sueloEnemigo) {
+                if (sueloReal) {
+                    posicionY  = filaBajo * (double)TILE_SIZE - getAlto();
+                }
                 cayendo    = false;
                 velocidadY = 0;
             } else {
-                // El suelo desapareció (ladrillo roto o borde de plataforma):
-                // caer inmediatamente sin esperar al siguiente frame.
                 enSuelo    = false;
                 cayendo    = true;
                 velocidadY = 0;
@@ -178,16 +188,9 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         int filaCuerpo = (int)(posicionY + getAlto() / 2.0)  / TILE_SIZE;
         int filaCabeza = (int)(posicionY)                    / TILE_SIZE;
 
-        // ── Detección de suelo estricta ──────────────────────────────────
+        // ── Detección de suelo estricta (Mapa) ───────────────────────────
         // Se comprueba si los pies están exactamente en el borde superior
-        // de un tile sólido. El margen es de 1 px para absorber errores de
-        // punto flotante sin dar falsos positivos.
-        //
-        // piesPx = posicionY + alto. Si piesPx == fila*TILE el personaje está
-        // apoyado. Si piesPx está 1 px por encima también se considera suelo
-        // para que la gravedad lo alinee correctamente en el mismo frame.
-        // No usamos +2 px porque eso causaba que el personaje "flotara" sobre
-        // huecos recién abiertos (ladrillo roto) durante varios frames.
+        // de un tile sólido.
         double piesPx   = posicionY + getAlto();
         int    filaBajo = (int) piesPx / TILE_SIZE;          // fila que contiene los pies
         double bordeInf = filaBajo * (double) TILE_SIZE;     // borde superior de ese tile
@@ -196,30 +199,39 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         boolean contacto = (piesPx - bordeInf) <= 1.0;
 
         // También verificar la columna izquierda y derecha del personaje
-        int colIzqP = (int) posicionX             / TILE_SIZE;
+        int colIzqP = (int) posicionX              / TILE_SIZE;
         int colDerP = (int)(posicionX + getAncho() - 1) / TILE_SIZE;
 
-        enSuelo = contacto && (esSolido(mapa.getTileEn(colIzqP, filaBajo))
-                            || esSolido(mapa.getTileEn(col,      filaBajo))
-                            || esSolido(mapa.getTileEn(colDerP,  filaBajo)));
+        boolean sueloMapa = contacto && (esSolido(mapa.getTileEn(colIzqP, filaBajo))
+                                    || esSolido(mapa.getTileEn(col,      filaBajo))
+                                    || esSolido(mapa.getTileEn(colDerP,  filaBajo)));
+
+        // ── Detección de suelo técnico (Pisando Enemigo en Hoyo) ─────────
+        boolean pisandoEnemigoEnHoyo = false;
+        
+        // Solo el Jugador puede caminar sobre los enemigos atrapados
+        if (this instanceof JugadorLR && listaEnemigos != null) {
+            for (EnemigoLR e : listaEnemigos) {
+                if (e.isEnHoyo() && estaPisandoCabeza(e)) {
+                    pisandoEnemigoEnHoyo = true;
+                    // Snap preciso: alineamos perfectamente los pies del jugador con su cabeza
+                    posicionY = e.getY() - getAlto(); 
+                    break;
+                }
+            }
+        }
+
+        // El estado enSuelo es verdadero si hay suelo por mapa O por enemigo
+        enSuelo = sueloMapa || pisandoEnemigoEnHoyo;
 
         int filaPies = filaBajo;
 
-        // En escalera: el TORSO del personaje está dentro de un tile de Escalera.
-        // Usar solo filaCuerpo (centro del sprite) evita dos problemas:
-        // 1. filaPies apuntaba al tile-tope cuando el personaje estaba parado
-        //    encima de él → enEscalera=true al caminar por la plataforma → parpadeo.
-        // 2. &&!enSuelo bloqueaba la entrada a la escalera desde la plataforma.
-        // Con solo filaCuerpo: false cuando está en plataforma (torso en aire),
-        // true cuando el torso cruza dentro del tile de escalera.
+        // ── En escalera ──────────────────────────────────────────────────
+        // El TORSO del personaje está dentro de un tile de Escalera.
         enEscalera = (mapa.getTileEn(col, filaCuerpo) instanceof Escalera);
 
-        // En barra: la CABEZA o el CUERPO del personaje están en un tile de Barra.
-        // Al detectarla, snap inmediato: posicionY = fila_barra * TILE_SIZE.
-        // Esto coloca las manos del sprite exactamente sobre la barra (rows 12-16
-        // del sprite de barra coinciden con rows 11-15 del sprite del personaje).
-        // El snap solo se aplica si el personaje acaba de entrar a la barra
-        // (evita reposicionar cada frame mientras se mueve horizontalmente).
+        // ── En barra ─────────────────────────────────────────────────────
+        // La CABEZA o el CUERPO del personaje están en un tile de Barra.
         boolean enBarraAnterior = enBarra;
         int filaConBarra = -1;
         if (mapa.getTileEn(col, filaCabeza) instanceof Barra) filaConBarra = filaCabeza;
@@ -228,15 +240,14 @@ public abstract class PersonajeLR extends ObjetoGrafico {
 
         if (enBarra && filaConBarra >= 0) {
             double snapY = filaConBarra * (double) TILE_SIZE;
-            // Solo aplicar snap si la posición actual difiere del snap (entrada a barra
-            // o posición incorrecta). Tolerancia de 1px para no interrumpir movimiento.
+            // Solo aplicar snap si la posición actual difiere del snap.
             if (Math.abs(posicionY - snapY) > 1.0) {
                 posicionY  = snapY;
                 velocidadY = 0;
             }
         }
 
-        // Atrapado en hoyo
+        // ── Atrapado en hoyo ─────────────────────────────────────────────
         enHoyo = estaEncerradoEnHoyo(col, filaCuerpo);
     }
 
