@@ -48,8 +48,8 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         juegos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         juegos.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         juegos.setVisibleRowCount(1);
-        juegos.setFixedCellWidth(140);
-        juegos.setFixedCellHeight(140);
+        juegos.setFixedCellWidth(150);
+        juegos.setFixedCellHeight(149);
         juegos.setPreferredSize(new Dimension(listaJuegos.size() * 150, 140));
         juegos.setCellRenderer(new IconListRenderer());
         juegos.setOpaque(false);
