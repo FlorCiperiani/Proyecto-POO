@@ -48,11 +48,12 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         juegos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         juegos.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         juegos.setVisibleRowCount(1);
-        juegos.setFixedCellWidth(140);
-        juegos.setFixedCellHeight(140);
+        juegos.setFixedCellWidth(150);
+        juegos.setFixedCellHeight(149);
         juegos.setPreferredSize(new Dimension(listaJuegos.size() * 150, 140));
         juegos.setCellRenderer(new IconListRenderer());
-        juegos.setOpaque(false);
+        juegos.setOpaque(true);
+        juegos.setBackground(Color.BLACK);
 
         scrollPane = new JScrollPane(juegos);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -61,15 +62,15 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         scrollPane.setPreferredSize(new Dimension(listaJuegos.size() * 150, 150));
 
         JPanel cardsWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        cardsWrapper.setBackground(Color.white);
+        cardsWrapper.setBackground(Color.black);
         cardsWrapper.add(scrollPane);
 
         JLabel pregunta = new JLabel("¿Qué quieres jugar?", SwingConstants.CENTER);
         pregunta.setFont(new Font("SansSerif", Font.PLAIN, 18));
-        pregunta.setForeground(Color.black);
+        pregunta.setForeground(Color.white);
 
         JPanel norte = new JPanel(new BorderLayout());
-        norte.setBackground(Color.white);
+        norte.setBackground(Color.black);
         norte.add(pregunta, BorderLayout.NORTH);
         norte.add(cardsWrapper, BorderLayout.CENTER);
 
@@ -109,6 +110,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         panelBotones.add(botonConfig);
 
         add(panelBotones, BorderLayout.SOUTH);
+        juegos.setSelectedIndex(0);
         setVisible(true);
     }
 
@@ -139,9 +141,9 @@ public class LanzadorJuego extends JFrame implements ActionListener {
     // Carga y escala ícono desde recursos empaquetados
     private ImageIcon getIconForGame(String nombre) {
         String ruta = null;
-        if ("Pong".equals(nombre)) ruta = "/assetsLanzador/gato.png";
-        else if ("SpaceInvaders".equals(nombre)) ruta = "/assetsLanzador/hombre-lobo.png";
-        else if ("Lode Runner".equals(nombre)) ruta = "/assetsLanzador/oso.png";
+        if ("Pong".equals(nombre)) ruta = "/assetsLanzador/pingPong.png";
+        else if ("SpaceInvaders".equals(nombre)) ruta = "/AssetsSpace/yellow.png";
+        else if ("Lode Runner".equals(nombre)) ruta = "/lodeRunner/jugador_neutral.png"; // CORREGIDO: Ahora coincide con la lista
         
 
         try {
@@ -164,10 +166,10 @@ public class LanzadorJuego extends JFrame implements ActionListener {
             }
 
             if ("Pong".equals(juegoSeleccionado)) {
-                juego = new Pong("Pong", 800, 600);
+                juego = new Pong("Ping Pong", 800, 600);
                 iniciarHiloJuego();
             } else if ("SpaceInvaders".equals(juegoSeleccionado)) {
-                juego = new SpaceInvaders("SpaceInvaders", 800, 600);
+                juego = new SpaceInvaders("Space Invaders", 800, 600);
                 iniciarHiloJuego();
             } else if ("Lode Runner".equals(juegoSeleccionado)) {
                 juego = new LodeRunner("Lode Runner", 800, 600);

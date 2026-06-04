@@ -68,7 +68,7 @@ public class MenuConfig implements ActionListener {
         movAbajo2 = new JTextField("↓", 5);
         movArriba1 = new JTextField("W", 5);
         movAbajo1 = new JTextField("S", 5);
-        pistaMusical = new JComboBox<>(new String[] { "pong_cancion.wav", "homero.wav", "undertale.wav" });
+        pistaMusical = new JComboBox<>(new String[] { "retro.wav", "arcade.wav", "undertale.wav" });
         pelota = new JComboBox<>(new String[] { "Original", "Disco", "Planeta"});
         paleta = new JComboBox<>(new String[] { "Original", "Paleta azul", "Paleta roja"});
         cancha = new JComboBox<>(new String[] { "Original", "Cancha 1", "Cancha 2"});
