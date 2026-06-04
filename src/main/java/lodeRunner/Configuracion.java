@@ -7,7 +7,8 @@ public class Configuracion {
     public static boolean sonidoGeneralAtrapado = true; // Master Switch
     public static boolean musicaActivada = true;
     public static boolean efectosActivados = true;
-    
+    public static boolean sonidoGeneralActivado = true; //Agrego flor
+
     public static String pistaMusicalSeleccionada = "tema_original.wav";
     public static String skinPersonajeSeleccionado = "original";
     
@@ -17,6 +18,7 @@ public class Configuracion {
         sonidoGeneralAtrapado = true;
         musicaActivada = true;
         efectosActivados = true;
+        sonidoGeneralActivado = true; //Agrego flor
         pistaMusicalSeleccionada = "tema_original.wav";
         skinPersonajeSeleccionado = "original";
     }
