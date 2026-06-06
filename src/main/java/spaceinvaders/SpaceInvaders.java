@@ -2,6 +2,8 @@ package spaceinvaders;
 
 import com.entropyinteractive.JGame;
 import com.entropyinteractive.Keyboard;
+
+import clasesCompartidas.Sonido;
 import clasesCompartidas.conversorTecla;
 
 import java.awt.Graphics2D;
@@ -31,13 +33,12 @@ public class SpaceInvaders extends JGame {
     private double tiempoParaProximoUfo = 15.0;
     private double tiempoDisparoEnemigo = 0;
     private static final double INTERVALO_DISPARO_ENEMIGO = 5.0;
-    private double velocidadBaseAliens = 80.0;
+    private double velocidadBaseAliens = 14.0;
     private double velocidadBaseUFO = 100.0;
 
     // ================== CONTROL DE RITMO RETRO ==================
     private double acumuladorRitmo = 0.0;
     private boolean moverEnEsteFotograma = false;
-
     private boolean disparoPresionado = false;
 
     // ================== CONTROL DE NIVELES ==================
@@ -47,6 +48,12 @@ public class SpaceInvaders extends JGame {
     private int vidas = 3;
     private boolean juegoTerminado = false;
     private int vidasConfiguradas = 3;
+
+    // ================== CONFIGURACIÓN LEÍDA DEL ARCHIVO ==================
+    private boolean sonidoActivado = true;   // propiedad "sonido"
+    private String  skinNave       = "Original";
+    private String  skinInvasores  = "Original";
+    private String  skinProyectil  = "Original";
 
     // ================== TECLAS ==================
     private int teclaIzquierdaCodigo;
@@ -63,21 +70,9 @@ public class SpaceInvaders extends JGame {
     @Override
     public void gameStartup() {
 
-        // ---- Cargar configuración ----
-        Properties config = new Properties();
-        try (InputStream input = new FileInputStream("spaceinvaders.properties")) {
-            config.load(input);
-        } catch (IOException e) {
-            // Si no existe el archivo usamos valores por defecto
-            config.setProperty("teclaIzquierda", "LEFT");
-            config.setProperty("teclaDerecha", "RIGHT");
-            config.setProperty("teclaDisparo", "SPACE");
-            config.setProperty("fondoGalaxia", "Original");
-            config.setProperty("musicaFondo", "space-invaders.wav");
-            config.setProperty("vidas", "3");
-        }
+        Properties config = cargarProperties();
 
-        // ---- Vidas ----
+        // ── Vidas ────────────────────────────────────────────────────────────
         try {
             vidasConfiguradas = Integer.parseInt(config.getProperty("vidas", "3"));
             if (vidasConfiguradas <= 0) vidasConfiguradas = 3;
@@ -85,74 +80,82 @@ public class SpaceInvaders extends JGame {
             vidasConfiguradas = 3;
         }
 
-        // ---- Velocidad de invasores ----
-        String velocidadConfig = config.getProperty("velocidadInvasores", "Media");
-        if ("Lenta".equals(velocidadConfig)) {
-            velocidadBaseAliens = 8.0;
-        } else if ("Rápida".equals(velocidadConfig)) {
-            velocidadBaseAliens = 20.0;
-        } else {
-            velocidadBaseAliens = 14.0;
+        // ── Velocidad de invasores ────────────────────────────────────────────
+        // Lee la clave exacta que guarda MenuConfigSpace: "velocidadInvasores"
+        switch (config.getProperty("velocidadInvasores", "Media")) {
+            case "Lenta":  velocidadBaseAliens = 8.0;  break;
+            case "Rápida": velocidadBaseAliens = 20.0; break;
+            default:       velocidadBaseAliens = 14.0; break;
         }
 
-        // ---- Teclas ----
-        // FIX: ahora leemos teclaDisparo desde el archivo en vez de hardcodear SPACE
-        teclaIzquierdaCodigo = conversorTecla.convertirTecla(config.getProperty("teclaIzquierda", "LEFT"));
-        teclaDerechaCodigo   = conversorTecla.convertirTecla(config.getProperty("teclaDerecha", "RIGHT"));
-        teclaDisparoCodigo   = conversorTecla.convertirTecla(config.getProperty("teclaDisparo", "SPACE"));
+        // ── Sonido ───────────────────────────────────────────────────────────
+        // Lee la clave "sonido" que guarda MenuConfigSpace
+        sonidoActivado = !"false".equals(config.getProperty("sonido", "true"));
 
-        // ---- Fondo ----
+        // ── Skins ────────────────────────────────────────────────────────────
+        skinNave      = config.getProperty("skinNave",      "Original");
+        skinInvasores = config.getProperty("skinInvasores", "Original");
+        skinProyectil = config.getProperty("skinProyectil", "Original");
+
+        // ── Teclas ───────────────────────────────────────────────────────────
+        teclaIzquierdaCodigo = conversorTecla.convertirTecla(config.getProperty("teclaIzquierda", "LEFT"));
+        teclaDerechaCodigo   = conversorTecla.convertirTecla(config.getProperty("teclaDerecha",   "RIGHT"));
+        teclaDisparoCodigo   = conversorTecla.convertirTecla(config.getProperty("teclaDisparo",   "SPACE"));
+
+        // ── Fondo ────────────────────────────────────────────────────────────
         galaxia = new Galaxia();
         galaxia.setEstilo(config.getProperty("fondoGalaxia", "Original"));
 
-        // ---- Marcador (se crea UNA sola vez aquí) ----
+        // ── Marcador ─────────────────────────────────────────────────────────
         marcador = new Marcador(30, 65);
 
-        // ---- Listas ----
+        // ── Listas ───────────────────────────────────────────────────────────
         proyectiles = new ArrayList<>();
         enemigos    = new ArrayList<>();
         escudos     = new ArrayList<>();
 
-        // ---- UFO ----
+        // ── UFO ──────────────────────────────────────────────────────────────
         ufo = new NaveNodriza(velocidadBaseUFO);
 
-        // ---- Inicializar partida ----
+        // ── Partida ───────────────────────────────────────────────────────────
         reiniciarPartidaCompleta();
 
-        // ---- Música ----
-        String cancionElegida = config.getProperty("musicaFondo", "space-invaders.wav");
-        clasesCompartidas.Musica.iniciarMusica(cancionElegida);
+        // ── Música ───────────────────────────────────────────────────────────
+        // Solo inicia si el sonido está activado
+        if (sonidoActivado) {
+            clasesCompartidas.Musica.iniciarMusica(
+                config.getProperty("musicaFondo", "space-invaders.wav")
+            );
+        }
+
+        // Pantalla completa: guardada en properties pero no aplicable
+        // en tiempo de ejecución sin reiniciar la ventana de JGame.
     }
 
-    /**
-     * Restablece el estado de juego al inicio/reinicio.
-     * NO recrea galaxia, marcador ni las listas (eso es responsabilidad de gameStartup).
-     */
+    // =================================================
+    // REINICIO
+    // =================================================
     private void reiniciarPartidaCompleta() {
-        desplazamientoNivelY  = 0;
-        contadorDisparos      = 0;
-        tiempoParaProximoUfo  = 15.0;
-        tiempoDisparoEnemigo  = 0;
-        acumuladorRitmo       = 0.0;
-        disparoPresionado     = false;
+        desplazamientoNivelY = 0;
+        contadorDisparos     = 0;
+        tiempoParaProximoUfo = 15.0;
+        tiempoDisparoEnemigo = 0;
+        acumuladorRitmo      = 0.0;
+        disparoPresionado    = false;
 
         vidas          = vidasConfiguradas;
         juegoTerminado = false;
 
-        // FIX: resetear el puntaje del marcador en lugar de recrearlo
-        // (si tu clase Marcador tiene un método reset, úsalo; si no, recreamos solo el puntaje)
-        marcador.resetearPuntaje();   // ← asegurate de tener este método en Marcador
+        marcador.resetearPuntaje();
 
         proyectiles.clear();
         enemigos.clear();
         escudos.clear();
 
-        // Cañón: se crea con su posición real de juego
         canion = new Canion(getWidth() / 2.0, getHeight() - 80);
 
         generarHordaEnemigos();
 
-        // Escudos
         for (int i = 0; i < 4; i++) {
             double x = (getWidth() / 5.0) * (i + 1) - 40;
             double y = getHeight() - 150;
@@ -189,19 +192,18 @@ public class SpaceInvaders extends JGame {
         if (juegoTerminado) {
             if (kb.isKeyPressed(KeyEvent.VK_R)) {
                 reiniciarPartidaCompleta();
-                clasesCompartidas.Musica.iniciarMusica(
-                    // Releer la canción guardada en el .properties para el reinicio
-                    leerPropiedadMusica()
-                );
+                if (sonidoActivado) {
+                    clasesCompartidas.Musica.iniciarMusica(leerPropiedadMusica());
+                }
             }
             return;
         }
 
-        // ---- Movimiento jugador ----
+        // ── Movimiento ───────────────────────────────────────────────────────
         if (kb.isKeyPressed(teclaIzquierdaCodigo)) canion.moverIzquierda(delta);
         if (kb.isKeyPressed(teclaDerechaCodigo))   canion.moverDerecha(delta, getWidth());
 
-        // ---- Disparo jugador ----
+        // ── Disparo jugador ──────────────────────────────────────────────────
         if (kb.isKeyPressed(teclaDisparoCodigo)) {
             if (!disparoPresionado && !hayDisparoJugadorActivo()) {
                 proyectiles.add(new Proyectil(
@@ -211,25 +213,26 @@ public class SpaceInvaders extends JGame {
                 ));
                 contadorDisparos++;
                 disparoPresionado = true;
-                clasesCompartidas.Sonido.reproducir("laser.wav");
+                // Solo reproduce el sonido si está activado
+                if (sonidoActivado) clasesCompartidas.Sonido.reproducir("laser.wav");
             }
         } else {
             disparoPresionado = false;
         }
 
-        // ---- UFO ----
+        // ── UFO ──────────────────────────────────────────────────────────────
         if (!ufo.isActiva()) {
             tiempoParaProximoUfo -= delta;
             if (tiempoParaProximoUfo <= 0) {
                 ufo.aparecer(getWidth());
+                 if (sonidoActivado) Sonido.reproducir("nave-nodriza.wav"); 
                 tiempoParaProximoUfo = 20 + Math.random() * 15;
             }
         } else {
             ufo.update(delta);
         }
 
-        // ---- Enemigos ----
-        int totalInicialAliens = 55;
+        // ── Enemigos ─────────────────────────────────────────────────────────
         int aliensVivos = enemigos.size();
 
         if (aliensVivos == 0) {
@@ -239,12 +242,11 @@ public class SpaceInvaders extends JGame {
             return;
         }
 
-        double intervaloGolpeMovimiento = 0.06 + (0.79 * ((double) aliensVivos / totalInicialAliens));
-
+        double intervalo = 0.06 + (0.79 * ((double) aliensVivos / 55));
         moverEnEsteFotograma = false;
         acumuladorRitmo += delta;
 
-        if (acumuladorRitmo >= intervaloGolpeMovimiento) {
+        if (acumuladorRitmo >= intervalo) {
             acumuladorRitmo = 0.0;
             moverEnEsteFotograma = true;
         }
@@ -254,14 +256,8 @@ public class SpaceInvaders extends JGame {
         if (moverEnEsteFotograma) {
             for (Enemigo e : enemigos) {
                 e.update(1.0);
-
-                if ((e.getY() + e.getAlto()) >= canion.getY()) {
-                    juegoTerminado = true;
-                }
-
-                if (e.getX() < 10 || e.getX() > getWidth() - e.getAncho() - 10) {
-                    cambiarDireccion = true;
-                }
+                if ((e.getY() + e.getAlto()) >= canion.getY()) juegoTerminado = true;
+                if (e.getX() < 10 || e.getX() > getWidth() - e.getAncho() - 10) cambiarDireccion = true;
             }
 
             if (juegoTerminado) {
@@ -272,32 +268,27 @@ public class SpaceInvaders extends JGame {
             if (cambiarDireccion) {
                 for (Enemigo e : enemigos) {
                     e.invertirDireccionYBajar();
-                    double direccion = Math.signum(e.getVelocidadX());
-                    e.setVelocidadX(direccion * velocidadBaseAliens);
+                    e.setVelocidadX(Math.signum(e.getVelocidadX()) * velocidadBaseAliens);
                 }
             }
         }
 
-        // ---- Proyectiles ----
+        // ── Proyectiles ──────────────────────────────────────────────────────
         for (int i = proyectiles.size() - 1; i >= 0; i--) {
             Proyectil p = proyectiles.get(i);
             p.update(delta);
-            if (p.getY() < 0 || p.getY() > getHeight()) {
-                proyectiles.remove(i);
-            }
+            if (p.getY() < 0 || p.getY() > getHeight()) proyectiles.remove(i);
         }
 
-        // ---- Colisiones proyectil vs enemigos / jugador ----
+        // ── Colisiones ───────────────────────────────────────────────────────
         for (int i = proyectiles.size() - 1; i >= 0; i--) {
             Proyectil p = proyectiles.get(i);
 
             if (p.isDisparoJugador()) {
-                // Bala del jugador → aliens
                 boolean impacto = false;
                 for (int j = enemigos.size() - 1; j >= 0; j--) {
-                    Enemigo en = enemigos.get(j);
-                    if (p.colisionaCon(en)) {
-                        marcador.incrementarPuntaje(en.getPuntos());
+                    if (p.colisionaCon(enemigos.get(j))) {
+                        marcador.incrementarPuntaje(enemigos.get(j).getPuntos());
                         enemigos.remove(j);
                         proyectiles.remove(i);
                         impacto = true;
@@ -306,21 +297,17 @@ public class SpaceInvaders extends JGame {
                 }
                 if (impacto) continue;
 
-                // Bala del jugador → UFO
                 if (ufo.isActiva() && p.colisionaCon(ufo)) {
                     marcador.incrementarPuntaje(ufo.calcularPuntajeEspecial(contadorDisparos));
                     ufo.desactivar();
                     proyectiles.remove(i);
                     continue;
                 }
-
             } else {
-                // Bala alien → cañón del jugador
                 if (p.colisionaCon(canion)) {
                     vidas--;
                     proyectiles.remove(i);
-                    clasesCompartidas.Sonido.reproducir("explosion.wav");
-
+                    if (sonidoActivado) clasesCompartidas.Sonido.reproducir("explosion.wav");
                     if (vidas <= 0) {
                         juegoTerminado = true;
                         clasesCompartidas.Musica.detenerMusicaFondo();
@@ -330,13 +317,10 @@ public class SpaceInvaders extends JGame {
             }
         }
 
-        // ---- Escudos ----
+        // ── Escudos ──────────────────────────────────────────────────────────
         for (int i = proyectiles.size() - 1; i >= 0; i--) {
             Proyectil p = proyectiles.get(i);
-
-            if (p.isDisparoJugador() && p.getY() > getHeight() - 140) {
-                continue;
-            }
+            if (p.isDisparoJugador() && p.getY() > getHeight() - 140) continue;
 
             for (int j = escudos.size() - 1; j >= 0; j--) {
                 Escudo esc = escudos.get(j);
@@ -348,7 +332,7 @@ public class SpaceInvaders extends JGame {
             }
         }
 
-        // ---- Disparo enemigo aleatorio ----
+        // ── Disparo enemigo ───────────────────────────────────────────────────
         tiempoDisparoEnemigo += delta;
         if (tiempoDisparoEnemigo >= INTERVALO_DISPARO_ENEMIGO) {
             disparoEnemigoAleatorio();
@@ -366,28 +350,18 @@ public class SpaceInvaders extends JGame {
 
         if (!juegoTerminado) {
 
-            // --- Dibujar vidas en HUD (esquina superior derecha) ---
-            // Guardamos posición real del cañón jugable
             double origX = canion.getX();
             double origY = canion.getY();
-
             int anchoCanion  = canion.getAncho();
             int margenDerecho = getWidth() - 30;
-            int yVidas = 35;
 
             for (int i = 0; i < vidas; i++) {
-                int posXVida = margenDerecho - anchoCanion - (i * (anchoCanion + 15));
-                canion.setX(posXVida);
-                canion.setY(yVidas);
+                canion.setX(margenDerecho - anchoCanion - (i * (anchoCanion + 15)));
+                canion.setY(35);
                 canion.mostrar(g2);
             }
-
-            // FIX CRÍTICO: restauramos AMBAS coordenadas antes de dibujar el cañón jugable
             canion.setX(origX);
-            canion.setY(origY); // ← en la versión original había dos setY() consecutivos
-                                //   que dejaban el cañón en y=35 (invisible arriba)
-
-            // --- Dibujar el cañón jugable en su posición real ---
+            canion.setY(origY);
             canion.mostrar(g2);
 
             for (Enemigo e : enemigos) e.mostrar(g2);
@@ -397,27 +371,23 @@ public class SpaceInvaders extends JGame {
             marcador.mostrar(g2);
 
         } else {
-            // ---- Pantalla de Game Over ----
             g2.setColor(new Color(0, 0, 0, 200));
             g2.fillRect(0, 0, getWidth(), getHeight());
 
             g2.setFont(new Font("Monospaced", Font.BOLD, 50));
             g2.setColor(Color.RED);
-            String textoPerdiste = "¡Perdiste!";
-            int anchoTextoPerdiste = g2.getFontMetrics().stringWidth(textoPerdiste);
-            g2.drawString(textoPerdiste, (getWidth() - anchoTextoPerdiste) / 2, getHeight() / 2 - 60);
+            String txt1 = "¡Perdiste!";
+            g2.drawString(txt1, (getWidth() - g2.getFontMetrics().stringWidth(txt1)) / 2, getHeight() / 2 - 60);
 
             g2.setFont(new Font("Monospaced", Font.PLAIN, 24));
             g2.setColor(Color.WHITE);
-            String textoPuntos = "Tu puntuación final: " + marcador.getPuntaje();
-            int anchoTextoPuntos = g2.getFontMetrics().stringWidth(textoPuntos);
-            g2.drawString(textoPuntos, (getWidth() - anchoTextoPuntos) / 2, getHeight() / 2);
+            String txt2 = "Tu puntuación final: " + marcador.getPuntaje();
+            g2.drawString(txt2, (getWidth() - g2.getFontMetrics().stringWidth(txt2)) / 2, getHeight() / 2);
 
             g2.setFont(new Font("Monospaced", Font.BOLD, 22));
             g2.setColor(Color.GREEN);
-            String textoReiniciar = "[ Presioná 'R' para volver a jugar ]";
-            int anchoTextoReiniciar = g2.getFontMetrics().stringWidth(textoReiniciar);
-            g2.drawString(textoReiniciar, (getWidth() - anchoTextoReiniciar) / 2, getHeight() / 2 + 70);
+            String txt3 = "[ Presioná 'R' para volver a jugar ]";
+            g2.drawString(txt3, (getWidth() - g2.getFontMetrics().stringWidth(txt3)) / 2, getHeight() / 2 + 70);
         }
     }
 
@@ -425,24 +395,38 @@ public class SpaceInvaders extends JGame {
     // UTILS
     // =================================================
     private boolean hayDisparoJugadorActivo() {
-        for (Proyectil p : proyectiles) {
-            if (p.isDisparoJugador()) return true;
-        }
+        for (Proyectil p : proyectiles) if (p.isDisparoJugador()) return true;
         return false;
     }
 
     private void disparoEnemigoAleatorio() {
         if (enemigos.isEmpty()) return;
-        int index = (int) (Math.random() * enemigos.size());
-        Enemigo e = enemigos.get(index);
-        proyectiles.add(new Proyectil(
-            e.getX() + e.getAncho() / 2.0,
-            e.getY() + e.getAlto(),
-            false
-        ));
+        Enemigo e = enemigos.get((int)(Math.random() * enemigos.size()));
+        proyectiles.add(new Proyectil(e.getX() + e.getAncho() / 2.0, e.getY() + e.getAlto(), false));
     }
 
-    /** Lee la propiedad musicaFondo del archivo de configuración (para el reinicio). */
+    private Properties cargarProperties() {
+        Properties p = new Properties();
+        try (InputStream in = new FileInputStream("spaceinvaders.properties")) {
+            p.load(in);
+        } catch (IOException e) {
+            // Valores por defecto si no existe el archivo
+            p.setProperty("teclaIzquierda",    "LEFT");
+            p.setProperty("teclaDerecha",       "RIGHT");
+            p.setProperty("teclaDisparo",       "SPACE");
+            p.setProperty("fondoGalaxia",       "Original");
+            p.setProperty("musicaFondo",        "space-invaders.wav");
+            p.setProperty("vidas",              "3");
+            p.setProperty("sonido",             "true");
+            p.setProperty("pantallaCompleta",   "false");
+            p.setProperty("velocidadInvasores", "Media");
+            p.setProperty("skinNave",           "Original");
+            p.setProperty("skinInvasores",      "Original");
+            p.setProperty("skinProyectil",      "Original");
+        }
+        return p;
+    }
+
     private String leerPropiedadMusica() {
         Properties p = new Properties();
         try (InputStream in = new FileInputStream("spaceinvaders.properties")) {
