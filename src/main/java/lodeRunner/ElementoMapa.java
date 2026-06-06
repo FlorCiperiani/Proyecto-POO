@@ -117,9 +117,11 @@ class Escalera extends ElementoMapa {
         if (esTope && bodyOffset > 0) {
             // Si el sprite es más alto que 32px, dibujamos el remate sobresaliendo
             // por encima del ladrillo adyacente.
+            
             g2.drawImage(imagen, dx, dy - bodyOffset, null);
         } else if (bodyOffset > 0) {
             // Sprite más alto que la celda: dibujar solo el cuerpo inferior de 32px.
+            // Esto se usa para los tiles intermedios de una columna de escalera, que no deben sobresalir.
             g2.drawImage(imagen,
                 dx,             dy,
                 dx + TILE_SIZE, dy + TILE_SIZE,
