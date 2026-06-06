@@ -25,6 +25,9 @@ class Marcador extends ObjetoGrafico {
     public int getPuntaje() {
         return puntaje;
     }
+    public void resetearPuntaje() {
+        this.puntaje = 0;   
+    }
 
     @Override
     public void update(double delta) {

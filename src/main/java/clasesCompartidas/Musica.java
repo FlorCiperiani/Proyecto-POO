@@ -1,4 +1,5 @@
 package clasesCompartidas;
+
 import javax.sound.sampled.*;
 import java.io.IOException;
 import java.net.URL;
@@ -9,12 +10,23 @@ public class Musica {
     public static void iniciarMusica(String archivo) {
         try {
             URL sonidoURL = Musica.class.getClassLoader().getResource("sonidos/" + archivo);
+
+            // FIX: si el archivo no existe, no crashea — solo avisa en consola
+            if (sonidoURL == null) {
+                System.out.println("Musica: no se encontró 'sonidos/" + archivo + "'. El juego continúa sin música.");
+                return;
+            }
+
+            // Si había música anterior, la detenemos antes de abrir una nueva
+            detenerMusicaFondo();
+
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(sonidoURL);
             musicaFondo = AudioSystem.getClip();
             musicaFondo.open(audioIn);
-            musicaFondo.loop(Clip.LOOP_CONTINUOUSLY); // Repetir indefinidamente
+            musicaFondo.loop(Clip.LOOP_CONTINUOUSLY);
+            musicaFondo.start(); // FIX: faltaba el start() — sin esto la música no suena
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            e.printStackTrace();
+            System.out.println("Musica: error al reproducir '" + archivo + "': " + e.getMessage());
         }
     }
 
@@ -22,6 +34,7 @@ public class Musica {
         if (musicaFondo != null && musicaFondo.isRunning()) {
             musicaFondo.stop();
             musicaFondo.close();
+            musicaFondo = null;
         }
     }
 }

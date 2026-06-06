@@ -1,17 +1,20 @@
 package spaceinvaders;
-
+ 
+import clasesCompartidas.Sonido;
+ 
 public class NaveNodriza extends Enemigo {
     private boolean activa = false;
-
+ 
     public NaveNodriza(double velocidadInicial) {
-        super(900, 70, "/AssetsSpace/extra.png", 0, -Math.abs(velocidadInicial) * 1.5); 
+        super(900, 70, "/AssetsSpace/extra.png", 0, -Math.abs(velocidadInicial) * 1.5);
     }
-
+ 
     public void aparecer(int anchoPantalla) {
-        this.posicionX = anchoPantalla; 
+        this.posicionX = anchoPantalla;
         this.activa = true;
+        Sonido.reproducir("nave-nodriza.wav"); // Sonido al aparecer la nave nodriza
     }
-
+ 
     @Override
     public void update(double delta) {
         if (activa) {
@@ -21,20 +24,19 @@ public class NaveNodriza extends Enemigo {
             }
         }
     }
-
+ 
     public void desactivar() {
         this.activa = false;
-       
     }
-
+ 
     public boolean isActiva() {
         return activa;
     }
-
+ 
     public int calcularPuntajeEspecial(int totalDisparosJugador) {
         if (totalDisparosJugador == 23 || (totalDisparosJugador > 23 && (totalDisparosJugador - 23) % 15 == 0)) {
             return 300;
         }
-        return 50 + ((int)(Math.random() * 5)) * 50; 
+        return 50 + ((int)(Math.random() * 5)) * 50;
     }
 }
