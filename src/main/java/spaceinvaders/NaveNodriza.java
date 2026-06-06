@@ -1,6 +1,5 @@
 package spaceinvaders;
 
-import clasesCompartidas.Sonido;
 
 public class NaveNodriza extends Enemigo {
     private boolean activa = false;
