@@ -420,7 +420,7 @@ public class SpaceInvaders extends JGame {
             String txt2 = "Tu puntuación final: " + marcador.getPuntaje();
             g2.drawString(txt2, (getWidth() - g2.getFontMetrics().stringWidth(txt2)) / 2, 90);
 
-            // Dibujar el Ranking actualizado en caliente en la interfaz
+            // Dibujar el Ranking actualizado en la interfaz
             dibujarTablaRanking(g2, 140);
 
             g2.setFont(new Font("Monospaced", Font.BOLD, 20));
