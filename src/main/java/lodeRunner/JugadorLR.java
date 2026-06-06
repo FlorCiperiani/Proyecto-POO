@@ -198,7 +198,7 @@ public class JugadorLR extends PersonajeLR {
                         oro.recolectar();
                         oroRecolectado++;
                         puntos += 100;
-                        Sonido.reproducir("tenton.wav");
+                        if (lodeRunner.Configuracion.efectosActivados && lodeRunner.Configuracion.sonidoGeneralActivado) Sonido.reproducir("LR_monedillas.wav");;
                         textosPuntos.add(new float[]{
                             col * MapaLR.TILE_SIZE + MapaLR.TILE_SIZE / 2f,
                             fila * MapaLR.TILE_SIZE,
