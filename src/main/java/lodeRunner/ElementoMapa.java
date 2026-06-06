@@ -94,8 +94,6 @@ class Piedra extends ElementoMapa {
  */
 class Escalera extends ElementoMapa {
 
-    /** Píxeles que el tope sobresale por encima del ladrillo adyacente. */
-    private static final int POKE_PX   = 8;
     private static final int TILE_SIZE = MapaLR.TILE_SIZE;
 
     private boolean esTope = false;
@@ -114,23 +112,23 @@ class Escalera extends ElementoMapa {
 
         int dx   = (int) posicionX;
         int dy   = (int) posicionY;
-        int sprH = imagen.getHeight();   // 40 px
+        int sprH = imagen.getHeight();
+        int yOffset = Math.max(0, sprH - TILE_SIZE);
 
-        if (esTope) {
-            // Dibujar el sprite COMPLETO (40px) desplazado POKE_PX hacia arriba.
-            // Los primeros POKE_PX sobresalen por encima del ladrillo adyacente,
-            // y los 32px restantes llenan exactamente la celda propia.
-            g2.drawImage(imagen, dx, dy - POKE_PX, null);
-        } else {
-            // Tile normal: saltear los POKE_PX del remate (parte superior del sprite)
-            // y dibujar los 32px del cuerpo exactamente en la celda.
-            // src: (0, POKE_PX, TILE_SIZE, sprH)  →  dst: (dx, dy, dx+TILE_SIZE, dy+TILE_SIZE)
+        if (esTope && yOffset > 0) {
+            // Si el sprite es más alto que la celda, dibujar el remate sobresaliendo.
+            g2.drawImage(imagen, dx, dy - yOffset, null);
+        } else if (yOffset > 0) {
+            // Si el sprite es más alto que la celda, dibujar solo la parte inferior de 32px.
             g2.drawImage(imagen,
-                dx,       dy,
+                dx,             dy,
                 dx + TILE_SIZE, dy + TILE_SIZE,
-                0,        POKE_PX,
-                TILE_SIZE, sprH,
+                0,              yOffset,
+                TILE_SIZE,      sprH,
                 null);
+        } else {
+            // Sprite de 32px o igual a la celda: dibujar completo sin recortes.
+            g2.drawImage(imagen, dx, dy, null);
         }
     }
 
