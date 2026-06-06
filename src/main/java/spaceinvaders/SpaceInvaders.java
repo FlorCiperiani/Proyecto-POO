@@ -3,6 +3,7 @@ package spaceinvaders;
 import com.entropyinteractive.JGame;
 import com.entropyinteractive.Keyboard;
 
+import clasesCompartidas.Ranking;
 import clasesCompartidas.Sonido;
 import clasesCompartidas.conversorTecla;
 
@@ -44,16 +45,15 @@ public class SpaceInvaders extends JGame {
     // ================== CONTROL DE NIVELES ==================
     private int desplazamientoNivelY = 0;
 
-    // ================== ESTADO DE VIDAS Y GAME OVER ==================
+    // ================== ESTADO DE VIDAS, MENÚ Y GAME OVER ==================
     private int vidas = 3;
     private boolean juegoTerminado = false;
+    private boolean enMenuInicio = true; // <--- NUEVO: Controla la pantalla de bienvenida
     private int vidasConfiguradas = 3;
+    private RankingSpace ranking;
 
     // ================== CONFIGURACIÓN LEÍDA DEL ARCHIVO ==================
-    private boolean sonidoActivado = true;   // propiedad "sonido"
-    private String  skinNave       = "Original";
-    private String  skinInvasores  = "Original";
-    private String  skinProyectil  = "Original";
+    private boolean sonidoActivado = true;   
 
     // ================== TECLAS ==================
     private int teclaIzquierdaCodigo;
@@ -69,7 +69,8 @@ public class SpaceInvaders extends JGame {
     // =================================================
     @Override
     public void gameStartup() {
-
+        ranking = new RankingSpace();
+    
         Properties config = cargarProperties();
 
         // ── Vidas ────────────────────────────────────────────────────────────
@@ -81,7 +82,6 @@ public class SpaceInvaders extends JGame {
         }
 
         // ── Velocidad de invasores ────────────────────────────────────────────
-        // Lee la clave exacta que guarda MenuConfigSpace: "velocidadInvasores"
         switch (config.getProperty("velocidadInvasores", "Media")) {
             case "Lenta":  velocidadBaseAliens = 8.0;  break;
             case "Rápida": velocidadBaseAliens = 20.0; break;
@@ -89,13 +89,7 @@ public class SpaceInvaders extends JGame {
         }
 
         // ── Sonido ───────────────────────────────────────────────────────────
-        // Lee la clave "sonido" que guarda MenuConfigSpace
         sonidoActivado = !"false".equals(config.getProperty("sonido", "true"));
-
-        // ── Skins ────────────────────────────────────────────────────────────
-        skinNave      = config.getProperty("skinNave",      "Original");
-        skinInvasores = config.getProperty("skinInvasores", "Original");
-        skinProyectil = config.getProperty("skinProyectil", "Original");
 
         // ── Teclas ───────────────────────────────────────────────────────────
         teclaIzquierdaCodigo = conversorTecla.convertirTecla(config.getProperty("teclaIzquierda", "LEFT"));
@@ -119,17 +113,14 @@ public class SpaceInvaders extends JGame {
 
         // ── Partida ───────────────────────────────────────────────────────────
         reiniciarPartidaCompleta();
+        enMenuInicio = true; // Nos aseguramos de empezar siempre mostrando el menú
 
         // ── Música ───────────────────────────────────────────────────────────
-        // Solo inicia si el sonido está activado
         if (sonidoActivado) {
             clasesCompartidas.Musica.iniciarMusica(
                 config.getProperty("musicaFondo", "space-invaders.wav")
             );
         }
-
-        // Pantalla completa: guardada en properties pero no aplicable
-        // en tiempo de ejecución sin reiniciar la ventana de JGame.
     }
 
     // =================================================
@@ -186,9 +177,17 @@ public class SpaceInvaders extends JGame {
     // =================================================
     @Override
     public void gameUpdate(double delta) {
-
         Keyboard kb = getKeyboard();
 
+        // LÓGICA DEL MENÚ DE INICIO (Antes de comenzar)
+        if (enMenuInicio) {
+            if (kb.isKeyPressed(KeyEvent.VK_ENTER)) {
+                enMenuInicio = false; // Comienza el juego al presionar ENTER
+            }
+            return;
+        }
+
+        // LÓGICA DE FIN DE JUEGO (Al finalizar)
         if (juegoTerminado) {
             if (kb.isKeyPressed(KeyEvent.VK_R)) {
                 reiniciarPartidaCompleta();
@@ -213,7 +212,6 @@ public class SpaceInvaders extends JGame {
                 ));
                 contadorDisparos++;
                 disparoPresionado = true;
-                // Solo reproduce el sonido si está activado
                 if (sonidoActivado) clasesCompartidas.Sonido.reproducir("laser.wav");
             }
         } else {
@@ -225,7 +223,7 @@ public class SpaceInvaders extends JGame {
             tiempoParaProximoUfo -= delta;
             if (tiempoParaProximoUfo <= 0) {
                 ufo.aparecer(getWidth());
-                 if (sonidoActivado) Sonido.reproducir("nave-nodriza.wav"); 
+                if (sonidoActivado) Sonido.reproducir("nave-nodriza.wav"); 
                 tiempoParaProximoUfo = 20 + Math.random() * 15;
             }
         } else {
@@ -262,6 +260,7 @@ public class SpaceInvaders extends JGame {
 
             if (juegoTerminado) {
                 clasesCompartidas.Musica.detenerMusicaFondo();
+                manejarGuardadoRanking();
                 return;
             }
 
@@ -308,9 +307,11 @@ public class SpaceInvaders extends JGame {
                     vidas--;
                     proyectiles.remove(i);
                     if (sonidoActivado) clasesCompartidas.Sonido.reproducir("explosion.wav");
+                    
                     if (vidas <= 0) {
                         juegoTerminado = true;
                         clasesCompartidas.Musica.detenerMusicaFondo();
+                        manejarGuardadoRanking(); // <--- Llamada modularizada para pedir nombre
                     }
                     continue;
                 }
@@ -340,16 +341,50 @@ public class SpaceInvaders extends JGame {
         }
     }
 
+    /**
+     * Pide el nombre de forma gráfica y procesa la persistencia del ranking.
+     */
+    private void manejarGuardadoRanking() {
+        String nombre = javax.swing.JOptionPane.showInputDialog(
+            null, 
+            "¡GAME OVER!\nTu puntaje: " + marcador.getPuntaje() + "\nIngresá tu nombre para el Ranking:", 
+            "Guardar Puntaje", 
+            javax.swing.JOptionPane.PLAIN_MESSAGE
+        );
+        int nivelAlcanzado = (desplazamientoNivelY / 40) + 1;
+        ranking.guardar(nombre, nivelAlcanzado, marcador.getPuntaje());
+    }
+
     // =================================================
     // DRAW
     // =================================================
     @Override
     public void gameDraw(Graphics2D g2) {
-
+        // Fondo del espacio común para todas las vistas
         galaxia.mostrar(g2, getWidth(), getHeight());
 
-        if (!juegoTerminado) {
+        // 1. VISTA ANTES DE COMENZAR (MENÚ DE INICIO CON TOP 10)
+        if (enMenuInicio) {
+            g2.setColor(new Color(0, 0, 0, 220));
+            g2.fillRect(0, 0, getWidth(), getHeight());
 
+            g2.setFont(new Font("Monospaced", Font.BOLD, 40));
+            g2.setColor(Color.GREEN);
+            String tituloMenu = "SPACE INVADERS";
+            g2.drawString(tituloMenu, (getWidth() - g2.getFontMetrics().stringWidth(tituloMenu)) / 2, 60);
+
+            // Dibujar el Ranking en la Interfaz Gráfica
+            dibujarTablaRanking(g2, 120);
+
+            g2.setFont(new Font("Monospaced", Font.BOLD, 20));
+            g2.setColor(Color.WHITE);
+            String jugarTxt = "[ Presioná 'ENTER' para comenzar ]";
+            g2.drawString(jugarTxt, (getWidth() - g2.getFontMetrics().stringWidth(jugarTxt)) / 2, getHeight() - 40);
+            return;
+        }
+
+        // 2. VISTA DE PARTIDA EN CURSO
+        if (!juegoTerminado) {
             double origX = canion.getX();
             double origY = canion.getY();
             int anchoCanion  = canion.getAncho();
@@ -370,24 +405,72 @@ public class SpaceInvaders extends JGame {
             if (ufo.isActiva()) ufo.mostrar(g2);
             marcador.mostrar(g2);
 
+        // 3. VISTA AL FINALIZAR LA PARTIDA (GAME OVER CON TOP 10)
         } else {
-            g2.setColor(new Color(0, 0, 0, 200));
+            g2.setColor(new Color(0, 0, 0, 230));
             g2.fillRect(0, 0, getWidth(), getHeight());
 
-            g2.setFont(new Font("Monospaced", Font.BOLD, 50));
+            g2.setFont(new Font("Monospaced", Font.BOLD, 45));
             g2.setColor(Color.RED);
-            String txt1 = "¡Perdiste!";
-            g2.drawString(txt1, (getWidth() - g2.getFontMetrics().stringWidth(txt1)) / 2, getHeight() / 2 - 60);
+            String txt1 = "¡PERDISTE!";
+            g2.drawString(txt1, (getWidth() - g2.getFontMetrics().stringWidth(txt1)) / 2, 55);
 
-            g2.setFont(new Font("Monospaced", Font.PLAIN, 24));
+            g2.setFont(new Font("Monospaced", Font.PLAIN, 20));
             g2.setColor(Color.WHITE);
             String txt2 = "Tu puntuación final: " + marcador.getPuntaje();
-            g2.drawString(txt2, (getWidth() - g2.getFontMetrics().stringWidth(txt2)) / 2, getHeight() / 2);
+            g2.drawString(txt2, (getWidth() - g2.getFontMetrics().stringWidth(txt2)) / 2, 90);
 
-            g2.setFont(new Font("Monospaced", Font.BOLD, 22));
+            // Dibujar el Ranking actualizado en caliente en la interfaz
+            dibujarTablaRanking(g2, 140);
+
+            g2.setFont(new Font("Monospaced", Font.BOLD, 20));
             g2.setColor(Color.GREEN);
             String txt3 = "[ Presioná 'R' para volver a jugar ]";
-            g2.drawString(txt3, (getWidth() - g2.getFontMetrics().stringWidth(txt3)) / 2, getHeight() / 2 + 70);
+            g2.drawString(txt3, (getWidth() - g2.getFontMetrics().stringWidth(txt3)) / 2, getHeight() - 35);
+        }
+    }
+
+    /**
+     * Dibuja los 10 mejores puntajes directamente sobre el lienzo del juego (g2).
+     */
+    private void dibujarTablaRanking(Graphics2D g2, int inicioY) {
+        g2.setFont(new Font("Monospaced", Font.BOLD, 22));
+        g2.setColor(Color.YELLOW);
+        String cabecera = "=== TOP 10 MEJORES PUNTAJES ===";
+        g2.drawString(cabecera, (getWidth() - g2.getFontMetrics().stringWidth(cabecera)) / 2, inicioY);
+
+        g2.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        g2.setColor(Color.CYAN);
+        
+        // Cabecera estructurada con todas las propiedades de la consigna
+        String columnas = String.format("%-3s %-15s %-7s %-10s %-16s", "POS", "JUGADOR", "NIVEL", "PUNTOS", "FECHA");
+        int posX = (getWidth() - g2.getFontMetrics().stringWidth(columnas)) / 2;
+        g2.drawString(columnas, posX, inicioY + 30);
+
+        g2.setColor(Color.WHITE);
+        ArrayList<Ranking.Entrada> top10 = ranking.obtenerTop10();
+        
+        int renglonY = inicioY + 55;
+        int posicion = 1;
+        
+        for (Ranking.Entrada e : top10) {
+            // Formateamos ordenadamente cada campo obtenido de la base de datos
+            String filaStr = String.format("%02d. %-15s Niv.%-4d %6d pts  %s", 
+                posicion, 
+                e.nombre.length() > 14 ? e.nombre.substring(0, 14) : e.nombre, 
+                e.nivel, 
+                e.puntaje, 
+                e.fecha
+            );
+            g2.drawString(filaStr, posX, renglonY);
+            renglonY += 24; // Espaciado vertical entre renglones del ranking
+            posicion++;
+        }
+        
+        if(top10.isEmpty()){
+            g2.setColor(Color.GRAY);
+            String vacio = "No hay registros aún. ¡Sé el primero!";
+            g2.drawString(vacio, (getWidth() - g2.getFontMetrics().stringWidth(vacio)) / 2, renglonY + 20);
         }
     }
 
@@ -410,7 +493,6 @@ public class SpaceInvaders extends JGame {
         try (InputStream in = new FileInputStream("spaceinvaders.properties")) {
             p.load(in);
         } catch (IOException e) {
-            // Valores por defecto si no existe el archivo
             p.setProperty("teclaIzquierda",    "LEFT");
             p.setProperty("teclaDerecha",       "RIGHT");
             p.setProperty("teclaDisparo",       "SPACE");
@@ -420,9 +502,6 @@ public class SpaceInvaders extends JGame {
             p.setProperty("sonido",             "true");
             p.setProperty("pantallaCompleta",   "false");
             p.setProperty("velocidadInvasores", "Media");
-            p.setProperty("skinNave",           "Original");
-            p.setProperty("skinInvasores",      "Original");
-            p.setProperty("skinProyectil",      "Original");
         }
         return p;
     }
@@ -438,5 +517,8 @@ public class SpaceInvaders extends JGame {
     @Override
     public void gameShutdown() {
         clasesCompartidas.Musica.detenerMusicaFondo();
+        if (ranking != null) {
+            ranking.cerrar();
+        }
     }
 }
