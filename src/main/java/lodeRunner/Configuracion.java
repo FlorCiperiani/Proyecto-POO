@@ -9,8 +9,11 @@ public class Configuracion {
     public static boolean efectosActivados = true;
     public static boolean sonidoGeneralActivado = true; //Agrego flor
 
-    public static String pistaMusicalSeleccionada = "tema_original.wav";
+    public static String pistaMusicalSeleccionada = "LR_musiquilla.wav";
     public static String skinPersonajeSeleccionado = "original";
+
+    public static float volumenMusica  = 0.3f;
+    public static float volumenEfectos = 0.3f;
     
     // Método para restablecer (Botón Reset de tu UI)
     public static void reset() {
@@ -19,8 +22,10 @@ public class Configuracion {
         musicaActivada = true;
         efectosActivados = true;
         sonidoGeneralActivado = true; //Agrego flor
-        pistaMusicalSeleccionada = "tema_original.wav";
+        pistaMusicalSeleccionada = "LR_musiquilla.wav";
         skinPersonajeSeleccionado = "original";
+        volumenMusica  = 0.3f;
+        volumenEfectos = 0.3f;
     }
     
 }

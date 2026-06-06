@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 /**
  * Clase principal del juego Lode Runner.
  *
@@ -47,6 +49,7 @@ public class LodeRunner extends JGame {
     private boolean escaleraList = false;
     private boolean juegoCompletado = false;
     private boolean pausado        = false;
+    private boolean teclaP_presionada = false;
 
     private double tiempoNivel  = 0;
     private double ultimoDelta  = 0;   // para pasar a dibujarTextosPuntos
@@ -56,7 +59,13 @@ public class LodeRunner extends JGame {
     private int vidasGuardadas = 5;   // vidas que se llevan al siguiente nivel
 
     public LodeRunner(String titulo, int ancho, int alto) {
-        super(titulo, ancho, alto);
+    super(titulo, ancho, alto);
+    getFrame().addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent e) {
+            Musica.detenerMusicaFondo();
+        }
+    });
     }
 
     // ── Ciclo JGame ──────────────────────────────────────────────────────
@@ -65,7 +74,6 @@ public class LodeRunner extends JGame {
     public void gameStartup() {
         indiceNivel = 0;
         puntajeTotal = 0;
-        Musica.iniciarMusica(MUSICA_FONDO);
         inicializarNivel();
     }
 
@@ -75,8 +83,21 @@ public class LodeRunner extends JGame {
         if (teclado.isKeyPressed(KeyEvent.VK_ESCAPE)) { stop(); return; }
 
         // ── Pausa ─────────────────────────────────────────────────────────
-        if (teclado.isKeyPressed(KeyEvent.VK_P)) pausado = !pausado;
-        if (pausado) return;
+        if (teclado.isKeyPressed(KeyEvent.VK_P) && !teclaP_presionada) {
+            teclaP_presionada = true;
+            if (!pausado) {
+                pausado = true;
+                SwingUtilities.invokeLater(() -> new MenuConfigLR());
+            } else {
+                pausado = false;
+            }
+        } else if (!teclado.isKeyPressed(KeyEvent.VK_P)) {
+            teclaP_presionada = false;
+        }
+        if (pausado) {
+            if (teclado.isKeyPressed(KeyEvent.VK_ENTER)) pausado = false;
+            return;
+        }
 
         // ── Atajo de desarrollo: N → siguiente nivel ──────────────────────
         if (teclado.isKeyPressed(KeyEvent.VK_N)) {
@@ -144,8 +165,11 @@ public class LodeRunner extends JGame {
         for (EnemigoLR e : enemigos) {
             if (jugador.colisionaCon(e) && !jugador.estaPisandoCabeza(e) && !e.isEnHoyo()) {
                 jugador.perderVida();
-                if (jugador.getVidas() <= 0) { Sonido.reproducir("gameOver.wav"); gameOver = true; }
-                else                          { Sonido.reproducir("LR_me_mataron.wav");     derrota  = true; }
+                if (jugador.getVidas() <= 0) { 
+                    if (Configuracion.efectosActivados && Configuracion.sonidoGeneralActivado) Sonido.reproducir("gameOver.wav"); 
+                }else { 
+                    if (Configuracion.efectosActivados && Configuracion.sonidoGeneralActivado) Sonido.reproducir("LR_me_mataron.wav");    
+                }
                 return;
             }
             if (e.isEnHoyo()) jugador.sumarPuntos(200);
@@ -228,7 +252,9 @@ public class LodeRunner extends JGame {
         tiempoNivel  = 0;
         pausado      = false;
         Musica.detenerMusicaFondo();
-        Musica.iniciarMusica(MUSICA_FONDO);
+        if (Configuracion.musicaActivada && Configuracion.sonidoGeneralActivado) {
+            Musica.iniciarMusica(Configuracion.pistaMusicalSeleccionada);
+        }
 
         nivelActual  = NIVELES[indiceNivel];
         int[][] diseño = nivelActual.getDiseño();

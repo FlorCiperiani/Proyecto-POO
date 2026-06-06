@@ -7,113 +7,204 @@ import java.awt.event.ActionListener;
 
 public class MenuConfigLR extends JFrame {
 
-    // Componentes interactivos de la interfaz
-    private JCheckBox chkPantallaCompleta;
-    private JCheckBox chkSonidoGeneral;
-    private JCheckBox chkMusica;
-    private JCheckBox chkEfectos;
+    // ── Componentes ────────────────────────────────────────────────────────
+    private JRadioButton rdVentana;
+    private JRadioButton rdPantallaCompleta;
+    private JCheckBox    chkSonidoGeneral;
+    private JCheckBox    chkMusica;
+    private JCheckBox    chkEfectos;
     private JComboBox<String> comboMusica;
     private JComboBox<String> comboSkin;
-    
-    private JButton btnGuardar;
-    private JButton btnReset;
+    private JButton      btnGuardar;
+    private JButton      btnReset;
+
+    // Fuente y colores al estilo Pong
+    private static final Font  FONT_LR  = new Font("Courier New", Font.BOLD, 16);
+    private static final Color FG_COLOR = Color.WHITE;
+    private static final Color BG_COLOR = Color.BLACK;
 
     public MenuConfigLR() {
-        // Configuración básica de la ventana emergente
         setTitle("Configuración - Lode Runner");
-        setSize(400, 350);
-        setLayout(new BorderLayout(10, 10));
-        setLocationRelativeTo(null); // La centra en la pantalla
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Solo cierra esta ventana, no todo el juego
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-        // ── PANEL DE PARAMETROS (Formulario) ───────────────────────────
-        JPanel panelFormulario = new JPanel(new GridLayout(6, 2, 10, 10));
-        panelFormulario.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        // ── Panel principal con imagen de fondo ────────────────────────
+        JPanel panelCompleto = new JPanel(new BorderLayout()) {
+            private final Image fondo = new ImageIcon(
+                getClass().getResource("/LodeRunner/portada_loderunner.png")).getImage();
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (fondo != null) {
+                    // Oscurecer un poco para que el texto sea legible
+                    g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
+                    g.setColor(new Color(0, 0, 0, 160));
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
 
-        // 1. Modo de pantalla
-        panelFormulario.add(new JLabel("Modo de Pantalla:"));
-        chkPantallaCompleta = new JCheckBox("Pantalla Completa", Configuracion.pantallaCompleta);
-        panelFormulario.add(chkPantallaCompleta);
+        // ── Panel formulario con GridBagLayout (igual que Pong) ────────
+        JPanel config = new JPanel(new GridBagLayout());
+        config.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(6, 10, 6, 10);
 
-        // 2. Sonido General (Master Switch)
-        panelFormulario.add(new JLabel("Sonido General:"));
-        chkSonidoGeneral = new JCheckBox("Activado", Configuracion.sonidoGeneralActivado);
-        panelFormulario.add(chkSonidoGeneral);
+        // 1. Pantalla
+        rdVentana         = makeRadioButton("Ventana",          !Configuracion.pantallaCompleta);
+        rdPantallaCompleta = makeRadioButton("Pantalla completa", Configuracion.pantallaCompleta);
+        ButtonGroup grupoPantalla = new ButtonGroup();
+        grupoPantalla.add(rdVentana);
+        grupoPantalla.add(rdPantallaCompleta);
 
-        // 3. Música de Fondo
-        panelFormulario.add(new JLabel("Música de Fondo:"));
-        chkMusica = new JCheckBox("Activado", Configuracion.musicaActivada);
-        panelFormulario.add(chkMusica);
+        addRow(config, gbc, 0, "Pantalla:", rdVentana, rdPantallaCompleta);
 
-        // 4. Efectos de Sonido
-        panelFormulario.add(new JLabel("Efectos de Sonido:"));
-        chkEfectos = new JCheckBox("Activado", Configuracion.efectosActivados);
-        panelFormulario.add(chkEfectos);
+        // 2. Sonido general
+        chkSonidoGeneral = makeCheckBox("Activado", Configuracion.sonidoGeneralActivado);
+        addRow(config, gbc, 1, "Sonido General:", chkSonidoGeneral, null);
 
-        // 5. Selección de Pista Musical
-        panelFormulario.add(new JLabel("Pista Musical:"));
-        String[] pistas = {"tema_original.wav", "tema_moderno.wav", "tema_retro.wav"};
-        comboMusica = new JComboBox<>(pistas);
-        comboMusica.setSelectedItem(Configuracion.pistaMusicalSeleccionada);
-        panelFormulario.add(comboMusica);
+        // 3. Música
+        chkMusica = makeCheckBox("Activado", Configuracion.musicaActivada);
+        addRow(config, gbc, 2, "Música de Fondo:", chkMusica, null);
 
-        // 6. Selección de Skin
-        panelFormulario.add(new JLabel("Skin del Personaje:"));
+        // 4. Efectos
+        chkEfectos = makeCheckBox("Activado", Configuracion.efectosActivados);
+        addRow(config, gbc, 3, "Efectos de Sonido:", chkEfectos, null);
+
+        // 7. Pista musical
+        String[] pistas = {"LR_musiquilla.wav", "retro.wav"};
+        comboMusica = makeCombo(pistas, Configuracion.pistaMusicalSeleccionada);
+        addRow(config, gbc, 6, "Pista Musical:", comboMusica, null);
+
+        // 8. Skin
         String[] skins = {"original", "clasico_8bit", "moderno"};
-        comboSkin = new JComboBox<>(skins);
-        comboSkin.setSelectedItem(Configuracion.skinPersonajeSeleccionado);
-        panelFormulario.add(comboSkin);
+        comboSkin = makeCombo(skins, Configuracion.skinPersonajeSeleccionado);
+        addRow(config, gbc, 7, "Skin del Personaje:", comboSkin, null);
 
-        add(panelFormulario, BorderLayout.CENTER);
+        // ── Panel botones ──────────────────────────────────────────────
+        btnGuardar = makeButton("Guardar");
+        btnReset   = makeButton("Restablecer");
 
-        // ── PANEL DE BOTONES (Guardar y Reset) ─────────────────────────
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        btnGuardar = new JButton("Guardar");
-        btnReset = new JButton("Reset");
-        
+        panelBotones.setOpaque(false);
         panelBotones.add(btnGuardar);
         panelBotones.add(btnReset);
-        add(panelBotones, BorderLayout.SOUTH);
 
-        // ── LÓGICA DE LOS BOTONES (Listeners) ──────────────────────────
-        
-        // Acción del Botón Guardar
-        btnGuardar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Pasamos los valores de la UI a nuestras variables estáticas de Configuración
-                Configuracion.pantallaCompleta = chkPantallaCompleta.isSelected();
-                Configuracion.sonidoGeneralActivado = chkSonidoGeneral.isSelected();
-                Configuracion.musicaActivada = chkMusica.isSelected();
-                Configuracion.efectosActivados = chkEfectos.isSelected();
-                Configuracion.pistaMusicalSeleccionada = (String) comboMusica.getSelectedItem();
-                Configuracion.skinPersonajeSeleccionado = (String) comboSkin.getSelectedItem();
+        panelCompleto.add(config, BorderLayout.CENTER);
+        panelCompleto.add(panelBotones, BorderLayout.SOUTH);
+        add(panelCompleto);
 
-                JOptionPane.showMessageDialog(MenuConfigLR.this, "Configuración guardada con éxito.");
-                dispose(); // Cierra la ventana de configuración
-            }
-        });
+        // ── Listeners ──────────────────────────────────────────────────
+        btnGuardar.addActionListener(e -> guardar());
+        btnReset.addActionListener(e -> reset());
 
-        // Acción del Botón Reset
-        btnReset.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Volvemos los valores lógicos a fábrica
-                Configuracion.reset();
-                
-                // Refrescamos los componentes de la interfaz para que reflejen el reset
-                chkPantallaCompleta.setSelected(Configuracion.pantallaCompleta);
-                chkSonidoGeneral.setSelected(Configuracion.sonidoGeneralActivado);
-                chkMusica.setSelected(Configuracion.musicaActivada);
-                chkEfectos.setSelected(Configuracion.efectosActivados);
-                comboMusica.setSelectedItem(Configuracion.pistaMusicalSeleccionada);
-                comboSkin.setSelectedItem(Configuracion.skinPersonajeSeleccionado);
-                
-                JOptionPane.showMessageDialog(MenuConfigLR.this, "Se han restablecido los valores por defecto.");
-            }
-        });
-
-        // Hacer visible la ventana apenas se instancia
         setVisible(true);
+    }
+
+    // ── Lógica ────────────────────────────────────────────────────────────
+
+    private void guardar() {
+        Configuracion.pantallaCompleta      = rdPantallaCompleta.isSelected();
+        Configuracion.sonidoGeneralActivado = chkSonidoGeneral.isSelected();
+        Configuracion.musicaActivada        = chkMusica.isSelected();
+        Configuracion.efectosActivados      = chkEfectos.isSelected();
+        Configuracion.pistaMusicalSeleccionada  = (String) comboMusica.getSelectedItem();
+        Configuracion.skinPersonajeSeleccionado = (String) comboSkin.getSelectedItem();
+
+        // Aplicar cambios de música inmediatamente
+        if (!Configuracion.sonidoGeneralActivado || !Configuracion.musicaActivada) {
+            clasesCompartidas.Musica.detenerMusicaFondo();
+        } else {
+            clasesCompartidas.Musica.detenerMusicaFondo();
+            clasesCompartidas.Musica.iniciarMusica(Configuracion.pistaMusicalSeleccionada);
+        }
+
+        JOptionPane.showMessageDialog(this, "Configuración guardada con éxito.");
+        dispose();
+    }
+
+    private void reset() {
+        Configuracion.reset();
+
+        rdVentana.setSelected(!Configuracion.pantallaCompleta);
+        rdPantallaCompleta.setSelected(Configuracion.pantallaCompleta);
+        chkSonidoGeneral.setSelected(Configuracion.sonidoGeneralActivado);
+        chkMusica.setSelected(Configuracion.musicaActivada);
+        chkEfectos.setSelected(Configuracion.efectosActivados);
+        comboMusica.setSelectedItem(Configuracion.pistaMusicalSeleccionada);
+        comboSkin.setSelectedItem(Configuracion.skinPersonajeSeleccionado);
+
+        JOptionPane.showMessageDialog(this, "Se han restablecido los valores por defecto.");
+    }
+
+    // ── Helpers de construcción ───────────────────────────────────────────
+
+    /** Agrega una fila con label + hasta 2 componentes al GridBag */
+    private void addRow(JPanel panel, GridBagConstraints g, int row,
+                        String labelText, JComponent c1, JComponent c2) {
+        g.gridx = 0; g.gridy = row;
+        panel.add(makeLabel(labelText), g);
+        g.gridx = 1;
+        panel.add(c1, g);
+        if (c2 != null) { g.gridx = 2; panel.add(c2, g); }
+    }
+
+    /** Agrega una fila de slider: label | slider (ancho) | porcentaje */
+    private void addSliderRow(JPanel panel, GridBagConstraints g, int row,
+                              String labelText, JSlider slider, JLabel pct) {
+        g.gridx = 0; g.gridy = row;
+        panel.add(makeLabel(labelText), g);
+        g.gridx = 1; g.fill = GridBagConstraints.HORIZONTAL; g.weightx = 1.0;
+        panel.add(slider, g);
+        g.gridx = 2; g.fill = GridBagConstraints.NONE; g.weightx = 0;
+        panel.add(pct, g);
+    }
+
+    private JLabel makeLabel(String text) {
+        JLabel lbl = new JLabel(text);
+        lbl.setFont(FONT_LR);
+        lbl.setForeground(FG_COLOR);
+        return lbl;
+    }
+
+    private JRadioButton makeRadioButton(String text, boolean selected) {
+        JRadioButton rb = new JRadioButton(text, selected);
+        rb.setFont(FONT_LR);
+        rb.setForeground(FG_COLOR);
+        rb.setBackground(BG_COLOR);
+        rb.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
+        rb.setOpaque(true);
+        return rb;
+    }
+
+    private JCheckBox makeCheckBox(String text, boolean selected) {
+        JCheckBox cb = new JCheckBox(text, selected);
+        cb.setFont(FONT_LR);
+        cb.setForeground(FG_COLOR);
+        cb.setBackground(BG_COLOR);
+        cb.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
+        cb.setOpaque(true);
+        return cb;
+    }
+
+    private JComboBox<String> makeCombo(String[] items, String selected) {
+        JComboBox<String> cb = new JComboBox<>(items);
+        cb.setSelectedItem(selected);
+        cb.setFont(FONT_LR);
+        cb.setForeground(FG_COLOR);
+        cb.setBackground(BG_COLOR);
+        cb.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
+        return cb;
+    }
+
+    private JButton makeButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(FONT_LR);
+        btn.setForeground(FG_COLOR);
+        btn.setBackground(BG_COLOR);
+        btn.setBorder(BorderFactory.createLineBorder(Color.GRAY, 3, true));
+        return btn;
     }
 }

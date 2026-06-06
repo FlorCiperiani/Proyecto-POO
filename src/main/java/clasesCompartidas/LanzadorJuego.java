@@ -144,7 +144,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         String ruta = null;
         if ("Pong".equals(nombre)) ruta = "/assetsLanzador/pingPong.png";
         else if ("SpaceInvaders".equals(nombre)) ruta = "/AssetsSpace/yellow.png";
-        else if ("Lode Runner".equals(nombre)) ruta = "/lodeRunner/jugador_neutral.png"; // CORREGIDO: Ahora coincide con la lista
+        else if ("Lode Runner".equals(nombre)) ruta = "/LodeRunner/jugador_neutral.png";
         
 
         try {
@@ -199,13 +199,15 @@ public class LanzadorJuego extends JFrame implements ActionListener {
 
     // Método auxiliar para evitar repetir código de hilos repetidas veces
     private void iniciarHiloJuego() {
-        t = new Thread() {
-            @Override
-            public void run() {
-                juego.run(1.0 / 60.0);
-            }
-        };
-        t.start();
+    t = new Thread() {
+        @Override
+        public void run() {
+            juego.run(1.0 / 60.0);
+            // Cuando el juego termina (por X o por ESC), detener música
+            clasesCompartidas.Musica.detenerMusicaFondo();
+        }
+    };
+    t.start();
     }
 
     public static void main(String[] args) {
