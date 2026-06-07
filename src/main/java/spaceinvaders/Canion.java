@@ -7,7 +7,11 @@ public class Canion extends ObjetoGrafico {
     private double velocidad = 300; // Píxeles por segundo
 
     public Canion(double x, double y) {
-        super("/AssetsSpace/player.png");
+        this(x, y, "/AssetsSpace/player.png");
+    }
+
+    public Canion(double x, double y, String rutaImagen) {
+        super(rutaImagen);
         this.posicionX = x;
         this.posicionY = y;
        

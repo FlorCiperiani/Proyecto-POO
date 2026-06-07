@@ -23,6 +23,8 @@ public class MenuConfigSpace implements ActionListener {
 
     // ── Visual ────────────────────────────────────────────────────────────────
     private JComboBox<String> comboGalaxia;   // fondo de pantalla
+    private JComboBox<String> comboSkinInvasores; // skin de invasores
+    private JComboBox<String> comboSkinNave;     // skin de nave
 
     // ── Audio ─────────────────────────────────────────────────────────────────
     private JComboBox<String> pistaMusical;
@@ -83,6 +85,8 @@ public class MenuConfigSpace implements ActionListener {
 
         velocidadInvasores = crearCombo(new String[]{"Lenta", "Media", "Rápida"});
         comboGalaxia       = crearCombo(new String[]{"Original", "Ciudad", "Oceano"});
+        comboSkinInvasores = crearCombo(new String[]{"Original", "Alternativa"});
+        comboSkinNave      = crearCombo(new String[]{"Original", "Alternativa"});
         pistaMusical       = crearCombo(new String[]{
             "space-invaders.wav", "undertale.wav", "retro.wav", "arcade.wav"
         });
@@ -124,6 +128,10 @@ public class MenuConfigSpace implements ActionListener {
         seccion(config, gbc, "── Visual ──", f++);
         label(config, gbc, "Fondo:", 0, f);
         comp(config, gbc, comboGalaxia, 1, f++);
+        label(config, gbc, "Invasores:", 0, f);
+        comp(config, gbc, comboSkinInvasores, 1, f++);
+        label(config, gbc, "Nave:", 0, f);
+        comp(config, gbc, comboSkinNave, 1, f++);
 
         // — Controles —
         espacio(config, gbc, f++);
@@ -246,6 +254,8 @@ public class MenuConfigSpace implements ActionListener {
 
         seleccionar(velocidadInvasores, p.getProperty("velocidadInvasores", "Media"));
         seleccionar(comboGalaxia,       p.getProperty("fondoGalaxia",       "Original"));
+        seleccionar(comboSkinInvasores, p.getProperty("skinInvasores",      "Original"));
+        seleccionar(comboSkinNave,      p.getProperty("skinNave",           "Original"));
         seleccionar(pistaMusical,       p.getProperty("musicaFondo",        "space-invaders.wav"));
     }
 
@@ -266,6 +276,8 @@ public class MenuConfigSpace implements ActionListener {
             sonidoBox.setSelected(true);
             velocidadInvasores.setSelectedIndex(1); // Media
             comboGalaxia.setSelectedIndex(0);       // Original
+            comboSkinInvasores.setSelectedIndex(0); // Original
+            comboSkinNave.setSelectedIndex(0);      // Original
             pistaMusical.setSelectedIndex(0);        // space-invaders.wav
             return;
         }
@@ -279,6 +291,8 @@ public class MenuConfigSpace implements ActionListener {
         p.setProperty("sonido",            String.valueOf(sonidoBox.isSelected()));
         p.setProperty("velocidadInvasores",(String) velocidadInvasores.getSelectedItem());
         p.setProperty("fondoGalaxia",      (String) comboGalaxia.getSelectedItem());
+        p.setProperty("skinInvasores",     (String) comboSkinInvasores.getSelectedItem());
+        p.setProperty("skinNave",          (String) comboSkinNave.getSelectedItem());
         p.setProperty("musicaFondo",       (String) pistaMusical.getSelectedItem());
 
         try (OutputStream out = new FileOutputStream(rutaArchivo)) {
