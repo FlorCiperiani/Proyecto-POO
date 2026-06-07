@@ -50,6 +50,8 @@ public class LodeRunner extends JGame {
     private boolean juegoCompletado = false;
     private boolean pausado        = false;
     private boolean teclaP_presionada = false;
+    private boolean teclaQ_presionada = false;
+    private boolean teclaW_presionada = false;
 
     private double tiempoNivel  = 0;
     private double ultimoDelta  = 0;   // para pasar a dibujarTextosPuntos
@@ -98,6 +100,27 @@ public class LodeRunner extends JGame {
             if (teclado.isKeyPressed(KeyEvent.VK_ENTER)) pausado = false;
             return;
         }
+
+        // ── Teclas de sonido ──────────────────────────────────────────────
+        if (teclado.isKeyPressed(KeyEvent.VK_Q) && !teclaQ_presionada) {
+            teclaQ_presionada = true;
+            Configuracion.efectosActivados = !Configuracion.efectosActivados;
+        } else if (!teclado.isKeyPressed(KeyEvent.VK_Q)) {
+            teclaQ_presionada = false;
+        }
+
+        if (teclado.isKeyPressed(KeyEvent.VK_W) && !teclaW_presionada) {
+            teclaW_presionada = true;
+            Configuracion.musicaActivada = !Configuracion.musicaActivada;
+            if (Configuracion.musicaActivada && Configuracion.sonidoGeneralActivado) {
+                Musica.iniciarMusica(Configuracion.pistaMusicalSeleccionada);
+            } else {
+                Musica.detenerMusicaFondo();
+            }
+        } else if (!teclado.isKeyPressed(KeyEvent.VK_W)) {
+            teclaW_presionada = false;
+        }
+
 
         // ── Atajo de desarrollo: N → siguiente nivel ──────────────────────
         if (teclado.isKeyPressed(KeyEvent.VK_N)) {
@@ -166,9 +189,11 @@ public class LodeRunner extends JGame {
             if (jugador.colisionaCon(e) && !jugador.estaPisandoCabeza(e) && !e.isEnHoyo()) {
                 jugador.perderVida();
                 if (jugador.getVidas() <= 0) { 
-                    if (Configuracion.efectosActivados && Configuracion.sonidoGeneralActivado) Sonido.reproducir("gameOver.wav"); 
-                }else { 
-                    if (Configuracion.efectosActivados && Configuracion.sonidoGeneralActivado) Sonido.reproducir("LR_me_mataron.wav");    
+                    if (Configuracion.efectosActivados && Configuracion.sonidoGeneralActivado) Sonido.reproducir("gameOver.wav");
+                    gameOver = true;
+                } else { 
+                    if (Configuracion.efectosActivados && Configuracion.sonidoGeneralActivado) Sonido.reproducir("LR_me_mataron.wav");
+                    derrota = true;
                 }
                 return;
             }

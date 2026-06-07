@@ -144,7 +144,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         String ruta = null;
         if ("Pong".equals(nombre)) ruta = "/assetsLanzador/pingPong.png";
         else if ("SpaceInvaders".equals(nombre)) ruta = "/AssetsSpace/yellow.png";
-        else if ("Lode Runner".equals(nombre)) ruta = "/LodeRunner/jugador_neutral.png";
+        else if ("Lode Runner".equals(nombre)) ruta = "/assetsLanzador/iconoLR.png";
         
 
         try {

@@ -53,8 +53,8 @@ public class JugadorLR extends PersonajeLR {
     private int teclaDer       = KeyEvent.VK_RIGHT;
     private int teclaArriba    = KeyEvent.VK_UP;
     private int teclaAbajo     = KeyEvent.VK_DOWN;
-    private int teclaRomperIzq = KeyEvent.VK_Z;
-    private int teclaRomperDer = KeyEvent.VK_X;
+    private int teclaRomperIzq = KeyEvent.VK_SPACE;
+    private int teclaRomperDer = KeyEvent.VK_SPACE;
 
     // Última dirección no-cero: se usa para cavar, sprite de barra y pose general.
     // Mantiene el último valor -1 o +1 aunque se suelten las teclas.
@@ -69,6 +69,7 @@ public class JugadorLR extends PersonajeLR {
     private int    frameAnim    = 0;
     private int    estadoAnim   = 0;   // 0=suelo 1=cayendo 2=escalera 3=barra
     private boolean moviendoVertical = false;
+    private boolean moviendoHorizontal = false;
 
     private static final double FPS_ESCALERA = 5.0;
     private static final double FPS_BARRA    = 6.0;
@@ -118,6 +119,7 @@ public class JugadorLR extends PersonajeLR {
 
         // Movimiento (bloqueado durante caída libre y si está en hoyo)
         moviendoVertical = false;
+        moviendoHorizontal = presIzq || presDer;
         if (!enHoyo) {
             if (presIzq) moverIzquierda(delta);
             if (presDer) moverDerecha(delta);
@@ -280,7 +282,9 @@ public class JugadorLR extends PersonajeLR {
                 break;
 
             default: // ESTADO_SUELO
-                if (ultimaDireccion == -1 && imgIzquierda != null) {
+                if (!moviendoHorizontal) {
+                    imagen = imgNeutral;
+                } else if (ultimaDireccion == -1 && imgIzquierda != null) {
                     imagen = imgIzquierda;
                 } else if (ultimaDireccion == +1 && imgDerecha != null) {
                     imagen = imgDerecha;
