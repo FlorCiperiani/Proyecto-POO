@@ -127,18 +127,13 @@ public class JugadorLR extends PersonajeLR {
             if (teclado.isKeyPressed(teclaAbajo))  { moverAbajo(delta);  moviendoVertical = true; }
         }
 
-        // Excavación: UNA SOLA TECLA (Z).
+        // Excavación: UNA SOLA TECLA (espacio).
         // La dirección del agujero depende del último botón direccional presionado:
         //   → último fue RIGHT  => agujero a la DERECHA
         //   → último fue LEFT   => agujero a la IZQUIERDA
-        boolean zActual = teclado.isKeyPressed(teclaRomperIzq);
-        if (zActual && !teclaZAnterior) romperLadrillo(ultimaDireccion);
-        teclaZAnterior = zActual;
-
-        // X cava en la dirección contraria
-        boolean xActual = teclado.isKeyPressed(teclaRomperDer);
-        if (xActual && !teclaXAnterior) romperLadrillo(-ultimaDireccion);
-        teclaXAnterior = xActual;
+        boolean espacioActual = teclado.isKeyPressed(KeyEvent.VK_SPACE);
+        if (espacioActual && !teclaZAnterior) romperLadrillo(ultimaDireccion);
+        teclaZAnterior = espacioActual;
 
         aplicarGravedad(delta);
         recolectarOro();
