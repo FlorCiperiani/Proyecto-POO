@@ -511,12 +511,10 @@ public class SpaceInvaders extends JGame {
                 case "Calamar":  return "/AssetsSpace/nuevoVerde.png";
             }
         } else if ("Oceano".equals(skinInvasores)) {
-            // TEMPORAL (faltan assets "*-oceano.png" en resources).
-            // Para que el juego muestre sprites, usamos los disponibles.
             switch (tipo) {
-                case "Pulpo":    return "/AssetsSpace/red.png";
-                case "Cangrejo": return "/AssetsSpace/yellow.png";
-                case "Calamar":  return "/AssetsSpace/green.png";
+                case "Pulpo":    return "/AssetsSpace/Pirania-oceano.png";
+                case "Cangrejo": return "/AssetsSpace/Caracol-oceano.png";
+                case "Calamar":  return "/AssetsSpace/Cangrejo-oceano.png";
             }
         }
 
