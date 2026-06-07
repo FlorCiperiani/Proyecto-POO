@@ -15,15 +15,8 @@ import java.util.Properties;
  *  - Lógica de carga y guardado en archivo .properties
  *  - Botones Guardar y Restablecer
  *  - GridBagLayout listo para agregar filas
- *
- * Cómo extender:
- *  1. Llamar a super(rutaArchivo, rutaImagenFondo) en el constructor
- *  2. Crear los componentes específicos del juego
- *  3. Agregarlos al panel con agregarSeccion(), agregarFila(), agregarEspacio()
- *  4. Implementar cargarValores() para leer el .properties y poblar los componentes
- *  5. Implementar guardarValores() para leer los componentes y escribir en el .properties
- *  6. Implementar restablecerDefectos() para el botón Reset
- *  7. Llamar a construir() al final del constructor de la subclase
+
+
  */
 public abstract class Configuracion implements ActionListener {
 
