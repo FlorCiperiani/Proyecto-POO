@@ -2,6 +2,8 @@ package pong;
 
 import clasesCompartidas.Configuracion;
 import javax.swing.*;
+import java.io.*;
+import java.util.Properties;
 
 public class MenuConfig extends Configuracion {
 
@@ -23,8 +25,7 @@ public class MenuConfig extends Configuracion {
               "defaultPong.properties",
               "/pong/fondoConfig.jpg");
 
-        // ── Crear componentes ─────────────────────────────────────────────────
-        ventana        = crearRadio("Ventana", true);
+        ventana          = crearRadio("Ventana", true);
         pantallaCompleta = crearRadio("Pantalla completa", false);
         ButtonGroup grupoVentana = new ButtonGroup();
         grupoVentana.add(ventana);
@@ -36,12 +37,11 @@ public class MenuConfig extends Configuracion {
         paleta       = crearCombo(new String[]{"Original", "Paleta azul", "Paleta roja"});
         cancha       = crearCombo(new String[]{"Original", "Cancha 1", "Cancha 2"});
 
-        movArriba1 = crearTextField("W",  5);
-        movAbajo1  = crearTextField("S",  5);
-        movArriba2 = crearTextField("↑",  5);
-        movAbajo2  = crearTextField("↓",  5);
+        movArriba1 = crearTextField("W", 5);
+        movAbajo1  = crearTextField("S", 5);
+        movArriba2 = crearTextField("↑", 5);
+        movAbajo2  = crearTextField("↓", 5);
 
-        // ── Armar el panel usando los helpers de la clase base ─────────────────
         agregarSeccion("── Pantalla ──");
         agregarFilaDoble("Pantalla:", ventana, pantallaCompleta);
 
@@ -66,8 +66,17 @@ public class MenuConfig extends Configuracion {
         agregarFila("Cancha:", cancha);
         agregarFila("Paleta:", paleta);
 
-        // ── Finalizar ─────────────────────────────────────────────────────────
         construir();
+    }
+
+    // ── Método estático que Pong.java usa directamente ────────────────────────
+    // Se mantiene aquí para no romper las llamadas: MenuConfig.cargarEnArchivo(...)
+    public static void cargarEnArchivo(Properties props, String rutaArchivo) {
+        try (FileInputStream in = new FileInputStream(rutaArchivo)) {
+            props.load(in);
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar configuración: " + rutaArchivo);
+        }
     }
 
     // ── Implementación de los métodos abstractos ──────────────────────────────
@@ -110,10 +119,10 @@ public class MenuConfig extends Configuracion {
     protected void restablecerDefectos() {
         ventana.setSelected(true);
         musicaBox.setSelected(true);
-        pistaMusical.setSelectedIndex(0); // retro.wav
-        pelota.setSelectedIndex(0);       // Original
-        paleta.setSelectedIndex(0);       // Original
-        cancha.setSelectedIndex(0);       // Original
+        pistaMusical.setSelectedIndex(0);
+        pelota.setSelectedIndex(0);
+        paleta.setSelectedIndex(0);
+        cancha.setSelectedIndex(0);
         movArriba1.setText("W");
         movAbajo1.setText("S");
         movArriba2.setText("↑");
