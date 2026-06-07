@@ -32,6 +32,7 @@ public class LodeRunner extends JGame {
     // ── Componentes ──────────────────────────────────────────────────────
     private MapaLR       mapa;
     private JugadorLR    jugador;
+    public static JugadorLR jugadorActual;
     private ArrayList<EnemigoLR> enemigos;
     private NivelLR      nivelActual;
     private int          indiceNivel = 0;
@@ -104,16 +105,16 @@ public class LodeRunner extends JGame {
         // ── Teclas de sonido ──────────────────────────────────────────────
         if (teclado.isKeyPressed(KeyEvent.VK_Q) && !teclaQ_presionada) {
             teclaQ_presionada = true;
-            Configuracion.efectosActivados = !Configuracion.efectosActivados;
+            MenuConfigLR.efectosActivados = !MenuConfigLR.efectosActivados;
         } else if (!teclado.isKeyPressed(KeyEvent.VK_Q)) {
             teclaQ_presionada = false;
         }
 
         if (teclado.isKeyPressed(KeyEvent.VK_W) && !teclaW_presionada) {
             teclaW_presionada = true;
-            Configuracion.musicaActivada = !Configuracion.musicaActivada;
-            if (Configuracion.musicaActivada && Configuracion.sonidoGeneralActivado) {
-                Musica.iniciarMusica(Configuracion.pistaMusicalSeleccionada);
+            MenuConfigLR.musicaActivada = !MenuConfigLR.musicaActivada;
+            if (MenuConfigLR.musicaActivada && MenuConfigLR.sonidoGeneralActivado) {
+                Musica.iniciarMusica(MenuConfigLR.pistaMusicalSeleccionada);
             } else {
                 Musica.detenerMusicaFondo();
             }
@@ -189,10 +190,10 @@ public class LodeRunner extends JGame {
             if (jugador.colisionaCon(e) && !jugador.estaPisandoCabeza(e) && !e.isEnHoyo()) {
                 jugador.perderVida();
                 if (jugador.getVidas() <= 0) { 
-                    if (Configuracion.efectosActivados && Configuracion.sonidoGeneralActivado) Sonido.reproducir("gameOver.wav");
+                    if (MenuConfigLR.efectosActivados && MenuConfigLR.sonidoGeneralActivado) Sonido.reproducir("gameOver.wav");
                     gameOver = true;
                 } else { 
-                    if (Configuracion.efectosActivados && Configuracion.sonidoGeneralActivado) Sonido.reproducir("LR_me_mataron.wav");
+                    if (MenuConfigLR.efectosActivados && MenuConfigLR.sonidoGeneralActivado) Sonido.reproducir("LR_me_mataron.wav");
                     derrota = true;
                 }
                 return;
@@ -277,8 +278,8 @@ public class LodeRunner extends JGame {
         tiempoNivel  = 0;
         pausado      = false;
         Musica.detenerMusicaFondo();
-        if (Configuracion.musicaActivada && Configuracion.sonidoGeneralActivado) {
-            Musica.iniciarMusica(Configuracion.pistaMusicalSeleccionada);
+        if (MenuConfigLR.musicaActivada && MenuConfigLR.sonidoGeneralActivado) {
+            Musica.iniciarMusica(MenuConfigLR.pistaMusicalSeleccionada);
         }
 
         nivelActual  = NIVELES[indiceNivel];
@@ -291,6 +292,7 @@ public class LodeRunner extends JGame {
             MapaLR.TILE_SIZE * spawnJ[0],
             MapaLR.TILE_SIZE * spawnJ[1]
         );
+        jugadorActual = jugador;
         jugador.setMapa(mapa);
 
         // Restaurar vidas del nivel anterior (se pierden al morir, no al cambiar nivel)

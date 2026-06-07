@@ -75,17 +75,17 @@ public class JugadorLR extends PersonajeLR {
     private static final double FPS_BARRA    = 6.0;
 
     public JugadorLR(double x, double y) {
-        super("/lodeRunner/jugador.png", x, y, 120.0);
+        super("/lodeRunner/skins/" + MenuConfigLR.skinPersonajeSeleccionado + "/jugador.png", x, y, 120.0);
+        String base = "/lodeRunner/skins/" + MenuConfigLR.skinPersonajeSeleccionado + "/";
         imgNeutral   = imagen;
-        imgIzquierda = cargarImagen("/lodeRunner/jugador_left.png");
-        imgDerecha   = cargarImagen("/lodeRunner/jugador_right.png");
-        imgCayendo   = cargarImagen("/lodeRunner/jugador_cayendo.png");
-        imgEscaleraA = cargarImagen("/lodeRunner/jugador_escalera_a.png");
-        imgEscaleraB = cargarImagen("/lodeRunner/jugador_escalera_b.png");
-        imgBarraA    = cargarImagen("/lodeRunner/jugador_barra_a.png");
-        imgBarraB    = cargarImagen("/lodeRunner/jugador_barra_b.png");
+        imgIzquierda = cargarImagen(base + "jugador_left.png");
+        imgDerecha   = cargarImagen(base + "jugador_right.png");
+        imgCayendo   = cargarImagen(base + "jugador_cayendo.png");
+        imgEscaleraA = cargarImagen(base + "jugador_escalera_a.png");
+        imgEscaleraB = cargarImagen(base + "jugador_escalera_b.png");
+        imgBarraA    = cargarImagen(base + "jugador_barra_a.png");
+        imgBarraB    = cargarImagen(base + "jugador_barra_b.png");
 
-        // Fallbacks: si algún sprite no carga, usar neutral
         if (imgCayendo   == null) imgCayendo   = imgNeutral;
         if (imgEscaleraA == null) imgEscaleraA = imgNeutral;
         if (imgEscaleraB == null) imgEscaleraB = imgNeutral;
@@ -195,7 +195,7 @@ public class JugadorLR extends PersonajeLR {
                         oro.recolectar();
                         oroRecolectado++;
                         puntos += 100;
-                        if (lodeRunner.Configuracion.efectosActivados && lodeRunner.Configuracion.sonidoGeneralActivado) Sonido.reproducir("LR_monedillas.wav");;
+                        if (MenuConfigLR.efectosActivados && MenuConfigLR.sonidoGeneralActivado) Sonido.reproducir("LR_monedillas.wav");;
                         textosPuntos.add(new float[]{
                             col * MapaLR.TILE_SIZE + MapaLR.TILE_SIZE / 2f,
                             fila * MapaLR.TILE_SIZE,
@@ -305,6 +305,25 @@ public class JugadorLR extends PersonajeLR {
 
     public int getOroRecolectado() { return oroRecolectado; }
     public void resetOro() { oroRecolectado = 0; }
+
+    public void recargarSprites() {
+        String base = "/lodeRunner/skins/" + MenuConfigLR.skinPersonajeSeleccionado + "/";
+        imagen       = cargarImagen(base + "jugador.png");
+        imgNeutral   = imagen;
+        imgIzquierda = cargarImagen(base + "jugador_left.png");
+        imgDerecha   = cargarImagen(base + "jugador_right.png");
+        imgCayendo   = cargarImagen(base + "jugador_cayendo.png");
+        imgEscaleraA = cargarImagen(base + "jugador_escalera_a.png");
+        imgEscaleraB = cargarImagen(base + "jugador_escalera_b.png");
+        imgBarraA    = cargarImagen(base + "jugador_barra_a.png");
+        imgBarraB    = cargarImagen(base + "jugador_barra_b.png");
+
+        if (imgCayendo   == null) imgCayendo   = imgNeutral;
+        if (imgEscaleraA == null) imgEscaleraA = imgNeutral;
+        if (imgEscaleraB == null) imgEscaleraB = imgNeutral;
+        if (imgBarraA    == null) imgBarraA    = imgNeutral;
+        if (imgBarraB    == null) imgBarraB    = imgNeutral;
+    }
 
     @Override
     public void update(double delta) { /* gestionado por procesarEntrada() */ }

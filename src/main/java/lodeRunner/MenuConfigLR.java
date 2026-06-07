@@ -2,12 +2,35 @@ package lodeRunner;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MenuConfigLR extends JFrame {
 
-    // ── Componentes ────────────────────────────────────────────────────────
+    // ── Configuración (antes en Configuracion.java) ───────────────────────
+    public static boolean pantallaCompleta        = false;
+    public static boolean sonidoGeneralAtrapado   = true;
+    public static boolean musicaActivada          = true;
+    public static boolean efectosActivados        = true;
+    public static boolean sonidoGeneralActivado   = true;
+
+    public static String pistaMusicalSeleccionada  = "LR_musiquilla.wav";
+    public static String skinPersonajeSeleccionado = "original";
+
+    public static float volumenMusica  = 0.3f;
+    public static float volumenEfectos = 0.3f;
+
+    public static void resetConfig() {
+        pantallaCompleta        = false;
+        sonidoGeneralAtrapado   = true;
+        musicaActivada          = true;
+        efectosActivados        = true;
+        sonidoGeneralActivado   = true;
+        pistaMusicalSeleccionada  = "LR_musiquilla.wav";
+        skinPersonajeSeleccionado = "original";
+        volumenMusica  = 0.3f;
+        volumenEfectos = 0.3f;
+    }
+
+
     private JRadioButton rdVentana;
     private JRadioButton rdPantallaCompleta;
     private JCheckBox    chkSonidoGeneral;
@@ -18,7 +41,6 @@ public class MenuConfigLR extends JFrame {
     private JButton      btnGuardar;
     private JButton      btnReset;
 
-    // Fuente y colores al estilo Pong
     private static final Font  FONT_LR  = new Font("Courier New", Font.BOLD, 16);
     private static final Color FG_COLOR = Color.WHITE;
     private static final Color BG_COLOR = Color.BLACK;
@@ -29,15 +51,13 @@ public class MenuConfigLR extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // ── Panel principal con imagen de fondo ────────────────────────
         JPanel panelCompleto = new JPanel(new BorderLayout()) {
             private final Image fondo = new ImageIcon(
-                getClass().getResource("/LodeRunner/portada_loderunner.png")).getImage();
+                getClass().getResource("/LodeRunner/portadaLR.png")).getImage();
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (fondo != null) {
-                    // Oscurecer un poco para que el texto sea legible
                     g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
                     g.setColor(new Color(0, 0, 0, 160));
                     g.fillRect(0, 0, getWidth(), getHeight());
@@ -45,7 +65,6 @@ public class MenuConfigLR extends JFrame {
             }
         };
 
-        // ── Panel formulario con GridBagLayout (igual que Pong) ────────
         JPanel config = new JPanel(new GridBagLayout());
         config.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -53,37 +72,36 @@ public class MenuConfigLR extends JFrame {
         gbc.insets = new Insets(6, 10, 6, 10);
 
         // 1. Pantalla
-        rdVentana         = makeRadioButton("Ventana",          !Configuracion.pantallaCompleta);
-        rdPantallaCompleta = makeRadioButton("Pantalla completa", Configuracion.pantallaCompleta);
+        rdVentana          = makeRadioButton("Ventana",           !pantallaCompleta);
+        rdPantallaCompleta = makeRadioButton("Pantalla completa",  pantallaCompleta);
         ButtonGroup grupoPantalla = new ButtonGroup();
         grupoPantalla.add(rdVentana);
         grupoPantalla.add(rdPantallaCompleta);
-
         addRow(config, gbc, 0, "Pantalla:", rdVentana, rdPantallaCompleta);
 
         // 2. Sonido general
-        chkSonidoGeneral = makeCheckBox("Activado", Configuracion.sonidoGeneralActivado);
+        chkSonidoGeneral = makeCheckBox("Activado", sonidoGeneralActivado);
         addRow(config, gbc, 1, "Sonido General:", chkSonidoGeneral, null);
 
         // 3. Música
-        chkMusica = makeCheckBox("Activado", Configuracion.musicaActivada);
+        chkMusica = makeCheckBox("Activado", musicaActivada);
         addRow(config, gbc, 2, "Música de Fondo:", chkMusica, null);
 
         // 4. Efectos
-        chkEfectos = makeCheckBox("Activado", Configuracion.efectosActivados);
+        chkEfectos = makeCheckBox("Activado", efectosActivados);
         addRow(config, gbc, 3, "Efectos de Sonido:", chkEfectos, null);
 
-        // 7. Pista musical
+        // 5. Pista musical
         String[] pistas = {"LR_musiquilla.wav", "retro.wav"};
-        comboMusica = makeCombo(pistas, Configuracion.pistaMusicalSeleccionada);
-        addRow(config, gbc, 6, "Pista Musical:", comboMusica, null);
+        comboMusica = makeCombo(pistas, pistaMusicalSeleccionada);
+        addRow(config, gbc, 4, "Pista Musical:", comboMusica, null);
 
-        // 8. Skin
-        String[] skins = {"original", "clasico_8bit", "moderno"};
-        comboSkin = makeCombo(skins, Configuracion.skinPersonajeSeleccionado);
-        addRow(config, gbc, 7, "Skin del Personaje:", comboSkin, null);
+        // 6. Skin
+        String[] skins = {"original", "skin_alternativa"};
+        comboSkin = makeCombo(skins, skinPersonajeSeleccionado);
+        addRow(config, gbc, 5, "Skin del Personaje:", comboSkin, null);
 
-        // ── Panel botones ──────────────────────────────────────────────
+        // Botones
         btnGuardar = makeButton("Guardar");
         btnReset   = makeButton("Restablecer");
 
@@ -96,29 +114,31 @@ public class MenuConfigLR extends JFrame {
         panelCompleto.add(panelBotones, BorderLayout.SOUTH);
         add(panelCompleto);
 
-        // ── Listeners ──────────────────────────────────────────────────
         btnGuardar.addActionListener(e -> guardar());
         btnReset.addActionListener(e -> reset());
 
         setVisible(true);
     }
 
-    // ── Lógica ────────────────────────────────────────────────────────────
-
     private void guardar() {
-        Configuracion.pantallaCompleta      = rdPantallaCompleta.isSelected();
-        Configuracion.sonidoGeneralActivado = chkSonidoGeneral.isSelected();
-        Configuracion.musicaActivada        = chkMusica.isSelected();
-        Configuracion.efectosActivados      = chkEfectos.isSelected();
-        Configuracion.pistaMusicalSeleccionada  = (String) comboMusica.getSelectedItem();
-        Configuracion.skinPersonajeSeleccionado = (String) comboSkin.getSelectedItem();
+        pantallaCompleta          = rdPantallaCompleta.isSelected();
+        sonidoGeneralActivado     = chkSonidoGeneral.isSelected();
+        musicaActivada            = chkMusica.isSelected();
+        efectosActivados          = chkEfectos.isSelected();
+        pistaMusicalSeleccionada  = (String) comboMusica.getSelectedItem();
+        skinPersonajeSeleccionado = (String) comboSkin.getSelectedItem();
 
         // Aplicar cambios de música inmediatamente
-        if (!Configuracion.sonidoGeneralActivado || !Configuracion.musicaActivada) {
+        if (!sonidoGeneralActivado || !musicaActivada) {
             clasesCompartidas.Musica.detenerMusicaFondo();
         } else {
             clasesCompartidas.Musica.detenerMusicaFondo();
-            clasesCompartidas.Musica.iniciarMusica(Configuracion.pistaMusicalSeleccionada);
+            clasesCompartidas.Musica.iniciarMusica(pistaMusicalSeleccionada);
+        }
+
+        // Aplicar skin inmediatamente si hay jugador activo
+        if (LodeRunner.jugadorActual != null) {
+            LodeRunner.jugadorActual.recargarSprites();
         }
 
         JOptionPane.showMessageDialog(this, "Configuración guardada con éxito.");
@@ -126,22 +146,17 @@ public class MenuConfigLR extends JFrame {
     }
 
     private void reset() {
-        Configuracion.reset();
-
-        rdVentana.setSelected(!Configuracion.pantallaCompleta);
-        rdPantallaCompleta.setSelected(Configuracion.pantallaCompleta);
-        chkSonidoGeneral.setSelected(Configuracion.sonidoGeneralActivado);
-        chkMusica.setSelected(Configuracion.musicaActivada);
-        chkEfectos.setSelected(Configuracion.efectosActivados);
-        comboMusica.setSelectedItem(Configuracion.pistaMusicalSeleccionada);
-        comboSkin.setSelectedItem(Configuracion.skinPersonajeSeleccionado);
-
+        resetConfig();
+        rdVentana.setSelected(!pantallaCompleta);
+        rdPantallaCompleta.setSelected(pantallaCompleta);
+        chkSonidoGeneral.setSelected(sonidoGeneralActivado);
+        chkMusica.setSelected(musicaActivada);
+        chkEfectos.setSelected(efectosActivados);
+        comboMusica.setSelectedItem(pistaMusicalSeleccionada);
+        comboSkin.setSelectedItem(skinPersonajeSeleccionado);
         JOptionPane.showMessageDialog(this, "Se han restablecido los valores por defecto.");
     }
 
-    // ── Helpers de construcción ───────────────────────────────────────────
-
-    /** Agrega una fila con label + hasta 2 componentes al GridBag */
     private void addRow(JPanel panel, GridBagConstraints g, int row,
                         String labelText, JComponent c1, JComponent c2) {
         g.gridx = 0; g.gridy = row;
@@ -149,17 +164,6 @@ public class MenuConfigLR extends JFrame {
         g.gridx = 1;
         panel.add(c1, g);
         if (c2 != null) { g.gridx = 2; panel.add(c2, g); }
-    }
-
-    /** Agrega una fila de slider: label | slider (ancho) | porcentaje */
-    private void addSliderRow(JPanel panel, GridBagConstraints g, int row,
-                              String labelText, JSlider slider, JLabel pct) {
-        g.gridx = 0; g.gridy = row;
-        panel.add(makeLabel(labelText), g);
-        g.gridx = 1; g.fill = GridBagConstraints.HORIZONTAL; g.weightx = 1.0;
-        panel.add(slider, g);
-        g.gridx = 2; g.fill = GridBagConstraints.NONE; g.weightx = 0;
-        panel.add(pct, g);
     }
 
     private JLabel makeLabel(String text) {
