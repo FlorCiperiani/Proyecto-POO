@@ -507,7 +507,7 @@ public class SpaceInvaders extends JGame {
         if ("Alternativa".equals(skinInvasores)) {
             switch (tipo) {
                 case "Pulpo":    return "/AssetsSpace/nuevoAzul.png";
-                case "Cangrejo": return "/AssetsSpace/nuevorojo.png";
+                case "Cangrejo": return "/AssetsSpace/nuevoRojo.png";
                 case "Calamar":  return "/AssetsSpace/nuevoVerde.png";
             }
         } else if ("Oceano".equals(skinInvasores)) {
