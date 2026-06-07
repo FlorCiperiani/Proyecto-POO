@@ -492,27 +492,39 @@ public class SpaceInvaders extends JGame {
         return false;
     }
 
-    private String obtenerRutaImagenInvasores(String tipo) {
+   private String obtenerRutaImagenInvasores(String tipo) {
+        if (tipo == null) return "/AssetsSpace/red.png";
+
         if ("Alternativa".equals(skinInvasores)) {
             switch (tipo) {
                 case "Pulpo":    return "/AssetsSpace/nuevoAzul.png";
                 case "Cangrejo": return "/AssetsSpace/nuevorojo.png";
                 case "Calamar":  return "/AssetsSpace/nuevoVerde.png";
-                default: return "/AssetsSpace/red.png";
+            }
+        } else if ("Oceano".equals(skinInvasores)) {
+            switch (tipo) {
+                case "Pulpo":    return "/AssetsSpace/Pirania-oceano.png";
+                case "Cangrejo": return "/AssetsSpace/Cangrejo-oceano.png";
+                case "Calamar":  return "/AssetsSpace/Caracol-oceano.png";
             }
         }
+
         // Original
         switch (tipo) {
             case "Pulpo":    return "/AssetsSpace/red.png";
             case "Cangrejo": return "/AssetsSpace/yellow.png";
             case "Calamar":  return "/AssetsSpace/green.png";
-            default: return "/AssetsSpace/red.png";
         }
+
+        return "/AssetsSpace/red.png"; // respaldo obligatorio
     }
 
     private String obtenerRutaImagenNave() {
+        //if (tipo == null) return "/AssetsSpace/player.png";
         if ("Alternativa".equals(skinNave)) {
             return "/AssetsSpace/nuevaNave.png";
+        }else if ("Oceano".equals(skinNave)){
+            return "/AssetsSpace/Canion-oceano.png";
         }
         return "/AssetsSpace/player.png";
     }

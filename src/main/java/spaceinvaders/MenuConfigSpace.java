@@ -85,8 +85,8 @@ public class MenuConfigSpace implements ActionListener {
 
         velocidadInvasores = crearCombo(new String[]{"Lenta", "Media", "Rápida"});
         comboGalaxia       = crearCombo(new String[]{"Original", "Ciudad", "Oceano"});
-        comboSkinInvasores = crearCombo(new String[]{"Original", "Alternativa"});
-        comboSkinNave      = crearCombo(new String[]{"Original", "Alternativa"});
+        comboSkinInvasores = crearCombo(new String[]{"Original", "Alternativa", "Oceano", "Ciudad"});
+        comboSkinNave      = crearCombo(new String[]{"Original", "Alternativa", "Oceano", "Ciudad"});
         pistaMusical       = crearCombo(new String[]{
             "space-invaders.wav", "undertale.wav", "retro.wav", "arcade.wav"
         });
