@@ -297,6 +297,7 @@ public class SpaceInvaders extends JGame {
                         enemigos.remove(j);
                         proyectiles.remove(i);
                         impacto = true;
+                        if (sonidoActivado) Sonido.reproducir("tenton.wav"); 
                         break;
                     }
                 }
