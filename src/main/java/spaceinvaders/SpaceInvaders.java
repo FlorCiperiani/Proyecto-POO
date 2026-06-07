@@ -53,7 +53,9 @@ public class SpaceInvaders extends JGame {
     private RankingSpace ranking;
 
     // ================== CONFIGURACIÓN LEÍDA DEL ARCHIVO ==================
-    private boolean sonidoActivado = true;   
+    private boolean sonidoActivado = true;
+    private String skinInvasores = "Original";
+    private String skinNave = "Original";   
 
     // ================== TECLAS ==================
     private int teclaIzquierdaCodigo;
@@ -90,6 +92,10 @@ public class SpaceInvaders extends JGame {
 
         // ── Sonido ───────────────────────────────────────────────────────────
         sonidoActivado = !"false".equals(config.getProperty("sonido", "true"));
+
+        // ── Skins ────────────────────────────────────────────────────────────
+        skinInvasores = config.getProperty("skinInvasores", "Original");
+        skinNave      = config.getProperty("skinNave", "Original");
 
         // ── Teclas ───────────────────────────────────────────────────────────
         teclaIzquierdaCodigo = conversorTecla.convertirTecla(config.getProperty("teclaIzquierda", "LEFT"));
@@ -143,7 +149,7 @@ public class SpaceInvaders extends JGame {
         enemigos.clear();
         escudos.clear();
 
-        canion = new Canion(getWidth() / 2.0, getHeight() - 80);
+        canion = new Canion(getWidth() / 2.0, getHeight() - 80, obtenerRutaImagenNave());
 
         generarHordaEnemigos();
 
@@ -162,11 +168,11 @@ public class SpaceInvaders extends JGame {
                 double y = 70 + (fila * 40) + desplazamientoNivelY;
 
                 if (fila <= 1) {
-                    enemigos.add(new Pulpo(x, y, velocidadBaseAliens));
+                    enemigos.add(new Pulpo(x, y, obtenerRutaImagenInvasores("Pulpo"), velocidadBaseAliens));
                 } else if (fila <= 3) {
-                    enemigos.add(new Cangrejo(x, y, velocidadBaseAliens));
+                    enemigos.add(new Cangrejo(x, y, obtenerRutaImagenInvasores("Cangrejo"), velocidadBaseAliens));
                 } else {
-                    enemigos.add(new Calamar(x, y, velocidadBaseAliens));
+                    enemigos.add(new Calamar(x, y, obtenerRutaImagenInvasores("Calamar"), velocidadBaseAliens));
                 }
             }
         }
@@ -291,6 +297,7 @@ public class SpaceInvaders extends JGame {
                         enemigos.remove(j);
                         proyectiles.remove(i);
                         impacto = true;
+                        if (sonidoActivado) Sonido.reproducir("tenton.wav"); 
                         break;
                     }
                 }
@@ -388,12 +395,15 @@ public class SpaceInvaders extends JGame {
             double origX = canion.getX();
             double origY = canion.getY();
             int anchoCanion  = canion.getAncho();
+            int altoCanion   = canion.getAlto();
+            int vidaAncho    = Math.max(24, anchoCanion / 2);
+            int vidaAlto     = Math.max(16, altoCanion / 2);
             int margenDerecho = getWidth() - 30;
 
             for (int i = 0; i < vidas; i++) {
-                canion.setX(margenDerecho - anchoCanion - (i * (anchoCanion + 15)));
-                canion.setY(35);
-                canion.mostrar(g2);
+                int xVida = margenDerecho - vidaAncho - (i * (vidaAncho + 15));
+                int yVida = 35;
+                g2.drawImage(canion.getImagen(), xVida, yVida, vidaAncho, vidaAlto, null);
             }
             canion.setX(origX);
             canion.setY(origY);
@@ -420,7 +430,7 @@ public class SpaceInvaders extends JGame {
             String txt2 = "Tu puntuación final: " + marcador.getPuntaje();
             g2.drawString(txt2, (getWidth() - g2.getFontMetrics().stringWidth(txt2)) / 2, 90);
 
-            // Dibujar el Ranking actualizado en caliente en la interfaz
+            // Dibujar el Ranking actualizado en la interfaz
             dibujarTablaRanking(g2, 140);
 
             g2.setFont(new Font("Monospaced", Font.BOLD, 20));
@@ -482,6 +492,43 @@ public class SpaceInvaders extends JGame {
         return false;
     }
 
+   private String obtenerRutaImagenInvasores(String tipo) {
+        if (tipo == null) return "/AssetsSpace/red.png";
+
+        if ("Alternativa".equals(skinInvasores)) {
+            switch (tipo) {
+                case "Pulpo":    return "/AssetsSpace/nuevoAzul.png";
+                case "Cangrejo": return "/AssetsSpace/nuevorojo.png";
+                case "Calamar":  return "/AssetsSpace/nuevoVerde.png";
+            }
+        } else if ("Oceano".equals(skinInvasores)) {
+            switch (tipo) {
+                case "Pulpo":    return "/AssetsSpace/Pirania-oceano.png";
+                case "Cangrejo": return "/AssetsSpace/Cangrejo-oceano.png";
+                case "Calamar":  return "/AssetsSpace/Caracol-oceano.png";
+            }
+        }
+
+        // Original
+        switch (tipo) {
+            case "Pulpo":    return "/AssetsSpace/red.png";
+            case "Cangrejo": return "/AssetsSpace/yellow.png";
+            case "Calamar":  return "/AssetsSpace/green.png";
+        }
+
+        return "/AssetsSpace/red.png"; // respaldo obligatorio
+    }
+
+    private String obtenerRutaImagenNave() {
+        //if (tipo == null) return "/AssetsSpace/player.png";
+        if ("Alternativa".equals(skinNave)) {
+            return "/AssetsSpace/nuevaNave.png";
+        }else if ("Oceano".equals(skinNave)){
+            return "/AssetsSpace/Canion-oceano.png";
+        }
+        return "/AssetsSpace/player.png";
+    }
+
     private void disparoEnemigoAleatorio() {
         if (enemigos.isEmpty()) return;
         Enemigo e = enemigos.get((int)(Math.random() * enemigos.size()));
@@ -502,6 +549,8 @@ public class SpaceInvaders extends JGame {
             p.setProperty("sonido",             "true");
             p.setProperty("pantallaCompleta",   "false");
             p.setProperty("velocidadInvasores", "Media");
+            p.setProperty("skinInvasores",      "Original");
+            p.setProperty("skinNave",           "Original");
         }
         return p;
     }
