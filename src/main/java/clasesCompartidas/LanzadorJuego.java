@@ -191,7 +191,6 @@ public class LanzadorJuego extends JFrame implements ActionListener {
             } else if ("Pong".equals(juegoSeleccionado)) {
                 new MenuConfig();
             } else if ("Lode Runner".equals(juegoSeleccionado)) {
-                System.out.println("PROBANDO SI SE ABRE LA CONFIGURACION DE LR");
                 new MenuConfigLR();
             }
         }
