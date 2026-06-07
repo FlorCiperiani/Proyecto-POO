@@ -29,9 +29,6 @@ public class Pong extends JGame {
     private Cancha cancha;
     private final Keyboard key = this.getKeyboard(); // Inicializa el teclado
 
-    private static final int SEGMENTO_PALETA =8;
-    private static final int ANCHO_PALETA = 10;
-    private static final int ALTO_PALETA = 10* SEGMENTO_PALETA; // 8 segmentos de 10px
     private static final double TIEMPO_ESPERA_MAXIMO = 2.0; // dos segundos de espera para volver a poner la pelota al
     // medio
     private int estado;
@@ -223,11 +220,11 @@ public class Pong extends JGame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            paletaIzquierda = new Paleta(ANCHO_PALETA, ALTO_PALETA, 30, 260, teclado, teclaArribaJ1, teclaAbajoJ1);
+            paletaIzquierda = new Paleta(10, 90, 30, 270, teclado, teclaArribaJ1, teclaAbajoJ1);
             if (conBot) {
-                paletaDerecha = new BotPaleta(ANCHO_PALETA, ALTO_PALETA, 760, 260, pelota);
+                paletaDerecha = new BotPaleta(10, 90, 760, 270, pelota);
             } else {
-                paletaDerecha = new Paleta(ANCHO_PALETA, ALTO_PALETA, 760, 260, teclado, teclaArribaJ2, teclaAbajoJ2);
+                paletaDerecha = new Paleta(10, 90, 760, 270, teclado, teclaArribaJ2, teclaAbajoJ2);
             }
             arcoIzquierdo = new Arco(0, true);
             arcoDerecho = new Arco(getWidth(), false);
