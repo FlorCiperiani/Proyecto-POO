@@ -12,6 +12,7 @@ public class MenuConfigSpace extends Configuracion {
     private JComboBox<String> velocidadInvasores;
     private JComboBox<String> comboGalaxia;
     private JComboBox<String> pistaMusical;
+    private JComboBox<String> tipoProyectil;
     private JTextField movIzquierda;
     private JTextField movDerecha;
     private JTextField teclaDisparo;
@@ -31,6 +32,8 @@ public class MenuConfigSpace extends Configuracion {
         sonidoBox          = crearCheckBox(true);
         velocidadInvasores = crearCombo(new String[]{"Lenta", "Media", "Rápida"});
         comboGalaxia       = crearCombo(new String[]{"Original", "Ciudad", "Oceano"});
+        tipoProyectil       = crearCombo(new String[]{"Original", "Laser"});
+
         pistaMusical       = crearCombo(new String[]{
             "space-invaders.wav", "undertale.wav", "retro.wav", "arcade.wav"
         });
@@ -64,6 +67,10 @@ public class MenuConfigSpace extends Configuracion {
         agregarSeccion("── Pista musical ──");
         agregarFila("Música:", pistaMusical);
 
+         agregarEspacio();
+        agregarSeccion("── Proyectiles ──");
+        agregarFila("Proyectil:", tipoProyectil);
+
         // ── Finalizar: carga .properties, puebla componentes, muestra ventana ──
         construir();
     }
@@ -85,6 +92,8 @@ public class MenuConfigSpace extends Configuracion {
         movIzquierda.setText(props.getProperty("teclaIzquierda", "LEFT"));
         movDerecha.setText(  props.getProperty("teclaDerecha",   "RIGHT"));
         teclaDisparo.setText(props.getProperty("teclaDisparo",   "SPACE"));
+
+        seleccionarEnCombo(tipoProyectil, props.getProperty("tipoProyectil", "Original")); // ← NUEVO
     }
 
     @Override
@@ -97,6 +106,7 @@ public class MenuConfigSpace extends Configuracion {
         props.setProperty("teclaIzquierda",    movIzquierda.getText().toUpperCase().trim());
         props.setProperty("teclaDerecha",      movDerecha.getText().toUpperCase().trim());
         props.setProperty("teclaDisparo",      teclaDisparo.getText().toUpperCase().trim());
+        props.setProperty("tipoProyectil",    (String) tipoProyectil.getSelectedItem());
     }
 
     @Override
@@ -109,5 +119,6 @@ public class MenuConfigSpace extends Configuracion {
         movIzquierda.setText("LEFT");
         movDerecha.setText("RIGHT");
         teclaDisparo.setText("SPACE");
+        tipoProyectil.setSelectedIndex(0); // Original ← NUEVO
     }
 }

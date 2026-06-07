@@ -55,7 +55,9 @@ public class SpaceInvaders extends JGame {
     // ================== CONFIGURACIÓN LEÍDA DEL ARCHIVO ==================
     private boolean sonidoActivado = true;
     private String skinInvasores = "Original";
-    private String skinNave = "Original";   
+    private String skinNave = "Original";
+    private String tipoProyectil = "Original";
+
 
     // ================== TECLAS ==================
     private int teclaIzquierdaCodigo;
@@ -96,6 +98,10 @@ public class SpaceInvaders extends JGame {
         // ── Skins ────────────────────────────────────────────────────────────
         skinInvasores = config.getProperty("skinInvasores", "Original");
         skinNave      = config.getProperty("skinNave", "Original");
+
+        // ── Proyectil ────────────────────────────────────────────────────────
+        tipoProyectil = config.getProperty("tipoProyectil", "Original");
+
 
         // ── Teclas ───────────────────────────────────────────────────────────
         teclaIzquierdaCodigo = conversorTecla.convertirTecla(config.getProperty("teclaIzquierda", "LEFT"));
@@ -214,8 +220,10 @@ public class SpaceInvaders extends JGame {
                 proyectiles.add(new Proyectil(
                     canion.getX() + canion.getAncho() / 2.0,
                     canion.getY(),
-                    true
+                    true,
+                    tipoProyectil
                 ));
+
                 contadorDisparos++;
                 disparoPresionado = true;
                 if (sonidoActivado) clasesCompartidas.Sonido.reproducir("laser.wav");
@@ -229,7 +237,8 @@ public class SpaceInvaders extends JGame {
             tiempoParaProximoUfo -= delta;
             if (tiempoParaProximoUfo <= 0) {
                 ufo.aparecer(getWidth());
-                if (sonidoActivado) Sonido.reproducir("nave-nodriza.wav"); 
+        if (sonidoActivado) Sonido.reproducir("nave-nodriza.wav");
+
                 tiempoParaProximoUfo = 20 + Math.random() * 15;
             }
         } else {
@@ -502,10 +511,12 @@ public class SpaceInvaders extends JGame {
                 case "Calamar":  return "/AssetsSpace/nuevoVerde.png";
             }
         } else if ("Oceano".equals(skinInvasores)) {
+            // TEMPORAL (faltan assets "*-oceano.png" en resources).
+            // Para que el juego muestre sprites, usamos los disponibles.
             switch (tipo) {
-                case "Pulpo":    return "/AssetsSpace/Pirania-oceano.png";
-                case "Cangrejo": return "/AssetsSpace/Cangrejo-oceano.png";
-                case "Calamar":  return "/AssetsSpace/Caracol-oceano.png";
+                case "Pulpo":    return "/AssetsSpace/red.png";
+                case "Cangrejo": return "/AssetsSpace/yellow.png";
+                case "Calamar":  return "/AssetsSpace/green.png";
             }
         }
 
@@ -532,7 +543,8 @@ public class SpaceInvaders extends JGame {
     private void disparoEnemigoAleatorio() {
         if (enemigos.isEmpty()) return;
         Enemigo e = enemigos.get((int)(Math.random() * enemigos.size()));
-        proyectiles.add(new Proyectil(e.getX() + e.getAncho() / 2.0, e.getY() + e.getAlto(), false));
+        proyectiles.add(new Proyectil(e.getX() + e.getAncho() / 2.0, e.getY() + e.getAlto(), false, tipoProyectil));
+
     }
 
     private Properties cargarProperties() {
