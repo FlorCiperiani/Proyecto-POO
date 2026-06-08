@@ -91,10 +91,10 @@ public class MenuConfigSpace implements ActionListener {
 
         velocidadInvasores = crearCombo(new String[]{"Lenta", "Media", "Rápida"});
         comboGalaxia       = crearCombo(new String[]{"Original", "Ciudad", "Oceano"});
-        comboSkinInvasores = crearCombo(new String[]{"Original", "Alternativa"});
-        comboSkinNave      = crearCombo(new String[]{"Original", "Alternativa"});
+        comboSkinInvasores = crearCombo(new String[]{"Original", "Alternativa", "Oceano"});
+        comboSkinNave      = crearCombo(new String[]{"Original", "Alternativa", "Oceano"});
 
-        // 🚀 PROYECTIL CONFIGURABLE DESDE LA VENTANA
+        // PROYECTIL CONFIGURABLE DESDE LA VENTANA
         comboTipoProyectil = crearCombo(new String[]{"Original", "Laser", "Plasma"});
         comboVelocidadProyectil = crearCombo(new String[]{"Lenta", "Media", "Rápida"});
 
@@ -123,14 +123,14 @@ public class MenuConfigSpace implements ActionListener {
         label(config, gbc, "Activado:", 0, f);
         comp(config, gbc, sonidoBox, 1, f++);
 
-        seccion(config, gbc, "── Visual ──", f++);
+       /*seccion(config, gbc, "── Visual ──", f++);
         label(config, gbc, "Fondo:", 0, f); comp(config, gbc, comboGalaxia, 1, f++);
         label(config, gbc, "Nave:", 0, f); comp(config, gbc, comboSkinNave, 1, f++);
-        label(config, gbc, "Invasores:", 0, f); comp(config, gbc, comboSkinInvasores, 1, f++);
+        label(config, gbc, "Invasores:", 0, f); comp(config, gbc, comboSkinInvasores, 1, f++); */ 
 
-        // 🔥 SECCIÓN PROYECTIL (VISIBLE Y MODIFICABLE)
-        seccion(config, gbc, "── Proyectil ──", f++);
-        label(config, gbc, "Tipo:", 0, f); comp(config, gbc, comboTipoProyectil, 1, f++);
+        // SECCIÓN PROYECTIL (VISIBLE Y MODIFICABLE)
+        seccion(config, gbc, "── Visual ──", f++);
+        label(config, gbc, "Tipo de proyectil:", 0, f); comp(config, gbc, comboTipoProyectil, 1, f++);
         label(config, gbc, "Velocidad:", 0, f); comp(config, gbc, comboVelocidadProyectil, 1, f++);
         label(config, gbc, "Fondo:", 0, f);
         comp(config, gbc, comboGalaxia, 1, f++);
