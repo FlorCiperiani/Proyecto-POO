@@ -53,7 +53,7 @@ class Pelota extends ObjetoGrafico {
         if (imagenPelota != null) {
             g2.drawImage(imagenPelota, (int) posicionX, (int) posicionY, tamanio, tamanio, null);
         } else {
-            g2.setColor(Color.WHITE); // fallback
+            g2.setColor(Color.WHITE); 
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.fillOval((int) posicionX, (int) posicionY, tamanio, tamanio);
         }

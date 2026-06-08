@@ -2,11 +2,7 @@ package pong;
 
 import clasesCompartidas.Ranking;
 
-/**
- * Ranking específico del Pong.
- * Tabla: ranking_pong
- * Campos heredados: nombre, nivel (usado como "ronda", siempre 1), puntaje, fecha.
- */
+
 public class RankingPong extends Ranking {
 
     public RankingPong() {

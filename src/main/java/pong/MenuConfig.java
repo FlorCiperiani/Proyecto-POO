@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class MenuConfig extends Configuracion {
 
-    // ── Componentes específicos del Pong ──────────────────────────────────────
+    // ── Componentes Pong ──────────────────────────────────────
     protected JRadioButton ventana;
     protected JRadioButton pantallaCompleta;
     protected JCheckBox    musicaBox;
@@ -69,8 +69,6 @@ public class MenuConfig extends Configuracion {
         construir();
     }
 
-    // ── Método estático que Pong.java usa directamente ────────────────────────
-    // Se mantiene aquí para no romper las llamadas: MenuConfig.cargarEnArchivo(...)
     public static void cargarEnArchivo(Properties props, String rutaArchivo) {
         try (FileInputStream in = new FileInputStream(rutaArchivo)) {
             props.load(in);

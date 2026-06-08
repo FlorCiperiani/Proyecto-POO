@@ -48,9 +48,9 @@ public class Pong extends JGame {
         appProperties2 = new Properties();
     }
 
-    // =================================================
-    // STARTUP
-    // =================================================
+   
+    // ── STARTUP ───────────────────────────────────────────────────────────────
+  
     @Override
     public void gameStartup() {
         try {
@@ -62,9 +62,8 @@ public class Pong extends JGame {
         }
     }
 
-    // =================================================
-    // UPDATE
-    // =================================================
+    // ── UPDATE ───────────────────────────────────────────────────────────────
+
     @Override
     public void gameUpdate(double delta) {
 
@@ -150,9 +149,9 @@ public class Pong extends JGame {
         }
     }
 
-    // =================================================
-    // DRAW
-    // =================================================
+   
+    // ── DRAW ──────────────────────────────────────────────────────────────
+  
     @Override
     public void gameDraw(Graphics2D g) {
         g.setColor(Color.BLACK);
@@ -223,9 +222,9 @@ public class Pong extends JGame {
         }
     }
 
-    // =================================================
-    // RANKING
-    // =================================================
+    
+    // ── RANKING ──────────────────────────────────────────────────────────────
+    
 
     private void manejarGuardadoRanking() {
         // Determinar ganador y su puntaje
@@ -293,9 +292,9 @@ public class Pong extends JGame {
         }
     }
 
-    // =================================================
-    // UTILS
-    // =================================================
+    
+    // ── UTILS ──────────────────────────────────────────────────────────────
+
     @Override
     public void gameShutdown() {
         if (ranking != null) ranking.cerrar();
