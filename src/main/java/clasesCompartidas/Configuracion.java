@@ -274,4 +274,21 @@ public abstract class Configuracion implements ActionListener {
             return null;
         }
     }
+
+    // ── Método estático para cargar propiedades desde archivo ──────────────────
+
+    /**
+     * Método estático para cargar propiedades desde un archivo.
+     * Útil para cargar configuración directamente sin crear una ventana.
+     *
+     * @param props   El objeto Properties donde se cargarán los valores
+     * @param rutaArchivo La ruta al archivo .properties
+     */
+    public static void cargarEnArchivo(Properties props, String rutaArchivo) {
+        try (InputStream in = new FileInputStream(rutaArchivo)) {
+            props.load(in);
+        } catch (IOException ignored) {
+            // Si no existe el archivo, props queda vacío y se usan los defectos
+        }
+    }
 }
