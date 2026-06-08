@@ -7,24 +7,24 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-/**
- * Jugador controlado por teclado.
- *
- * Controles:
- *   ← →  : moverse (también cambia la pose del sprite)
- *   ↑ ↓  : trepar escalera / colgarse de barra
- *   Z    : romper ladrillo a la izquierda
- *   X    : romper ladrillo a la derecha
- *
- * Poses del jugador:
- *   - jugador_left.png    : presionando ←
- *   - jugador.png         : sin dirección (neutral / parado)
- *   - jugador_right.png   : presionando →
- *
- * Mecánica de excavación:
- *   - Solo se puede cavar a los lados (no directamente debajo).
- *   - Se cava el ladrillo del suelo adyacente.
- *   - Solo se puede cavar estando parado en el suelo.
+/*
+ Jugador controlado por teclado.
+ 
+ Controles:
+   ← →  : moverse (también cambia la pose del sprite)
+   ↑ ↓  : trepar escalera / colgarse de barra
+   Z    : romper ladrillo a la izquierda
+   X    : romper ladrillo a la derecha
+ 
+ Poses del jugador:
+   - jugador_left.png    : presionando ←
+   - jugador.png         : sin dirección (neutral / parado)
+   - jugador_right.png   : presionando →
+ 
+ Mecánica de excavación:
+   - Solo se puede cavar a los lados (no directamente debajo).
+   - Se cava el ladrillo del suelo adyacente.
+   - Solo se puede cavar estando parado en el suelo.
  */
 public class JugadorLR extends PersonajeLR {
 
@@ -142,14 +142,14 @@ public class JugadorLR extends PersonajeLR {
 
     // ── Excavación ───────────────────────────────────────────────────────
 
-    /**
-     * Cava el ladrillo del suelo en la dirección indicada.
-     *   direccion = -1 → cava a la izquierda
-     *   direccion = +1 → cava a la derecha
-     *
-     * La columna objetivo es la columna DEL CENTRO del personaje ±1,
-     * lo que siempre apunta al tile directamente adyacente.
-     */
+    /*
+    Cava el ladrillo del suelo en la dirección indicada.
+    direccion = -1 → cava a la izquierda
+    direccion = +1 → cava a la derecha
+     
+    La columna objetivo es la columna DEL CENTRO del personaje ±1,
+    lo que siempre apunta al tile directamente adyacente.
+    */
     private void romperLadrillo(int direccion) {
         if (mapa == null) return;
         if (enBarra)      return;
@@ -207,7 +207,7 @@ public class JugadorLR extends PersonajeLR {
         }
     }
 
-    /** Dibujar y actualizar los textos flotantes "+100". Llamar desde mostrar(). */
+    /* Dibujar y actualizar los textos flotantes "+100". Llamar desde mostrar(). */
     public void dibujarTextosPuntos(java.awt.Graphics2D g2, double delta) {
         java.util.Iterator<float[]> it = textosPuntos.iterator();
         while (it.hasNext()) {

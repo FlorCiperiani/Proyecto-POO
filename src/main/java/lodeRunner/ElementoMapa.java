@@ -2,9 +2,9 @@ package lodeRunner;
 
 import clasesCompartidas.ObjetoGrafico;
 
-/**
- * Clase base abstracta para todos los elementos del mapa (tiles).
- */
+
+ // Clase base abstracta para todos los elementos del mapa (tiles).
+ 
 public abstract class ElementoMapa extends ObjetoGrafico {
 
     public ElementoMapa(String rutaRecurso, double x, double y) {
@@ -102,7 +102,7 @@ class Escalera extends ElementoMapa {
         super("/lodeRunner/escalera.png", x, y);
     }
 
-    /** Llamado por MapaLR cuando este tile es el más alto de su columna continua. */
+    // Llamado por MapaLR cuando este tile es el más alto de su columna continua. 
     public void setEsTope(boolean v) { esTope = v; }
     public boolean isEsTope()        { return esTope; }
 

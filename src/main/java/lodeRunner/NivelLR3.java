@@ -1,9 +1,9 @@
 package lodeRunner;
 
-/**
- * Nivel 3 — El laberinto.
- * Plataformas asimétricas, muchas barras y el oro muy disperso.
- * 4 enemigos. Dificultad: alta.
+/*
+ Nivel 3 — El laberinto.
+ Plataformas asimétricas, muchas barras y el oro muy disperso.
+ 4 enemigos. Dificultad: alta.
  */
 public class NivelLR3 extends NivelLR {
 

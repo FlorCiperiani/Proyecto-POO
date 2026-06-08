@@ -10,12 +10,12 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-/**
- * Clase principal del juego Lode Runner.
+/*
+ Clase principal del juego Lode Runner.
  *
- * Gestiona el ciclo de juego, el HUD y la progresión entre niveles.
- * El diseño de cada nivel está en su propia clase (NivelLR1, NivelLR2, NivelLR3...).
- * Para agregar un nivel: crear NivelLRN extends NivelLR y añadirlo al array NIVELES.
+ Gestiona el ciclo de juego, el HUD y la progresión entre niveles.
+ El diseño de cada nivel está en su propia clase (NivelLR1, NivelLR2, NivelLR3...).
+ Para agregar un nivel: crear NivelLRN extends NivelLR y añadirlo al array NIVELES.
  */
 public class LodeRunner extends JGame {
 

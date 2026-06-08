@@ -6,25 +6,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.Properties;
 
-/**
- * Clase base compartida para menús de configuración de todos los juegos.
- *
- * Provee:
- *  - Ventana con fondo de imagen personalizable
- *  - Estilo visual uniforme (Courier New, negro/blanco/gris)
- *  - Lógica de carga y guardado en archivo .properties
- *  - Botones Guardar y Restablecer
- *  - GridBagLayout listo para agregar filas
- *
- * Cómo extender:
- *  1. Llamar a super(rutaArchivo, rutaImagenFondo) en el constructor
- *  2. Crear los componentes específicos del juego
- *  3. Agregarlos al panel con agregarSeccion(), agregarFila(), agregarEspacio()
- *  4. Implementar cargarValores() para leer el .properties y poblar los componentes
- *  5. Implementar guardarValores() para leer los componentes y escribir en el .properties
- *  6. Implementar restablecerDefectos() para el botón Reset
- *  7. Llamar a construir() al final del constructor de la subclase
- */
+
 public abstract class Configuracion implements ActionListener {
 
     // ── Estilo visual compartido ──────────────────────────────────────────────
@@ -52,9 +34,9 @@ public abstract class Configuracion implements ActionListener {
 
     /**
      * @param titulo          Título de la ventana
-     * @param rutaArchivo     Ruta al .properties (ej: "spaceinvaders.properties")
-     * @param rutaImagenFondo Ruta al recurso de imagen para el fondo (ej: "/AssetsSpace/Galaxia.png")
-     *                        Si es null o no se encuentra, usa fondo negro.
+     * @param rutaArchivo     Ruta al .properties 
+     * @param rutaImagenFondo 
+     *                       
      */
     protected Configuracion(String titulo, String rutaArchivo, String rutaImagenFondo) {
         this.rutaArchivo = rutaArchivo;
@@ -109,20 +91,20 @@ public abstract class Configuracion implements ActionListener {
 
     // ── Métodos que deben implementar las subclases ───────────────────────────
 
-    /** Lee el .properties ya cargado en {@code props} y puebla los componentes. */
+    //Lee el .properties ya cargado en {@code props} y puebla los componentes. 
     protected abstract void cargarValores();
 
-    /** Lee los componentes y escribe los valores en {@code props}. */
+    // Lee los componentes y escribe los valores en {@code props}. 
     protected abstract void guardarValores();
 
-    /** Vuelve todos los componentes a sus valores por defecto (sin guardar). */
+    // Vuelve todos los componentes a sus valores por defecto (sin guardar).
     protected abstract void restablecerDefectos();
 
     // ── Método que las subclases llaman al final de su constructor ────────────
 
-    /**
-     * Finaliza la construcción: carga el .properties, puebla los componentes
-     * y muestra la ventana. Llamar DESPUÉS de agregar todas las filas.
+    /*
+      Finaliza la construcción: carga el .properties, puebla los componentes
+      y muestra la ventana. Llamar DESPUÉS de agregar todas las filas.
      */
     protected void construir() {
         cargarProperties();
@@ -144,7 +126,7 @@ public abstract class Configuracion implements ActionListener {
 
     // ── Helpers de layout para las subclases ─────────────────────────────────
 
-    /** Agrega un título de sección (texto en azul claro, ocupa 3 columnas). */
+    /* Agrega un título de sección (texto en azul claro, ocupa 3 columnas). */
     protected void agregarSeccion(String texto) {
         gbc.gridx = 0; gbc.gridy = filaActual++; gbc.gridwidth = 3;
         JLabel l = new JLabel(texto);
@@ -154,7 +136,7 @@ public abstract class Configuracion implements ActionListener {
         gbc.gridwidth = 1;
     }
 
-    /** Agrega una fila con etiqueta en col 0 y componente en col 1. */
+    /* Agrega una fila con etiqueta en col 0 y componente en col 1. */
     protected void agregarFila(String etiqueta, JComponent componente) {
         gbc.gridx = 0; gbc.gridy = filaActual;
         JLabel l = new JLabel(etiqueta);
@@ -166,9 +148,8 @@ public abstract class Configuracion implements ActionListener {
         panelConfig.add(componente, gbc);
     }
 
-    /**
-     * Agrega una fila con etiqueta en col 0 y DOS componentes en col 1 y col 2.
-     * Útil para RadioButtons lado a lado (ej: Ventana / Pantalla completa).
+    /*
+     Agrega una fila con etiqueta en col 0 y DOS componentes en col 1 y col 2.
      */
     protected void agregarFilaDoble(String etiqueta, JComponent comp1, JComponent comp2) {
         gbc.gridx = 0; gbc.gridy = filaActual;
@@ -184,7 +165,7 @@ public abstract class Configuracion implements ActionListener {
         panelConfig.add(comp2, gbc);
     }
 
-    /** Agrega una fila vacía como separador visual. */
+    // Agrega una fila vacía como separador visual. 
     protected void agregarEspacio() {
         gbc.gridx = 0; gbc.gridy = filaActual++; gbc.gridwidth = 3;
         panelConfig.add(new JLabel(" "), gbc);

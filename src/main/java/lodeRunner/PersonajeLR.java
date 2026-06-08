@@ -2,9 +2,9 @@ package lodeRunner;
 
 import clasesCompartidas.ObjetoGrafico;
 
-/**
- * Clase base para todos los personajes del juego (jugador y enemigos).
- * Gestiona movimiento, gravedad y consultas de colisión al mapa.
+/*
+ Clase base para todos los personajes del juego (jugador y enemigos).
+ Gestiona movimiento, gravedad y consultas de colisión al mapa.
  */
 public abstract class PersonajeLR extends ObjetoGrafico {
 
@@ -202,9 +202,9 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         int colIzqP = (int) posicionX              / TILE_SIZE;
         int colDerP = (int)(posicionX + getAncho() - 1) / TILE_SIZE;
 
-        boolean sueloMapa = contacto && (esSolido(mapa.getTileEn(colIzqP, filaBajo))
-                                    || esSolido(mapa.getTileEn(col,      filaBajo))
-                                    || esSolido(mapa.getTileEn(colDerP,  filaBajo)));
+        boolean sueloMapa = contacto && (esSolido(mapa.getTileEn(colIzqP, filaBajo)) 
+            || esSolido(mapa.getTileEn(col, filaBajo))
+            || esSolido(mapa.getTileEn(colDerP,  filaBajo)));
 
         // ── Detección de suelo técnico (Pisando Enemigo en Hoyo) ─────────
         boolean pisandoEnemigoEnHoyo = false;

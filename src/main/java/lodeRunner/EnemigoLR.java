@@ -21,7 +21,6 @@ public class EnemigoLR extends PersonajeLR {
     private double tiempoAtrapado  = 0;
     private static final double TIEMPO_ESCAPAR = 8.0; // segundos
 
-    //
     public boolean isCaidoEnPozo() {
         return this.enHoyo;
     }
@@ -112,7 +111,7 @@ public class EnemigoLR extends PersonajeLR {
 
     // ── Oro ──────────────────────────────────────────────────────────────
 
-    /** Intenta recoger oro del tile donde está parado. */
+    // Intenta recoger oro del tile donde está parado. 
     public void intentarRecogerOro(MapaLR mapa) {
         if (lleva_oro || mapa == null) return;
         int col  = (int)(posicionX + getAncho() / 2.0) / TILE_SIZE;

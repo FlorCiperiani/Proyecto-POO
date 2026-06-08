@@ -1,9 +1,9 @@
 package lodeRunner;
 
-/**
- * Nivel 1 — El clásico.
- * Mapa con 3 plataformas, múltiples escaleras y barras.
- * Dificultad: baja. Ideal para aprender los controles.
+/*
+ Nivel 1 — El clásico.
+ Mapa con 3 plataformas, múltiples escaleras y barras.
+ Dificultad: baja. Ideal para aprender los controles.
  */
 public class NivelLR1 extends NivelLR {
 

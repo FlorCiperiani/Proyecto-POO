@@ -2,17 +2,17 @@ package lodeRunner;
 
 import java.awt.Graphics2D;
 
-/**
- * Representa el mapa del nivel como una grilla de ElementoMapa.
- *
- * Convención del array de diseño:
- *   0 = Aire (vacío)
- *   1 = Ladrillo (rompible)
- *   2 = Piedra   (indestructible)
- *   3 = Escalera
- *   4 = Barra horizontal
- *   5 = Oro
- *   6 = Escalera oculta (aparece al recoger todo el oro)
+/*
+Representa el mapa del nivel como una grilla de ElementoMapa.
+ 
+ Convención del array de diseño:
+   0 = Aire (vacío)
+   1 = Ladrillo (rompible)
+   2 = Piedra   (indestructible)
+   3 = Escalera
+   4 = Barra horizontal
+   5 = Oro
+   6 = Escalera oculta (aparece al recoger todo el oro)
  */
 public class MapaLR {
 
@@ -69,11 +69,11 @@ public class MapaLR {
         }
     }
 
-    /**
-     * Recorre cada columna y marca como "tope" (esTope=true) al tile de Escalera
-     * más alto de cada segmento continuo vertical.
-     * Esto se usa en Escalera.mostrar() para dibujar el remate sobresaliendo
-     * levemente por encima del ladrillo adyacente, igual que en el original.
+    /*
+    Recorre cada columna y marca como "tope" (esTope=true) al tile de Escalera
+    más alto de cada segmento continuo vertical.
+    Esto se usa en Escalera.mostrar() para dibujar el remate sobresaliendo
+    levemente por encima del ladrillo adyacente, igual que en el original.
      */
     private void marcarTopesEscalera() {
         for (int c = 0; c < columnas; c++) {
@@ -171,7 +171,7 @@ public class MapaLR {
         }
     }
 
-    /** True si el diseño del nivel tiene un tile tipo 6 (escalera oculta). */
+    /*True si el diseño del nivel tiene un tile tipo 6 (escalera oculta). */
     public boolean tieneEscaleraOculta() { return colEscaleraOculta >= 0; }
 
     public boolean jugadorEscapo(double jugadorY) {

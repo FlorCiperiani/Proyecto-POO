@@ -1,10 +1,10 @@
 package lodeRunner;
 
-/**
- * Nivel 2 — La mina.
- * Diseño más vertical con más escaleras y menos barras.
- * El oro está más disperso y los enemigos empiezan más cerca.
- * Dificultad: media.
+/*
+ Nivel 2 — La mina.
+ Diseño más vertical con más escaleras y menos barras.
+ El oro está más disperso y los enemigos empiezan más cerca.
+ Dificultad: media.
  */
 public class NivelLR2 extends NivelLR {
 

@@ -24,7 +24,7 @@ public class Musica {
             musicaFondo = AudioSystem.getClip();
             musicaFondo.open(audioIn);
             musicaFondo.loop(Clip.LOOP_CONTINUOUSLY);
-            musicaFondo.start(); // FIX: faltaba el start() — sin esto la música no suena
+            musicaFondo.start(); //  sin esto la música no suena
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             System.out.println("Musica: error al reproducir '" + archivo + "': " + e.getMessage());
         }
