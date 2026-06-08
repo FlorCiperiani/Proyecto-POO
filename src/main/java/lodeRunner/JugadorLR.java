@@ -7,25 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-/*
- Jugador controlado por teclado.
- 
- Controles:
-   ← →  : moverse (también cambia la pose del sprite)
-   ↑ ↓  : trepar escalera / colgarse de barra
-   Z    : romper ladrillo a la izquierda
-   X    : romper ladrillo a la derecha
- 
- Poses del jugador:
-   - jugador_left.png    : presionando ←
-   - jugador.png         : sin dirección (neutral / parado)
-   - jugador_right.png   : presionando →
- 
- Mecánica de excavación:
-   - Solo se puede cavar a los lados (no directamente debajo).
-   - Se cava el ladrillo del suelo adyacente.
-   - Solo se puede cavar estando parado en el suelo.
- */
+
 public class JugadorLR extends PersonajeLR {
 
     private int oroRecolectado = 0;
@@ -37,14 +19,14 @@ public class JugadorLR extends PersonajeLR {
     private BufferedImage imgIzquierda;
     private BufferedImage imgDerecha;
 
-    // Sprites de animación: caída
+    // Sprite de caída  (No es gancia con sprite)
     private BufferedImage imgCayendo;
 
-    // Sprites de animación: escalera (2 frames alternados)
+    // Sprites subiendo escalera  (terminé usando el mismo)
     private BufferedImage imgEscaleraA;
     private BufferedImage imgEscaleraB;
 
-    // Sprites de animación: barra (2 frames alternados)
+    // Sprites en barra
     private BufferedImage imgBarraA;
     private BufferedImage imgBarraB;
 
@@ -56,15 +38,15 @@ public class JugadorLR extends PersonajeLR {
     private int teclaRomperIzq = KeyEvent.VK_SPACE;
     private int teclaRomperDer = KeyEvent.VK_SPACE;
 
-    // Última dirección no-cero: se usa para cavar, sprite de barra y pose general.
+    // Última dirección
     // Mantiene el último valor -1 o +1 aunque se suelten las teclas.
     private int ultimaDireccion = -1; // arranca mirando izquierda como el original
 
-    // Anti-repetición de teclas de excavación
+    // Quitar, inicialmente usaba X y X como en los juegos del ejemlo, pero en pdf pide que sea con el espacio
     private boolean teclaZAnterior = false;
     private boolean teclaXAnterior = false;
 
-    // Animación: tiempo acumulado, frame actual y estado previo
+    // tiempo acumulado, frame actual y estado previo
     private double tiempoAnim   = 0.0;
     private int    frameAnim    = 0;
     private int    estadoAnim   = 0;   // 0=suelo 1=cayendo 2=escalera 3=barra
@@ -100,7 +82,7 @@ public class JugadorLR extends PersonajeLR {
         } catch (java.io.IOException e) { return null; }
     }
 
-    // ── Entrada principal ────────────────────────────────────────────────
+    // Entrada principal
 
     public void procesarEntrada(Keyboard teclado, double delta, double escala) {
         actualizarEstado();
@@ -127,10 +109,10 @@ public class JugadorLR extends PersonajeLR {
             if (teclado.isKeyPressed(teclaAbajo))  { moverAbajo(delta);  moviendoVertical = true; }
         }
 
-        // Excavación: UNA SOLA TECLA (espacio).
-        // La dirección del agujero depende del último botón direccional presionado:
-        //   → último fue RIGHT  => agujero a la DERECHA
-        //   → último fue LEFT   => agujero a la IZQUIERDA
+        // Excavación, UNA SOLA TECLA (espacio).
+        // La dirección del agujero depende del último botón direccional apretado:
+        // último fue RIGHT entonces agujero a la DERECHA
+        // último fue LEFT entonces agujero a la IZQUIERDA
         boolean espacioActual = teclado.isKeyPressed(KeyEvent.VK_SPACE);
         if (espacioActual && !teclaZAnterior) romperLadrillo(ultimaDireccion);
         teclaZAnterior = espacioActual;
@@ -140,15 +122,12 @@ public class JugadorLR extends PersonajeLR {
         actualizarSprite();
     }
 
-    // ── Excavación ───────────────────────────────────────────────────────
+    // Excavación
 
     /*
     Cava el ladrillo del suelo en la dirección indicada.
-    direccion = -1 → cava a la izquierda
-    direccion = +1 → cava a la derecha
-     
-    La columna objetivo es la columna DEL CENTRO del personaje ±1,
-    lo que siempre apunta al tile directamente adyacente.
+    direccion = -1 entonces cava a la izquierda
+    direccion = +1 entonces cava a la derecha
     */
     private void romperLadrillo(int direccion) {
         if (mapa == null) return;
@@ -159,7 +138,7 @@ public class JugadorLR extends PersonajeLR {
         int colCentro  = (int)(posicionX + getAncho() / 2.0) / TILE_SIZE;
         int colObjetivo = colCentro + direccion;
 
-        // Fila del suelo: donde están los pies
+        // Fila del suelo
         int filaSuelo = (int)(posicionY + getAlto()) / TILE_SIZE;
 
         ElementoMapa tile = mapa.getTileEn(colObjetivo, filaSuelo);
@@ -169,9 +148,11 @@ public class JugadorLR extends PersonajeLR {
         }
     }
 
-    // ── Recolección de oro ───────────────────────────────────────────────
 
-    // ── Texto flotante al recoger oro ───────────────────────────────────
+
+    // Recolección de oro
+
+    // Texto al juntar oro
     private final java.util.List<float[]> textosPuntos = new java.util.ArrayList<>();
     // Cada entrada: {x, y, tiempoRestante} en píxeles del mapa
 
@@ -182,10 +163,6 @@ public class JugadorLR extends PersonajeLR {
         int colIzq    = (int)(posicionX)                   / TILE_SIZE;
         int colDer    = (int)(posicionX + getAncho() - 1)  / TILE_SIZE;
 
-        // Verificar tanto la fila del torso como la de los pies.
-        // El oro puede estar en la misma fila que el suelo sobre el que camina
-        // el personaje (ej: ladrillos en fila=9 con oro también en fila=9),
-        // en cuyo caso filaTorso apunta a fila=8 y nunca detectaría el oro.
         for (int fila : new int[]{filaTorso, filaPies}) {
             for (int col = colIzq; col <= colDer; col++) {
                 ElementoMapa tile = mapa.getTileEn(col, fila);
@@ -207,7 +184,7 @@ public class JugadorLR extends PersonajeLR {
         }
     }
 
-    /* Dibujar y actualizar los textos flotantes "+100". Llamar desde mostrar(). */
+    // Dibujar y actualizar los textos "+100". Llamar desde mostrar(). 
     public void dibujarTextosPuntos(java.awt.Graphics2D g2, double delta) {
         java.util.Iterator<float[]> it = textosPuntos.iterator();
         while (it.hasNext()) {
@@ -215,8 +192,8 @@ public class JugadorLR extends PersonajeLR {
             t[2] -= (float) delta;
             if (t[2] <= 0) { it.remove(); continue; }
             // Subir el texto a medida que pasa el tiempo
-            float alpha  = Math.min(1f, t[2] / 0.4f);   // fade out en los últimos 0.4s
-            float drawY  = t[1] - (0.8f - t[2]) * 24f;  // sube 24px durante 0.8s
+            float alpha  = Math.min(1f, t[2] / 0.4f);   
+            float drawY  = t[1] - (0.8f - t[2]) * 24f; 
             java.awt.AlphaComposite ac = java.awt.AlphaComposite.getInstance(
                 java.awt.AlphaComposite.SRC_OVER, alpha);
             java.awt.Composite anterior = g2.getComposite();
@@ -228,25 +205,21 @@ public class JugadorLR extends PersonajeLR {
         }
     }
 
-    // ── Sprite según estado con animación ────────────────────────────────
-
+    // Sprite según estado con la animación
     private static final int ESTADO_SUELO    = 0;
     private static final int ESTADO_CAYENDO  = 1;
     private static final int ESTADO_ESCALERA = 2;
     private static final int ESTADO_BARRA    = 3;
 
     private void actualizarSprite() {
-        // Determinar el estado actual con prioridad clara.
-        // ESCALERA: activar siempre que enEscalera=true, sin importar moviendoVertical.
-        // El avance de frames se controla por separado dentro del case.
+        // activar siempre que enEscalera=true, sin importar moviendoVertical.
         int nuevoEstado;
         if      (cayendo)    nuevoEstado = ESTADO_CAYENDO;
         else if (enBarra)    nuevoEstado = ESTADO_BARRA;
         else if (enEscalera) nuevoEstado = ESTADO_ESCALERA;
         else                 nuevoEstado = ESTADO_SUELO;
 
-        // Al cambiar de estado: resetear timer y frame para que la animación
-        // empiece limpia desde el principio, sin arrastrar tiempo acumulado.
+        // Al cambiar de estado resetear timer y frame para que la animación empiece limpia desde el principio, sin arrastrar tiempo acumulado.
         if (nuevoEstado != estadoAnim) {
             tiempoAnim = 0.0;
             frameAnim  = 0;
@@ -260,9 +233,8 @@ public class JugadorLR extends PersonajeLR {
                 break;
 
             case ESTADO_ESCALERA: {
-                // Avanzar la animación SOLO si el jugador se mueve verticalmente.
-                // Si está parado en la escalera (sin presionar ↑↓), congelar el frame.
-                // Esto evita el reseteo continuo de tiempoAnim que causaba el parpadeo.
+                // Avanzar la animación SOLO si el jugador se mueve verticalmente. Si está parado en la escalera congelar el frame.
+                // Esto arregla un bug que hacia que titile o parpadee la imagen
                 if (moviendoVertical) {
                     double periodo = 1.0 / FPS_ESCALERA;
                     tiempoAnim = tiempoAnim % periodo;
@@ -290,19 +262,16 @@ public class JugadorLR extends PersonajeLR {
         }
     }
 
-    // ── Vidas ────────────────────────────────────────────────────────────
-
+    // Vidas
     public void perderVida() { vidas--; }
     public void ganarVida()  { vidas++; }
     public int  getVidas()   { return vidas; }
 
-    // ── Puntos ───────────────────────────────────────────────────────────
-
+    // Puntos 
     public void sumarPuntos(int cantidad) { puntos += cantidad; }
     public int  getPuntos()               { return puntos; }
 
-    // ── Getters ──────────────────────────────────────────────────────────
-
+    // Getters
     public int getOroRecolectado() { return oroRecolectado; }
     public void resetOro() { oroRecolectado = 0; }
 
@@ -326,5 +295,5 @@ public class JugadorLR extends PersonajeLR {
     }
 
     @Override
-    public void update(double delta) { /* gestionado por procesarEntrada() */ }
+    public void update(double delta) { /* Mirar procesarEntrada() */ }
 }

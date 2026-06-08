@@ -10,26 +10,17 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-/*
- Clase principal del juego Lode Runner.
- *
- Gestiona el ciclo de juego, el HUD y la progresión entre niveles.
- El diseño de cada nivel está en su propia clase (NivelLR1, NivelLR2, NivelLR3...).
- Para agregar un nivel: crear NivelLRN extends NivelLR y añadirlo al array NIVELES.
- */
+
 public class LodeRunner extends JGame {
 
-    // ── Audio ─────────────────────────────────────────────────────────────
     private static final String MUSICA_FONDO = "LR_musiquilla.wav";
 
-    // ── Niveles disponibles (agregar aquí para expandir) ─────────────────
     private static final NivelLR[] NIVELES = {
-        new NivelLR1(),
-        new NivelLR2(),
-        new NivelLR3(),
+        NivelLR.NIVEL_1,
+        NivelLR.NIVEL_2,
+        NivelLR.NIVEL_3,
     };
 
-    // ── Componentes ──────────────────────────────────────────────────────
     private MapaLR       mapa;
     private JugadorLR    jugador;
     public static JugadorLR jugadorActual;
@@ -37,13 +28,12 @@ public class LodeRunner extends JGame {
     private NivelLR      nivelActual;
     private int          indiceNivel = 0;
 
-    // ── Escala y offset ──────────────────────────────────────────────────
     private double escala  = 1.0;
     private int    offsetX = 0;
     private int    offsetY = 0;
-    private static final int HUD_ALTO = 30;
+    private static final int HUD_ALTO = 50; //la barra de arriba que no anda :(
 
-    // ── Estado de juego ──────────────────────────────────────────────────
+    // Estados en que pueda estar
     private boolean victoria     = false;
     private boolean derrota      = false;
     private boolean gameOver     = false;
@@ -59,7 +49,7 @@ public class LodeRunner extends JGame {
     private static final double TIEMPO_MAXIMO = 180.0;
 
     private int puntajeTotal = 0;
-    private int vidasGuardadas = 5;   // vidas que se llevan al siguiente nivel
+    private int vidasGuardadas = 5;
 
     public LodeRunner(String titulo, int ancho, int alto) {
     super(titulo, ancho, alto);
@@ -71,8 +61,7 @@ public class LodeRunner extends JGame {
     });
     }
 
-    // ── Ciclo JGame ──────────────────────────────────────────────────────
-
+    //Ciclo JGame
     @Override
     public void gameStartup() {
         indiceNivel = 0;
@@ -85,7 +74,7 @@ public class LodeRunner extends JGame {
         Keyboard teclado = this.getKeyboard();
         if (teclado.isKeyPressed(KeyEvent.VK_ESCAPE)) { stop(); return; }
 
-        // ── Pausa ─────────────────────────────────────────────────────────
+        // Pausa
         if (teclado.isKeyPressed(KeyEvent.VK_P) && !teclaP_presionada) {
             teclaP_presionada = true;
             if (!pausado) {
@@ -102,7 +91,7 @@ public class LodeRunner extends JGame {
             return;
         }
 
-        // ── Teclas de sonido ──────────────────────────────────────────────
+        // Teclas para el sonido
         if (teclado.isKeyPressed(KeyEvent.VK_Q) && !teclaQ_presionada) {
             teclaQ_presionada = true;
             MenuConfigLR.efectosActivados = !MenuConfigLR.efectosActivados;
@@ -123,7 +112,7 @@ public class LodeRunner extends JGame {
         }
 
 
-        // ── Atajo de desarrollo: N → siguiente nivel ──────────────────────
+        // Atajo N para pasar al siguiente nivel, lo implementé para que sea mas facil trabajar los niveles
         if (teclado.isKeyPressed(KeyEvent.VK_N)) {
             vidasGuardadas = jugador != null ? jugador.getVidas() : 5;
             puntajeTotal  += jugador != null ? jugador.getPuntos() : 0;
@@ -143,7 +132,7 @@ public class LodeRunner extends JGame {
             return;
         }
 
-        // ── Game Over ─────────────────────────────────────────────────────
+        // Game Over
         if (gameOver) {
             if (teclado.isKeyPressed(KeyEvent.VK_ENTER)) {
                 indiceNivel  = 0;
@@ -153,11 +142,11 @@ public class LodeRunner extends JGame {
             return;
         }
 
-        // ── Victoria / Derrota ────────────────────────────────────────────
+        // Victoria o Derrota 
         if (victoria || derrota) {
             if (teclado.isKeyPressed(KeyEvent.VK_ENTER)) {
                 if (victoria) {
-                    // Avanzar al siguiente nivel
+                    // Pasar al siguiente nivel
                     puntajeTotal  += jugador.getPuntos();
                     vidasGuardadas = jugador.getVidas();
                     indiceNivel++;
@@ -175,7 +164,7 @@ public class LodeRunner extends JGame {
             return;
         }
 
-        // ── Update normal ─────────────────────────────────────────────────
+        // Update normal 
         tiempoNivel += delta;
         ultimoDelta  = delta;
 
@@ -214,10 +203,7 @@ public class LodeRunner extends JGame {
         }
 
         // Victoria:
-        // - Si el nivel tiene escalera oculta (tile 6): necesita escaleraList=true
-        //   (haber recogido todo el oro) para que la escalera esté revelada.
-        // - Si no tiene escalera oculta (escalera visible desde el inicio):
-        //   basta con llegar al extremo superior (posicionY < TILE_SIZE).
+        // necesita escaleraList=true (haber juntado todo el oro) para que la escalera no esté oculta.
         boolean condicionEscape = mapa.tieneEscaleraOculta()
                 ? (escaleraList && mapa.jugadorEscapo(jugador.getY()))
                 : mapa.jugadorEscapo(jugador.getY());
@@ -269,7 +255,7 @@ public class LodeRunner extends JGame {
         Musica.detenerMusicaFondo();
     }
 
-    // ── Inicialización de nivel ───────────────────────────────────────────
+    //Inicialización de nivel
 
     private void inicializarNivel() {
         victoria     = false;
@@ -322,11 +308,11 @@ public class LodeRunner extends JGame {
         offsetY = (int)((venH - mapaH * escala) / 2);
     }
 
-    // ── HUD ──────────────────────────────────────────────────────────────
+    // HUD, la barra de arriba que no anda :(
 
     private void dibujarHUD(Graphics2D g2) {
         g2.setColor(new Color(20, 20, 20, 220));
-        g2.fillRect(0, 0, getWidth(), HUD_ALTO);
+        int venH  = getHeight() - (int)(HUD_ALTO * 1.5);
 
         g2.setFont(new Font("Arial", Font.BOLD, 14));
 

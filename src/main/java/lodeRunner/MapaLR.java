@@ -4,15 +4,13 @@ import java.awt.Graphics2D;
 
 /*
 Representa el mapa del nivel como una grilla de ElementoMapa.
- 
- Convención del array de diseño:
    0 = Aire (vacío)
-   1 = Ladrillo (rompible)
-   2 = Piedra   (indestructible)
+   1 = Ladrillo
+   2 = Piedra
    3 = Escalera
    4 = Barra horizontal
    5 = Oro
-   6 = Escalera oculta (aparece al recoger todo el oro)
+   6 = Escalera oculta
  */
 public class MapaLR {
 
@@ -37,8 +35,7 @@ public class MapaLR {
         marcarTopesEscalera();
     }
 
-    // ── Construcción ────────────────────────────────────────────────────
-
+    // Construcción 
     private void construirGrilla(int[][] diseño) {
         oroTotal = 0;
         escaleraVisible = false;
@@ -69,17 +66,10 @@ public class MapaLR {
         }
     }
 
-    /*
-    Recorre cada columna y marca como "tope" (esTope=true) al tile de Escalera
-    más alto de cada segmento continuo vertical.
-    Esto se usa en Escalera.mostrar() para dibujar el remate sobresaliendo
-    levemente por encima del ladrillo adyacente, igual que en el original.
-     */
     private void marcarTopesEscalera() {
         for (int c = 0; c < columnas; c++) {
             for (int f = 0; f < filas; f++) {
                 if (grilla[f][c] instanceof Escalera) {
-                    // ¿El tile de arriba también es escalera?
                     boolean hayEscaleraArriba = (f > 0) && (grilla[f-1][c] instanceof Escalera);
                     if (!hayEscaleraArriba) {
                         // Este es el tope del segmento
@@ -90,8 +80,7 @@ public class MapaLR {
         }
     }
 
-    // ── Actualización ───────────────────────────────────────────────────
-
+    // Actualización
     public void update(double delta) {
         for (int f = 0; f < filas; f++)
             for (int c = 0; c < columnas; c++)
@@ -104,8 +93,7 @@ public class MapaLR {
                 if (grilla[f][c] != null) grilla[f][c].mostrar(g2);
     }
 
-    // ── Escalera oculta ─────────────────────────────────────────────────
-
+    // Escalera oculta
     public void revelarEscaleraOculta(double jugadorX) {
         if (escaleraVisible) return;
         escaleraVisible = true;
@@ -120,29 +108,14 @@ public class MapaLR {
             filaOculta = 0;
         }
 
-        // Buscar la fila más baja desde filaOculta hacia abajo que ya tenga
-        // una escalera continua que llegue hasta una plataforma pisable,
-        // para saber hasta dónde hay que completar la columna.
-        // En la práctica el tile 6 está en fila 0 y fila 1 suele tener ya
-        // una escalera visible.  Lo que falta es:
-        //   1. Colocar escalera en todas las filas desde filaOculta hacia abajo
-        //      hasta la primera fila que ya tenga escalera (exclusive), para
-        //      cerrar el hueco.
-        //   2. Actualizar el flag esTope: solo la fila superior debe ser tope.
-
-        // Paso 1a: extender hacia ARRIBA desde filaOculta hasta fila 0,
-        // rellenando celdas null con Escalera para que moverArriba no haga
-        // snap y bloquee al jugador antes de que pueda escapar por el techo.
         for (int f = filaOculta - 1; f >= 0; f--) {
             if (grilla[f][col] == null) {
                 grilla[f][col] = new Escalera(col * TILE_SIZE, f * TILE_SIZE);
             } else {
-                break; // Piedra u otro tile: no continuar
+                break;
             }
         }
 
-        // Paso 1b: colocar escalera en filaOculta y extender hacia ABAJO
-        // hasta la primera Escalera ya existente o tile sólido.
         int filaInicio = filaOculta;
         int filaFin    = filaOculta;
 
@@ -161,8 +134,6 @@ public class MapaLR {
             grilla[f][col] = new Escalera(col * TILE_SIZE, f * TILE_SIZE);
         }
 
-        // Paso 2: recalcular esTope en toda la columna para que solo el tile
-        // más alto sea tope (puede haber escaleras preexistentes debajo).
         for (int f = 0; f < filas; f++) {
             if (grilla[f][col] instanceof Escalera) {
                 boolean hayEscaleraArriba = (f > 0) && (grilla[f - 1][col] instanceof Escalera);
@@ -171,19 +142,13 @@ public class MapaLR {
         }
     }
 
-    /*True si el diseño del nivel tiene un tile tipo 6 (escalera oculta). */
     public boolean tieneEscaleraOculta() { return colEscaleraOculta >= 0; }
 
     public boolean jugadorEscapo(double jugadorY) {
-        // El personaje escapa cuando su posicionY (borde superior) llega a fila=0.
-        // Usamos < TILE_SIZE en vez de <= 0 porque el snap de moverArriba
-        // detiene al personaje exactamente en y=0 (borde del mapa) y nunca
-        // llega a valores negativos.
         return jugadorY < TILE_SIZE;
     }
 
-    // ── Acceso a tiles ──────────────────────────────────────────────────
-
+    // Acceso a tiles
     public ElementoMapa getTileEn(int col, int fila) {
         if (fila >= 0 && fila < filas && col >= 0 && col < columnas)
             return grilla[fila][col];

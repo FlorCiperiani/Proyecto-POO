@@ -2,10 +2,6 @@ package lodeRunner;
 
 import clasesCompartidas.ObjetoGrafico;
 
-/*
- Clase base para todos los personajes del juego (jugador y enemigos).
- Gestiona movimiento, gravedad y consultas de colisión al mapa.
- */
 public abstract class PersonajeLR extends ObjetoGrafico {
 
     protected double velocidad;
@@ -33,8 +29,8 @@ public abstract class PersonajeLR extends ObjetoGrafico {
 
     public void setEnemigos(java.util.ArrayList<EnemigoLR> enemigos) { this.listaEnemigos = enemigos; }
 
-    // ── Movimientos básicos ──────────────────────────────────────────────
 
+    //Movimientos basicos
     public void moverIzquierda(double delta) {
         if (cayendo) return;
         double nuevaX = posicionX - velocidad * delta;
@@ -48,10 +44,6 @@ public abstract class PersonajeLR extends ObjetoGrafico {
     }
 
     public void moverArriba(double delta) {
-        // El personaje tiene ancho = 1 tile (32px). Cuando está parado sobre el
-        // ladrillo adyacente a la escalera, colIzq == colDer == colCentro, por lo
-        // que verificar "los bordes" no ayuda. La solución es buscar escalera en
-        // las columnas VECINAS al centro: centro-1, centro, centro+1.
         int colCentro = (int)(posicionX + getAncho() / 2.0) / TILE_SIZE;
         int filaPies  = (int)(posicionY + getAlto())        / TILE_SIZE;
         int filaCuerpoActual = (int)(posicionY + getAlto() / 2.0) / TILE_SIZE;
@@ -62,7 +54,7 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         if (enEscalera) {
             colEscalera = colCentro;
         } else {
-            // Buscar escalera en las tres columnas vecinas
+            // Buscar escalera en las columnas vecinas
             for (int dc : new int[]{0, -1, 1}) {
                 int c = colCentro + dc;
                 if (mapa.getTileEn(c, filaPies)          instanceof Escalera ||
@@ -75,7 +67,7 @@ public abstract class PersonajeLR extends ObjetoGrafico {
 
         if (colEscalera < 0) return;  // no hay escalera accesible
 
-        // Snap horizontal: centrar al personaje en la columna de la escalera
+        //centrar al personaje en la columna de la escalera
         if (colEscalera != colCentro) {
             posicionX = colEscalera * (double) TILE_SIZE;
         }
@@ -88,7 +80,6 @@ public abstract class PersonajeLR extends ObjetoGrafico {
             int filaActual = (int)(posicionY) / TILE_SIZE;
             if (nuevaY < filaActual * (double) TILE_SIZE) nuevaY = filaActual * (double) TILE_SIZE;
         } else {
-            // Si el torso salió del tile de escalera: snap al tope
             int filaCuerpoNueva = (int)(nuevaY + getAlto() / 2.0) / TILE_SIZE;
             if (!(mapa.getTileEn(colEscalera, filaCuerpoNueva) instanceof Escalera)) {
                 double snapY = (filaCuerpoNueva + 1) * (double) TILE_SIZE - getAlto();
@@ -103,14 +94,13 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         if (!enEscalera && !enBarra) return;
         double nuevaY = posicionY + velocidad * delta;
 
-        // Snap al suelo cuando los pies llegan a un tile sólido o salen de la escalera
+        //al suelo cuando los pies llegan a un bloque sólido o salen de la escalera
         int col      = (int)(posicionX + getAncho() / 2.0) / TILE_SIZE;
         int filaPies = (int)(nuevaY + getAlto()) / TILE_SIZE;
 
         ElementoMapa debajo = mapa != null ? mapa.getTileEn(col, filaPies) : null;
 
         if (esSolido(debajo)) {
-            // Snap: pies exactamente en el borde superior del tile sólido
             nuevaY   = filaPies * (double)TILE_SIZE - getAlto();
             enSuelo  = true;
             cayendo  = false;
@@ -120,8 +110,7 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         posicionY = nuevaY;
     }
 
-    // ── Física: gravedad ────────────────────────────────────────────────
-
+    //gravedad
     public void aplicarGravedad(double delta) {
         if (enHoyo)                return;
         if (enEscalera || enBarra) { velocidadY = 0; cayendo = false; return; }
@@ -142,7 +131,7 @@ public abstract class PersonajeLR extends ObjetoGrafico {
                 enSuelo   = false;
             }
         } else {
-            // Re-verificar que el suelo sigue siendo sólido DESPUÉS del movimiento
+            // volver a verificar que el suelo sigue siendo sólido despues del movimiento
             double piesPx   = posicionY + getAlto();
             int    filaBajo = (int) piesPx / TILE_SIZE;
             int    colIzqP  = (int) posicionX              / TILE_SIZE;
@@ -179,7 +168,7 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         }
     }
 
-    // ── Detección de estado según el mapa ───────────────────────────────
+    // Detección de estado según el mapa
 
     public void actualizarEstado() {
         if (mapa == null) return;
@@ -188,17 +177,12 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         int filaCuerpo = (int)(posicionY + getAlto() / 2.0)  / TILE_SIZE;
         int filaCabeza = (int)(posicionY)                    / TILE_SIZE;
 
-        // ── Detección de suelo estricta (Mapa) ───────────────────────────
-        // Se comprueba si los pies están exactamente en el borde superior
-        // de un tile sólido.
         double piesPx   = posicionY + getAlto();
         int    filaBajo = (int) piesPx / TILE_SIZE;          // fila que contiene los pies
         double bordeInf = filaBajo * (double) TILE_SIZE;     // borde superior de ese tile
 
-        // Los pies están "en contacto" si están dentro del primer pixel del tile
         boolean contacto = (piesPx - bordeInf) <= 1.0;
 
-        // También verificar la columna izquierda y derecha del personaje
         int colIzqP = (int) posicionX              / TILE_SIZE;
         int colDerP = (int)(posicionX + getAncho() - 1) / TILE_SIZE;
 
@@ -206,15 +190,13 @@ public abstract class PersonajeLR extends ObjetoGrafico {
             || esSolido(mapa.getTileEn(col, filaBajo))
             || esSolido(mapa.getTileEn(colDerP,  filaBajo)));
 
-        // ── Detección de suelo técnico (Pisando Enemigo en Hoyo) ─────────
         boolean pisandoEnemigoEnHoyo = false;
         
-        // Solo el Jugador puede caminar sobre los enemigos atrapados
+        // Solamente el Jugador puede caminar sobre los enemigos atrapados
         if (this instanceof JugadorLR && listaEnemigos != null) {
             for (EnemigoLR e : listaEnemigos) {
                 if (e.isEnHoyo() && estaPisandoCabeza(e)) {
                     pisandoEnemigoEnHoyo = true;
-                    // Snap preciso: alineamos perfectamente los pies del jugador con su cabeza
                     posicionY = e.getY() - getAlto(); 
                     break;
                 }
@@ -226,12 +208,10 @@ public abstract class PersonajeLR extends ObjetoGrafico {
 
         int filaPies = filaBajo;
 
-        // ── En escalera ──────────────────────────────────────────────────
-        // El TORSO del personaje está dentro de un tile de Escalera.
+        //En escalera
         enEscalera = (mapa.getTileEn(col, filaCuerpo) instanceof Escalera);
 
-        // ── En barra ─────────────────────────────────────────────────────
-        // La CABEZA o el CUERPO del personaje están en un tile de Barra.
+        // En barra
         boolean enBarraAnterior = enBarra;
         int filaConBarra = -1;
         if (mapa.getTileEn(col, filaCabeza) instanceof Barra) filaConBarra = filaCabeza;
@@ -247,7 +227,7 @@ public abstract class PersonajeLR extends ObjetoGrafico {
             }
         }
 
-        // ── Atrapado en hoyo ─────────────────────────────────────────────
+        //Atrapado en hoyo
         enHoyo = estaEncerradoEnHoyo(col, filaCuerpo);
     }
 
@@ -264,7 +244,9 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         return lados && suelo && hueco;
     }
 
-    // ── Colisiones ──────────────────────────────────────────────────────
+
+
+    // Colisiones
 
     protected boolean colisionaHorizontal(double nx, double y) {
         if (mapa == null) return false;
@@ -298,7 +280,8 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         return false;
     }
 
-    // ── Colisión entre personajes (AABB) ─────────────────────────────────
+
+    // Colisión entre personajes
 
     public boolean colisionaCon(PersonajeLR otro) {
         return posicionX < otro.posicionX + otro.getAncho()
@@ -308,8 +291,7 @@ public abstract class PersonajeLR extends ObjetoGrafico {
     }
 
     public boolean estaPisandoCabeza(PersonajeLR otro) {
-        boolean solapaX = posicionX < otro.posicionX + otro.getAncho()
-                       && posicionX + getAncho() > otro.posicionX;
+        boolean solapaX = posicionX < otro.posicionX + otro.getAncho() && posicionX + getAncho() > otro.posicionX;
         double piesPropios  = posicionY + getAlto();
         double cabezaOtro   = otro.posicionY;
         double tercioCuerpo = otro.posicionY + otro.getAlto() / 3.0;
@@ -320,7 +302,8 @@ public abstract class PersonajeLR extends ObjetoGrafico {
         return colisionaCon(otro) && !estaPisandoCabeza(otro);
     }
 
-    // ── Getters de estado ───────────────────────────────────────────────
+
+    //Getters de estado
 
     public boolean isEnHoyo()    { return enHoyo;     }
     public boolean isCayendo()   { return cayendo;    }

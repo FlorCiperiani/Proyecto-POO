@@ -5,7 +5,6 @@ import java.awt.*;
 
 public class MenuConfigLR extends JFrame {
 
-    // ── Configuración (antes en Configuracion.java) ───────────────────────
     public static boolean pantallaCompleta        = false;
     public static boolean sonidoGeneralAtrapado   = true;
     public static boolean musicaActivada          = true;
@@ -71,7 +70,7 @@ public class MenuConfigLR extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(6, 10, 6, 10);
 
-        // 1. Pantalla
+        // Pantalla
         rdVentana          = makeRadioButton("Ventana",           !pantallaCompleta);
         rdPantallaCompleta = makeRadioButton("Pantalla completa",  pantallaCompleta);
         ButtonGroup grupoPantalla = new ButtonGroup();
@@ -79,24 +78,24 @@ public class MenuConfigLR extends JFrame {
         grupoPantalla.add(rdPantallaCompleta);
         addRow(config, gbc, 0, "Pantalla:", rdVentana, rdPantallaCompleta);
 
-        // 2. Sonido general
+        // Sonido general
         chkSonidoGeneral = makeCheckBox("Activado", sonidoGeneralActivado);
         addRow(config, gbc, 1, "Sonido General:", chkSonidoGeneral, null);
 
-        // 3. Música
+        // Música
         chkMusica = makeCheckBox("Activado", musicaActivada);
         addRow(config, gbc, 2, "Música de Fondo:", chkMusica, null);
 
-        // 4. Efectos
+        // Efectos
         chkEfectos = makeCheckBox("Activado", efectosActivados);
         addRow(config, gbc, 3, "Efectos de Sonido:", chkEfectos, null);
 
-        // 5. Pista musical
+        // Pista musical
         String[] pistas = {"LR_musiquilla.wav", "retro.wav"};
         comboMusica = makeCombo(pistas, pistaMusicalSeleccionada);
         addRow(config, gbc, 4, "Pista Musical:", comboMusica, null);
 
-        // 6. Skin
+        // Skin
         String[] skins = {"original", "skin_alternativa"};
         comboSkin = makeCombo(skins, skinPersonajeSeleccionado);
         addRow(config, gbc, 5, "Skin del Personaje:", comboSkin, null);
@@ -128,7 +127,7 @@ public class MenuConfigLR extends JFrame {
         pistaMusicalSeleccionada  = (String) comboMusica.getSelectedItem();
         skinPersonajeSeleccionado = (String) comboSkin.getSelectedItem();
 
-        // Aplicar cambios de música inmediatamente
+        // Aplicar cambios de música
         if (!sonidoGeneralActivado || !musicaActivada) {
             clasesCompartidas.Musica.detenerMusicaFondo();
         } else {
@@ -136,7 +135,7 @@ public class MenuConfigLR extends JFrame {
             clasesCompartidas.Musica.iniciarMusica(pistaMusicalSeleccionada);
         }
 
-        // Aplicar skin inmediatamente si hay jugador activo
+        // Aplicar skin si hay jugador activo
         if (LodeRunner.jugadorActual != null) {
             LodeRunner.jugadorActual.recargarSprites();
         }
@@ -157,8 +156,7 @@ public class MenuConfigLR extends JFrame {
         JOptionPane.showMessageDialog(this, "Se han restablecido los valores por defecto.");
     }
 
-    private void addRow(JPanel panel, GridBagConstraints g, int row,
-                        String labelText, JComponent c1, JComponent c2) {
+    private void addRow(JPanel panel, GridBagConstraints g, int row, String labelText, JComponent c1, JComponent c2) {
         g.gridx = 0; g.gridy = row;
         panel.add(makeLabel(labelText), g);
         g.gridx = 1;
