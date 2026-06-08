@@ -185,6 +185,14 @@ public class SpaceInvaders extends JGame {
     public void gameUpdate(double delta) {
         Keyboard kb = getKeyboard();
 
+        // ESC: volver al menú de inicio  
+        if (kb.isKeyPressed(KeyEvent.VK_ESCAPE)) {
+            enMenuInicio = true;
+            juegoTerminado = false;
+            clasesCompartidas.Musica.detenerMusicaFondo();
+            return;
+        }
+
         // LÓGICA DEL MENÚ DE INICIO (Antes de comenzar)
         if (enMenuInicio) {
             if (kb.isKeyPressed(KeyEvent.VK_ENTER)) {
@@ -372,6 +380,7 @@ public class SpaceInvaders extends JGame {
 
         // 1. VISTA ANTES DE COMENZAR (MENÚ DE INICIO CON TOP 10)
         if (enMenuInicio) {
+        
             g2.setColor(new Color(0, 0, 0, 220));
             g2.fillRect(0, 0, getWidth(), getHeight());
 
@@ -392,6 +401,11 @@ public class SpaceInvaders extends JGame {
 
         // 2. VISTA DE PARTIDA EN CURSO
         if (!juegoTerminado) {
+            // Texto ayuda ESC 
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Monospaced", Font.PLAIN, 14));
+            g2.drawString("ESC: menú", 12, getHeight() - 12);
+
             double origX = canion.getX();
             double origY = canion.getY();
             int anchoCanion  = canion.getAncho();
