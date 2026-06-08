@@ -1,7 +1,6 @@
 package spaceinvaders;
 
 import clasesCompartidas.ObjetoGrafico;
-//import java.awt.Graphics2D;
 
 public class Canion extends ObjetoGrafico {
     private double velocidad = 300; // Píxeles por segundo

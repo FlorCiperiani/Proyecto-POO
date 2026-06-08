@@ -72,10 +72,10 @@ public class Escudo extends ObjetoGrafico {
         int escX = (int) this.posicionX;
         int escY = (int) this.posicionY;
 
-        // 🔹 Elegimos el orden según QUIÉN disparó
+        // Elegimos el orden según QUIÉN disparó
         if (proyectil.isDisparoJugador()) {
 
-            // DISPARO DEL JUGADOR → buscar desde ABAJO
+            // DISPARO DEL JUGADOR: buscar desde ABAJO
             for (int f = FILAS - 1; f >= 0; f--) {
                 for (int c = 0; c < COLUMNAS; c++) {
                     if (impactaPixel(pX, pY, pAncho, pAlto, escX, escY, f, c)) {
@@ -87,7 +87,7 @@ public class Escudo extends ObjetoGrafico {
 
         } else {
 
-            // DISPARO ENEMIGO → buscar desde ARRIBA
+            // DISPARO ENEMIGO: buscar desde ARRIBA
             for (int f = 0; f < FILAS; f++) {
                 for (int c = 0; c < COLUMNAS; c++) {
                     if (impactaPixel(pX, pY, pAncho, pAlto, escX, escY, f, c)) {

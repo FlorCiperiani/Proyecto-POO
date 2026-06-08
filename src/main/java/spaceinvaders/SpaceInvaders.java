@@ -19,7 +19,7 @@ import java.util.Properties;
 
 public class SpaceInvaders extends JGame {
 
-    // ================== COMPONENTES ==================
+    // ── COMPONENTES ──────────────────────────────────────────────────────────────
     private NaveNodriza ufo;
     private Canion canion;
     private Galaxia galaxia;
@@ -29,7 +29,7 @@ public class SpaceInvaders extends JGame {
     private ArrayList<Proyectil> proyectiles;
     private ArrayList<Escudo> escudos;
 
-    // ================== ESTADO ==================
+    //── ESTADO ──────────────────────────────────────────────────────────────
     private int contadorDisparos = 0;
     private double tiempoParaProximoUfo = 15.0;
     private double tiempoDisparoEnemigo = 0;
@@ -37,25 +37,25 @@ public class SpaceInvaders extends JGame {
     private double velocidadBaseAliens = 14.0;
     private double velocidadBaseUFO = 100.0;
 
-    // ================== CONTROL DE RITMO RETRO ==================
+    // ── CONTROL DE RITMO RETRO ──────────────────────────────────────────────────────────────
     private double acumuladorRitmo = 0.0;
     private boolean moverEnEsteFotograma = false;
     private boolean disparoPresionado = false;
 
-    // ================== CONTROL DE NIVELES ==================
+    //── CONTROL DE NIVELES ──────────────────────────────────────────────────────────────
     private int desplazamientoNivelY = 0;
 
-    // ================== ESTADO DE VIDAS, MENÚ Y GAME OVER ==================
+    // ── ESTADO DE VIDAS, MENÚ Y GAME OVER ──────────────────────────────────────────────────────────────
     private int vidas = 3;
     private boolean juegoTerminado = false;
-    private boolean enMenuInicio = true; // <--- NUEVO: Controla la pantalla de bienvenida
+    private boolean enMenuInicio = true; 
     private int vidasConfiguradas = 3;
     private RankingSpace ranking;
 
-    // ================== CONFIGURACIÓN LEÍDA DEL ARCHIVO ==================
+    // ── CONFIGURACIÓN LEÍDA DEL ARCHIVO ──────────────────────────────────────────────────────────────
     private boolean sonidoActivado = true;   
 
-    // ================== TECLAS ==================
+    // ── TECLAS ──────────────────────────────────────────────────────────────
     private int teclaIzquierdaCodigo;
     private int teclaDerechaCodigo;
     private int teclaDisparoCodigo;
@@ -64,9 +64,8 @@ public class SpaceInvaders extends JGame {
         super(titulo, ancho, alto);
     }
 
-    // =================================================
-    // STARTUP
-    // =================================================
+    // ── STARTUP ──────────────────────────────────────────────────────────────
+   
     @Override
     public void gameStartup() {
         ranking = new RankingSpace();
@@ -123,9 +122,8 @@ public class SpaceInvaders extends JGame {
         }
     }
 
-    // =================================================
-    // REINICIO
-    // =================================================
+    // ── REINICIO ───────────────────────────────────────────────────────────
+  
     private void reiniciarPartidaCompleta() {
         desplazamientoNivelY = 0;
         contadorDisparos     = 0;
@@ -172,9 +170,9 @@ public class SpaceInvaders extends JGame {
         }
     }
 
-    // =================================================
-    // UPDATE
-    // =================================================
+  
+    // ── UPDATE ───────────────────────────────────────────────────────────
+
     @Override
     public void gameUpdate(double delta) {
         Keyboard kb = getKeyboard();
@@ -341,9 +339,7 @@ public class SpaceInvaders extends JGame {
         }
     }
 
-    /**
-     * Pide el nombre de forma gráfica y procesa la persistencia del ranking.
-     */
+    // Pide el nombre de forma gráfica y procesa la persistencia del ranking.
     private void manejarGuardadoRanking() {
         String nombre = javax.swing.JOptionPane.showInputDialog(
             null, 
@@ -355,9 +351,9 @@ public class SpaceInvaders extends JGame {
         ranking.guardar(nombre, nivelAlcanzado, marcador.getPuntaje());
     }
 
-    // =================================================
-    // DRAW
-    // =================================================
+   
+    // ── DRAW ───────────────────────────────────────────────────
+  
     @Override
     public void gameDraw(Graphics2D g2) {
         // Fondo del espacio común para todas las vistas
@@ -430,9 +426,8 @@ public class SpaceInvaders extends JGame {
         }
     }
 
-    /**
-     * Dibuja los 10 mejores puntajes directamente sobre el lienzo del juego (g2).
-     */
+    // Dibuja los 10 mejores puntajes.
+     
     private void dibujarTablaRanking(Graphics2D g2, int inicioY) {
         g2.setFont(new Font("Monospaced", Font.BOLD, 22));
         g2.setColor(Color.YELLOW);
@@ -474,9 +469,9 @@ public class SpaceInvaders extends JGame {
         }
     }
 
-    // =================================================
-    // UTILS
-    // =================================================
+   
+    // ── UTILS ───────────────────────────────────────────────────
+  
     private boolean hayDisparoJugadorActivo() {
         for (Proyectil p : proyectiles) if (p.isDisparoJugador()) return true;
         return false;
