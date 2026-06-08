@@ -20,14 +20,21 @@ public class Cancha extends ObjetoGrafico {
         this.estilo = estilo;
         String ruta = "/pong/";
 
-        switch (estilo) {
+        String est = (estilo == null) ? "" : estilo.trim();
+        est = est.toLowerCase();
+
+        switch (est) {
             case "cancha 1":
+            case "cancha1":
                 imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha1.png")).getImage();
                 break;
-            case "Cancha 2":
+            case "cancha 2":
+            case "cancha2":
                 imagenCancha = new ImageIcon(getClass().getResource(ruta + "cancha2.png")).getImage();
                 break;
-            case "Original":
+            case "original":
+                imagenCancha = new ImageIcon(getClass().getResource(ruta + "original.png")).getImage();
+                break;
             default:
                 imagenCancha = null;
                 break;
