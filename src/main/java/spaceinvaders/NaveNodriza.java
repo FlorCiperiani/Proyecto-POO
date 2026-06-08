@@ -1,6 +1,5 @@
 package spaceinvaders;
 
-import clasesCompartidas.Sonido;
 
 public class NaveNodriza extends Enemigo {
     private boolean activa = false;
@@ -12,7 +11,6 @@ public class NaveNodriza extends Enemigo {
     public void aparecer(int anchoPantalla) {
         this.posicionX = anchoPantalla;
         this.activa = true;
-       // Sonido.reproducir("nave-nodriza.wav"); 
     }
 
     @Override

@@ -52,7 +52,7 @@ public class Escudo extends ObjetoGrafico {
                 if (matriz[f][c]) {
                     int px = (int) this.posicionX + (c * TAMANIO_PIXEL);
                     int py = (int) this.posicionY + (f * TAMANIO_PIXEL);
-                    g2.fillRect(px, py, TAMANIO_PIXEL, TAMANIO_PIXEL);
+                    g2.fillRect(px, py, TAMANIO_PIXEL, TAMANIO_PIXEL); //fillRect dibuja un rectangulo relleno
                 }
             }
         }
@@ -120,7 +120,7 @@ public class Escudo extends ObjetoGrafico {
             for (int c = colImpacto - radio; c <= colImpacto + radio; c++) {
                 // Validamos no salirnos de los límites de la matriz
                 if (f >= 0 && f < FILAS && c >= 0 && c < COLUMNAS) {
-                    // Ecuación de distancia para que el cráter sea redondo
+                    // Ecuación de distancia para que el cráter sea redondo (Math.hypot calcula la longitud de la hipotenusa)
                     if (Math.hypot(f - filaImpacto, c - colImpacto) <= radio) {
                         matriz[f][c] = false; // El píxel se desintegra
                     }

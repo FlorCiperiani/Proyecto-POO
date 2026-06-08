@@ -132,6 +132,12 @@ public class MenuConfigSpace implements ActionListener {
         seccion(config, gbc, "── Proyectil ──", f++);
         label(config, gbc, "Tipo:", 0, f); comp(config, gbc, comboTipoProyectil, 1, f++);
         label(config, gbc, "Velocidad:", 0, f); comp(config, gbc, comboVelocidadProyectil, 1, f++);
+        label(config, gbc, "Fondo:", 0, f);
+        comp(config, gbc, comboGalaxia, 1, f++);
+        label(config, gbc, "Invasores:", 0, f);
+        comp(config, gbc, comboSkinInvasores, 1, f++);
+        label(config, gbc, "Nave:", 0, f);
+        comp(config, gbc, comboSkinNave, 1, f++);
 
         seccion(config, gbc, "── Controles ──", f++);
         label(config, gbc, "Izquierda:", 0, f); comp(config, gbc, movIzquierda, 1, f++);
@@ -224,6 +230,23 @@ public class MenuConfigSpace implements ActionListener {
 
         comboTipoProyectil.setSelectedItem(p.getProperty("tipoProyectil", "Original"));
         comboVelocidadProyectil.setSelectedItem(p.getProperty("velocidadProyectil", "Media"));
+        boolean esCompleta = "true".equals(p.getProperty("pantallaCompleta", "false"));
+        modoPantalla.setSelected(esCompleta);
+        modoVentana.setSelected(!esCompleta);
+
+        sonidoBox.setSelected(!"false".equals(p.getProperty("sonido", "true")));
+
+        seleccionar(velocidadInvasores, p.getProperty("velocidadInvasores", "Media"));
+        seleccionar(comboGalaxia,       p.getProperty("fondoGalaxia",       "Original"));
+        seleccionar(comboSkinInvasores, p.getProperty("skinInvasores",      "Original"));
+        seleccionar(comboSkinNave,      p.getProperty("skinNave",           "Original"));
+        seleccionar(pistaMusical,       p.getProperty("musicaFondo",        "space-invaders.wav"));
+    }
+
+    private void seleccionar(JComboBox<String> cb, String valor) {
+        for (int i = 0; i < cb.getItemCount(); i++) {
+            if (cb.getItemAt(i).equals(valor)) { cb.setSelectedIndex(i); return; }
+        }
     }
 
     @Override
@@ -232,12 +255,32 @@ public class MenuConfigSpace implements ActionListener {
         if (e.getSource() == reset) {
             comboTipoProyectil.setSelectedIndex(0);
             comboVelocidadProyectil.setSelectedIndex(1);
+            movIzquierda.setText("LEFT");
+            movDerecha.setText("RIGHT");
+            teclaDisparo.setText("SPACE");
+            modoVentana.setSelected(true);
+            sonidoBox.setSelected(true);
+            velocidadInvasores.setSelectedIndex(1); // Media
+            comboGalaxia.setSelectedIndex(0);       // Original
+            comboSkinInvasores.setSelectedIndex(0); // Original
+            comboSkinNave.setSelectedIndex(0);      // Original
+            pistaMusical.setSelectedIndex(0);        // space-invaders.wav
             return;
         }
 
         Properties p = new Properties();
         p.setProperty("tipoProyectil", (String) comboTipoProyectil.getSelectedItem());
         p.setProperty("velocidadProyectil", (String) comboVelocidadProyectil.getSelectedItem());
+        p.setProperty("teclaIzquierda",    movIzquierda.getText().toUpperCase().trim());
+        p.setProperty("teclaDerecha",      movDerecha.getText().toUpperCase().trim());
+        p.setProperty("teclaDisparo",      teclaDisparo.getText().toUpperCase().trim());
+        p.setProperty("pantallaCompleta",  String.valueOf(modoPantalla.isSelected()));
+        p.setProperty("sonido",            String.valueOf(sonidoBox.isSelected()));
+        p.setProperty("velocidadInvasores",(String) velocidadInvasores.getSelectedItem());
+        p.setProperty("fondoGalaxia",      (String) comboGalaxia.getSelectedItem());
+        p.setProperty("skinInvasores",     (String) comboSkinInvasores.getSelectedItem());
+        p.setProperty("skinNave",          (String) comboSkinNave.getSelectedItem());
+        p.setProperty("musicaFondo",       (String) pistaMusical.getSelectedItem());
 
         try (OutputStream out = new FileOutputStream(rutaArchivo)) {
             p.store(out, "Config Space Invaders");

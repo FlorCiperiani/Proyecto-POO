@@ -17,13 +17,32 @@ public abstract class ObjetoGrafico implements ObjetoMovible{
         InputStream is = getClass().getResourceAsStream(filename);
         if (is == null) {
             System.out.println("NO SE ENCONTRÓ: " + filename);
+                imagen = crearPlaceholder();
         } else {
             imagen = ImageIO.read(is);
+            if (imagen == null) {
+                System.out.println("NO SE PUDO LEER LA IMAGEN: " + filename);
+                imagen = crearPlaceholder();
+            }
         }
     } catch (IOException e) {
         e.printStackTrace();
+        imagen = crearPlaceholder();
     }
 }
+
+    private BufferedImage crearPlaceholder() {
+        BufferedImage img = new BufferedImage(40, 30, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+        g.setColor(Color.MAGENTA);
+        g.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g.setColor(Color.BLACK);
+        g.drawRect(0, 0, img.getWidth() - 1, img.getHeight() - 1);
+        g.drawLine(0, 0, img.getWidth() - 1, img.getHeight() - 1);
+        g.drawLine(0, img.getHeight() - 1, img.getWidth() - 1, 0);
+        g.dispose();
+        return img;
+    }
 
     public int getAncho() {
     return imagen != null ? imagen.getWidth() : 0;
