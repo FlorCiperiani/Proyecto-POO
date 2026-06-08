@@ -2,51 +2,45 @@ package spaceinvaders;
 
 import clasesCompartidas.ObjetoGrafico;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
 public class Galaxia extends ObjetoGrafico {
-    private String estilo = "Original";
+
+    private BufferedImage imagenActual;
 
     public Galaxia() {
-        // Cargamos la imagen por defecto en la variable 'imagen' heredada de ObjetoGrafico
-        super("/AssetsSpace/Galaxia.png");
-        this.posicionX = 0;
-        this.posicionY = 0;
+        cargarImagen("/AssetsSpace/Galaxia.png");
     }
 
     public void setEstilo(String estilo) {
-        this.estilo = estilo;
-        String ruta = "/AssetsSpace/";
-
-        /*try {
-            switch (estilo) {
-                case "Futbol":
-                    // Reutilizamos setImagen() heredado de ObjetoGrafico
-                    setImagen(ImageIO.read(getClass().getResourceAsStream(ruta + "cancha-fondo.png")));
-                    break;
-                case "Ciudad":
-                    setImagen(ImageIO.read(getClass().getResourceAsStream(ruta + "ciudad-fondo.jpg")));
-                    break;
-                case "Original":
-                default:
-                    setImagen(ImageIO.read(getClass().getResourceAsStream(ruta + "Galaxia.png")));
-                    break;
-            }
-        } catch (IOException | NullPointerException e) {
-            System.out.println("No se pudo cargar el fondo de estilo: " + estilo + ". Se usará el fondo negro.");
-            setImagen(null); // Si falla en encontrar la imagen de la carpeta, la deja en null
-        }*/
+        switch (estilo) {
+            case "Oceano":
+                cargarImagen("/AssetsSpace/Oceano.png");
+                break;
+            case "Ciudad":
+                cargarImagen("/AssetsSpace/Ciudad.png");
+                break;
+            default:
+                cargarImagen("/AssetsSpace/Galaxia.png");
+                break;
+        }
     }
 
-    // Cambiamos el comportamiento de mostrar para que use la variable 'imagen' del padre
+    private void cargarImagen(String ruta) {
+        try {
+            imagenActual = ImageIO.read(getClass().getResourceAsStream(ruta));
+        } catch (IOException | IllegalArgumentException e) {
+            System.out.println("No se pudo cargar el fondo: " + ruta);
+            imagenActual = null;
+        }
+    }
+
     public void mostrar(Graphics2D g2, int ancho, int alto) {
-        // getImagen() viene de ObjetoGrafico
-        if (getImagen() != null) {
-            // Dibuja estirando la imagen al tamaño total de la ventana
-            g2.drawImage(getImagen(), 0, 0, ancho, alto, null);
+        if (imagenActual != null) {
+            g2.drawImage(imagenActual, 0, 0, ancho, alto, null);
         } else {
-            // Resguardo por si falla la carga del archivo
             g2.setColor(Color.BLACK);
             g2.fillRect(0, 0, ancho, alto);
         }

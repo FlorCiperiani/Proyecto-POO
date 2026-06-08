@@ -12,6 +12,7 @@ import com.entropyinteractive.*;
 import pong.Pong;
 import spaceinvaders.SpaceInvaders;
 import lodeRunner.LodeRunner;
+import lodeRunner.MenuConfigLR;
 
 
 public class LanzadorJuego extends JFrame implements ActionListener {
@@ -93,7 +94,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                         panelImg.add(new JPanelImage("/assetsLanzador/portadaSpaceInvaders.png"));
                     } else if ("Pong".equals(selected)) {
                         panelImg.add(new JPanelImage("/assetsLanzador/portadaPong.png"));
-                    } else if ("Lode Runner".equals(selected)) { // CORREGIDO: Ahora coincide con la lista
+                    } else if ("Lode Runner".equals(selected)) {
                         panelImg.add(new JPanelImage("/assetsLanzador/portadaLR.png")); 
                     } 
                     
@@ -143,7 +144,7 @@ public class LanzadorJuego extends JFrame implements ActionListener {
         String ruta = null;
         if ("Pong".equals(nombre)) ruta = "/assetsLanzador/pingPong.png";
         else if ("SpaceInvaders".equals(nombre)) ruta = "/AssetsSpace/yellow.png";
-        else if ("Lode Runner".equals(nombre)) ruta = "/lodeRunner/jugador_neutral.png"; // CORREGIDO: Ahora coincide con la lista
+        else if ("Lode Runner".equals(nombre)) ruta = "/assetsLanzador/iconoLR.png";
         
 
         try {
@@ -189,13 +190,8 @@ public class LanzadorJuego extends JFrame implements ActionListener {
                 new MenuConfigSpace();
             } else if ("Pong".equals(juegoSeleccionado)) {
                 new MenuConfig();
-
-            } else if ("Counter-Strike".equals(juegoSeleccionado)) {
-                JOptionPane.showMessageDialog(LanzadorJuego.this, "Configuración en proceso... (Jugate otro juego)");
-
             } else if ("Lode Runner".equals(juegoSeleccionado)) {
-            
-
+                new MenuConfigLR();
             }
         }
     }

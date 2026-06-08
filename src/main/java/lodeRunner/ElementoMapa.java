@@ -1,10 +1,7 @@
 package lodeRunner;
 
 import clasesCompartidas.ObjetoGrafico;
-
-/**
- * Clase base abstracta para todos los elementos del mapa (tiles).
- */
+ 
 public abstract class ElementoMapa extends ObjetoGrafico {
 
     public ElementoMapa(String rutaRecurso, double x, double y) {
@@ -13,7 +10,7 @@ public abstract class ElementoMapa extends ObjetoGrafico {
     }
 }
 
-// ─── Ladrillo (rompible) ───────────────────────────────────────────────────
+// Ladrillo (rompible)
 class Ladrillo extends ElementoMapa {
     private boolean roto = false;
     private double tiempoRestauracion = 0;
@@ -70,7 +67,7 @@ class Ladrillo extends ElementoMapa {
     }
 }
 
-// ─── Piedra (indestructible) ───────────────────────────────────────────────
+// Piedra (no se rompe)
 class Piedra extends ElementoMapa {
     public Piedra(double x, double y) {
         super("/lodeRunner/piedra.png", x, y);
@@ -78,24 +75,10 @@ class Piedra extends ElementoMapa {
     @Override public void update(double delta) {}
 }
 
-// ─── Escalera ─────────────────────────────────────────────────────────────
-/**
- * Diseño de renderizado de escalera:
- *
- *  - Todos los tiles de escalera se dibujan en su posición lógica (sin offset).
- *    Esto hace que la BASE llegue exactamente al suelo inferior.
- *
- *  - El tile SUPERIOR de cada columna de escalera (esTope=true) dibuja la imagen
- *    con un pequeño offset de -POKE_PX píxeles hacia arriba, de modo que el remate
- *    sobresale levemente por encima del piso adyacente, tal como en el original.
- *    Ese sobrelapeo es puramente visual y no afecta colisiones.
- *
- *  MapaLR llama a setEsTope(true) al construir la grilla.
- */
+// Escalera
+
 class Escalera extends ElementoMapa {
 
-    /** Píxeles que el tope sobresale por encima del ladrillo adyacente. */
-    private static final int POKE_PX   = 8;
     private static final int TILE_SIZE = MapaLR.TILE_SIZE;
 
     private boolean esTope = false;
@@ -104,7 +87,6 @@ class Escalera extends ElementoMapa {
         super("/lodeRunner/escalera.png", x, y);
     }
 
-    /** Llamado por MapaLR cuando este tile es el más alto de su columna continua. */
     public void setEsTope(boolean v) { esTope = v; }
     public boolean isEsTope()        { return esTope; }
 
@@ -114,23 +96,23 @@ class Escalera extends ElementoMapa {
 
         int dx   = (int) posicionX;
         int dy   = (int) posicionY;
-        int sprH = imagen.getHeight();   // 40 px
+        int sprH = imagen.getHeight();
+        int yOffset = Math.max(0, sprH - TILE_SIZE);
 
-        if (esTope) {
-            // Dibujar el sprite COMPLETO (40px) desplazado POKE_PX hacia arriba.
-            // Los primeros POKE_PX sobresalen por encima del ladrillo adyacente,
-            // y los 32px restantes llenan exactamente la celda propia.
-            g2.drawImage(imagen, dx, dy - POKE_PX, null);
-        } else {
-            // Tile normal: saltear los POKE_PX del remate (parte superior del sprite)
-            // y dibujar los 32px del cuerpo exactamente en la celda.
-            // src: (0, POKE_PX, TILE_SIZE, sprH)  →  dst: (dx, dy, dx+TILE_SIZE, dy+TILE_SIZE)
+        if (esTope && yOffset > 0) {
+            // Si el sprite es más alto que la celda, dibujar el sobresaliendo.
+            g2.drawImage(imagen, dx, dy - yOffset, null);
+        } else if (yOffset > 0) {
+            // Si el sprite es más alto que la celda, dibujar solamente la parte inferior de 32px.
             g2.drawImage(imagen,
-                dx,       dy,
+                dx,             dy,
                 dx + TILE_SIZE, dy + TILE_SIZE,
-                0,        POKE_PX,
-                TILE_SIZE, sprH,
+                0,              yOffset,
+                TILE_SIZE,      sprH,
                 null);
+        } else {
+            // Sprite de 32px o igual a la celda
+            g2.drawImage(imagen, dx, dy, null);
         }
     }
 
@@ -138,7 +120,7 @@ class Escalera extends ElementoMapa {
     public void update(double delta) {}
 }
 
-// ─── Barra horizontal ─────────────────────────────────────────────────────
+// Barra horizontal 
 class Barra extends ElementoMapa {
     public Barra(double x, double y) {
         super("/lodeRunner/barra.png", x, y);
@@ -146,7 +128,7 @@ class Barra extends ElementoMapa {
     @Override public void update(double delta) {}
 }
 
-// ─── Oro ──────────────────────────────────────────────────────────────────
+// Oro
 class Oro extends ElementoMapa {
     private boolean recolectado = false;
 

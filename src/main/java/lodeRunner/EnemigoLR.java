@@ -2,28 +2,23 @@ package lodeRunner;
 
 import java.util.Random;
 
-/**
- * Enemigo controlado por IA.
- *
- * Comportamiento (según consigna):
- *  - Persigue al jugador pero NO siempre toma el camino más corto.
- *  - A veces se mueve de forma aparentemente ilógica o se aleja.
- *  - Puede recoger lingotes de oro (uno a la vez); si cae en hoyo con oro, lo suelta.
- *  - Si queda atrapado y no escapa antes de que el hoyo se cierre, desaparece
- *    y reaparece en la parte superior en posición aleatoria.
- */
+
 public class EnemigoLR extends PersonajeLR {
 
     private JugadorLR objetivo;
     private static final Random RNG = new Random();
 
-    // Estado de hoyo/reaparecer
+    // reaparecer
     private double tiempoAtrapado  = 0;
     private static final double TIEMPO_ESCAPAR = 8.0; // segundos
 
-    // Comportamiento impredecible
+    public boolean isCaidoEnPozo() {
+        return this.enHoyo;
+    }
+
+    // Comportamiento aleatorio
     private double tiempoDecision  = 0;
-    private int    dirRandomActual = 0;      // -1, 0, +1 (horizontal aleatoria ocasional)
+    private int dirRandomActual = 0;      // -1, 0, +1 (horizontal aleatoria cada tanto)
     private static final double INTERVALO_DECISION = 2.0; // cada cuántos segundos recalcula
 
     // Oro transportado
@@ -40,9 +35,14 @@ public class EnemigoLR extends PersonajeLR {
     public void update(double delta) {
         actualizarEstado();
 
-        // ── Atrapado en hoyo ─────────────────────────────────────────────
+        // Atrapado en hoyo
         if (enHoyo) {
-            // Si llevaba oro, lo suelta en la celda actual
+            //Fuerzo a que se caiga hasta el fondo del bloque porque se buggeaba
+            int tamañoBloque = 32; 
+            int filaActual = (int) ((posicionY + tamañoBloque / 2) / tamañoBloque);
+            this.posicionY = filaActual * tamañoBloque;
+
+            // Si llevaba oro lo suelta
             if (lleva_oro && oroTransportado != null) {
                 soltarOro();
             }
@@ -56,7 +56,7 @@ public class EnemigoLR extends PersonajeLR {
 
         tiempoAtrapado = 0;
 
-        // ── Decisión aleatoria ocasional ─────────────────────────────────
+        // Decisión aleatoria
         tiempoDecision += delta;
         if (tiempoDecision >= INTERVALO_DECISION) {
             tiempoDecision = 0;
@@ -69,14 +69,14 @@ public class EnemigoLR extends PersonajeLR {
             }
         }
 
-        // ── Persecución o movimiento aleatorio ───────────────────────────
+        // Persecución o movimiento aleatorio
         if (objetivo != null) {
             double dx = objetivo.getX() - posicionX;
             double dy = objetivo.getY() - posicionY;
 
             int dirH;
             if (dirRandomActual != 0) {
-                // Movimiento aparentemente ilógico
+                // Movimiento ilógico
                 dirH = dirRandomActual;
             } else {
                 dirH = (dx < 0) ? -1 : (dx > 0 ? 1 : 0);
@@ -94,15 +94,15 @@ public class EnemigoLR extends PersonajeLR {
 
         aplicarGravedad(delta);
 
-        // Si lleva oro, mantiene el sprite del oro encima (lógica simplificada)
+        // Si lleva oro, mantiene el sprite del oro encima (Al final no implementé del todo esto, no me andaba bien)
         if (lleva_oro && oroTransportado != null) {
             oroTransportado.setPosicion(posicionX + getAncho() / 4.0, posicionY - 8);
         }
     }
 
-    // ── Oro ──────────────────────────────────────────────────────────────
+    // Oro (Al final no implementé del todo esto, no me andaba bien)
 
-    /** Intenta recoger oro del tile donde está parado. */
+    // Intenta juntar el oro del tile donde está parado. 
     public void intentarRecogerOro(MapaLR mapa) {
         if (lleva_oro || mapa == null) return;
         int col  = (int)(posicionX + getAncho() / 2.0) / TILE_SIZE;
@@ -119,7 +119,7 @@ public class EnemigoLR extends PersonajeLR {
     }
 
     private void soltarOro() {
-        // Devuelve el oro al mapa en su posición actual (simplificado: lo deja visible)
+        // Devuelve el oro al mapa en la posición actual
         if (oroTransportado != null) {
             oroTransportado.devolver(posicionX, posicionY);
         }
@@ -127,7 +127,8 @@ public class EnemigoLR extends PersonajeLR {
         oroTransportado = null;
     }
 
-    // ── Reaparición ──────────────────────────────────────────────────────
+
+    // Reaparición
 
     private void reaparecerArriba() {
         if (mapa == null) return;
@@ -145,7 +146,6 @@ public class EnemigoLR extends PersonajeLR {
             }
             intentos++;
         }
-        // Fallback: esquina superior izquierda libre
         posicionX = TILE_SIZE;
         posicionY = TILE_SIZE;
         velocidadY = 0;
