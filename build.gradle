@@ -16,5 +16,17 @@ dependencies {
 	implementation 'org.xerial:sqlite-jdbc:3.45.1.0'
 }
 
+compileJava.options.encoding = 'UTF-8'
 
-
+jar {
+    manifest {
+        attributes 'Main-Class': 'clasesCompartidas.LanzadorJuego'
+    }
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+	from sourceSets.main.resources
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
