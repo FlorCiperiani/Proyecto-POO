@@ -19,6 +19,10 @@ public class JugadorLR extends PersonajeLR {
     private BufferedImage imgIzquierda;
     private BufferedImage imgDerecha;
 
+    // Segundo frame de cada dirección, para alternar y simular animación al correr
+    private BufferedImage imgIzquierdaB;
+    private BufferedImage imgDerechaB;
+
     // Sprite de caída  (No es gancia con sprite)
     private BufferedImage imgCayendo;
 
@@ -55,6 +59,7 @@ public class JugadorLR extends PersonajeLR {
 
     private static final double FPS_ESCALERA = 5.0;
     private static final double FPS_BARRA    = 6.0;
+    private static final double FPS_CORRER   = 4.0;
 
     public JugadorLR(double x, double y) {
         super("/lodeRunner/skins/" + MenuConfigLR.skinPersonajeSeleccionado + "/jugador.png", x, y, 120.0);
@@ -62,6 +67,8 @@ public class JugadorLR extends PersonajeLR {
         imgNeutral   = imagen;
         imgIzquierda = cargarImagen(base + "jugador_left.png");
         imgDerecha   = cargarImagen(base + "jugador_right.png");
+        imgIzquierdaB = cargarImagen(base + "jugador_left_b.png");
+        imgDerechaB   = cargarImagen(base + "jugador_right_b.png");
         imgCayendo   = cargarImagen(base + "jugador_cayendo.png");
         imgEscaleraA = cargarImagen(base + "jugador_escalera_a.png");
         imgEscaleraB = cargarImagen(base + "jugador_escalera_b.png");
@@ -73,6 +80,14 @@ public class JugadorLR extends PersonajeLR {
         if (imgEscaleraB == null) imgEscaleraB = imgNeutral;
         if (imgBarraA    == null) imgBarraA    = imgNeutral;
         if (imgBarraB    == null) imgBarraB    = imgNeutral;
+        if (imgIzquierdaB == null) {
+            System.out.println("JugadorLR: no se encontró 'jugador_left_b.png' en " + base + " — la animación de correr no alternará poses.");
+            imgIzquierdaB = imgIzquierda;
+        }
+        if (imgDerechaB == null) {
+            System.out.println("JugadorLR: no se encontró 'jugador_right_b.png' en " + base + " — la animación de correr no alternará poses.");
+            imgDerechaB = imgDerecha;
+        }
     }
 
     private BufferedImage cargarImagen(String ruta) {
@@ -244,19 +259,36 @@ public class JugadorLR extends PersonajeLR {
                 break;
             }
 
-            case ESTADO_BARRA:
-                imagen = (ultimaDireccion < 0) ? imgBarraA : imgBarraB;
+            case ESTADO_BARRA: {
+                // Alterna entre las dos poses mientras se desplaza por la barra,
+                // simulando el balanceo de brazo en brazo. Si está quieto, se
+                // congela el frame (igual que en la escalera) para que no titile.
+                if (moviendoHorizontal) {
+                    double periodo = 1.0 / FPS_BARRA;
+                    tiempoAnim = tiempoAnim % periodo;
+                    frameAnim  = (int)(tiempoAnim / (periodo / 2)) % 2;
+                }
+                imagen = (frameAnim == 0) ? imgBarraA : imgBarraB;
                 break;
+            }
 
             default: // ESTADO_SUELO
                 if (!moviendoHorizontal) {
                     imagen = imgNeutral;
-                } else if (ultimaDireccion == -1 && imgIzquierda != null) {
-                    imagen = imgIzquierda;
-                } else if (ultimaDireccion == +1 && imgDerecha != null) {
-                    imagen = imgDerecha;
                 } else {
-                    imagen = imgNeutral;
+                    // Alterna entre los dos frames de la zancada para simular animación de correr
+                    double periodo = 1.0 / FPS_CORRER;
+                    tiempoAnim = tiempoAnim % periodo;
+                    frameAnim  = (int)(tiempoAnim / (periodo / 2)) % 2;
+                    boolean primerFrame = (frameAnim == 0);
+
+                    if (ultimaDireccion == -1 && imgIzquierda != null) {
+                        imagen = primerFrame ? imgIzquierda : imgIzquierdaB;
+                    } else if (ultimaDireccion == +1 && imgDerecha != null) {
+                        imagen = primerFrame ? imgDerecha : imgDerechaB;
+                    } else {
+                        imagen = imgNeutral;
+                    }
                 }
                 break;
         }
@@ -281,6 +313,8 @@ public class JugadorLR extends PersonajeLR {
         imgNeutral   = imagen;
         imgIzquierda = cargarImagen(base + "jugador_left.png");
         imgDerecha   = cargarImagen(base + "jugador_right.png");
+        imgIzquierdaB = cargarImagen(base + "jugador_left_b.png");
+        imgDerechaB   = cargarImagen(base + "jugador_right_b.png");
         imgCayendo   = cargarImagen(base + "jugador_cayendo.png");
         imgEscaleraA = cargarImagen(base + "jugador_escalera_a.png");
         imgEscaleraB = cargarImagen(base + "jugador_escalera_b.png");
@@ -292,6 +326,14 @@ public class JugadorLR extends PersonajeLR {
         if (imgEscaleraB == null) imgEscaleraB = imgNeutral;
         if (imgBarraA    == null) imgBarraA    = imgNeutral;
         if (imgBarraB    == null) imgBarraB    = imgNeutral;
+        if (imgIzquierdaB == null) {
+            System.out.println("JugadorLR: no se encontró 'jugador_left_b.png' en " + base + " — la animación de correr no alternará poses.");
+            imgIzquierdaB = imgIzquierda;
+        }
+        if (imgDerechaB == null) {
+            System.out.println("JugadorLR: no se encontró 'jugador_right_b.png' en " + base + " — la animación de correr no alternará poses.");
+            imgDerechaB = imgDerecha;
+        }
     }
 
     @Override

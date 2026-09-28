@@ -56,13 +56,22 @@ public class EnemigoLR extends PersonajeLR {
 
         tiempoAtrapado = 0;
 
+        double dx = 0, dy = 0;
+        if (objetivo != null) {
+            dx = objetivo.getX() - posicionX;
+            dy = objetivo.getY() - posicionY;
+        }
+
         // Decisión aleatoria
         tiempoDecision += delta;
         if (tiempoDecision >= INTERVALO_DECISION) {
             tiempoDecision = 0;
-            // 20% de probabilidad de moverse "de forma ilógica" por un rato
+            // 20% de probabilidad de moverse "de forma ilógica" por un rato,
+            // pero solo si está relativamente lejos del jugador (a corta distancia
+            // siempre persigue de forma precisa, no se distrae).
+            double distancia = Math.hypot(dx, dy);
             int r = RNG.nextInt(10);
-            if (r < 2) {
+            if (distancia > TILE_SIZE * 6 && r < 2) {
                 dirRandomActual = RNG.nextBoolean() ? -1 : 1;  // dirección contraria
             } else {
                 dirRandomActual = 0;  // modo normal: perseguir
@@ -71,9 +80,6 @@ public class EnemigoLR extends PersonajeLR {
 
         // Persecución o movimiento aleatorio
         if (objetivo != null) {
-            double dx = objetivo.getX() - posicionX;
-            double dy = objetivo.getY() - posicionY;
-
             int dirH;
             if (dirRandomActual != 0) {
                 // Movimiento ilógico

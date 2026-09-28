@@ -6,32 +6,28 @@ import java.awt.*;
 
 public class MenuConfigLR extends Configuracion {
 
-    public static boolean pantallaCompleta        = false;
     public static boolean sonidoGeneralAtrapado   = true;
     public static boolean musicaActivada          = true;
     public static boolean efectosActivados        = true;
     public static boolean sonidoGeneralActivado   = true;
 
     public static String pistaMusicalSeleccionada  = "LR_musiquilla.wav";
-    public static String skinPersonajeSeleccionado = "original";
+    public static String skinPersonajeSeleccionado = "skin_principal";
 
     public static float volumenMusica  = 0.3f;
     public static float volumenEfectos = 0.3f;
 
     public static void resetConfig() {
-        pantallaCompleta          = false;
         sonidoGeneralAtrapado     = true;
         musicaActivada            = true;
         efectosActivados          = true;
         sonidoGeneralActivado     = true;
         pistaMusicalSeleccionada  = "LR_musiquilla.wav";
-        skinPersonajeSeleccionado = "original";
+        skinPersonajeSeleccionado = "skin_principal";
         volumenMusica             = 0.3f;
         volumenEfectos            = 0.3f;
     }
 
-    private JRadioButton rdVentana;
-    private JRadioButton rdPantallaCompleta;
     private JCheckBox    chkSonidoGeneral;
     private JCheckBox    chkMusica;
     private JCheckBox    chkEfectos;
@@ -44,23 +40,13 @@ public class MenuConfigLR extends Configuracion {
               null,
               "/LodeRunner/portadaLR.png");
 
-        rdVentana          = crearRadio("Ventana",          !pantallaCompleta);
-        rdPantallaCompleta = crearRadio("Pantalla completa", pantallaCompleta);
-        ButtonGroup grupoPantalla = new ButtonGroup();
-        grupoPantalla.add(rdVentana);
-        grupoPantalla.add(rdPantallaCompleta);
-
         chkSonidoGeneral = crearCheckBoxConTexto("Activado", sonidoGeneralActivado);
         chkMusica        = crearCheckBoxConTexto("Activado", musicaActivada);
         chkEfectos       = crearCheckBoxConTexto("Activado", efectosActivados);
 
         comboMusica = crearCombo(new String[]{"LR_musiquilla.wav", "retro.wav"});
-        comboSkin   = crearCombo(new String[]{"original", "skin_alternativa"});
+        comboSkin   = crearCombo(new String[]{"skin_principal", "skin_alternativa"});
 
-        agregarSeccion("── Pantalla ──");
-        agregarFilaDoble("Pantalla:", rdVentana, rdPantallaCompleta);
-
-        agregarEspacio();
         agregarSeccion("── Sonido ──");
         agregarFila("Sonido General:",    chkSonidoGeneral);
         agregarFila("Música de Fondo:",   chkMusica);
@@ -78,8 +64,6 @@ public class MenuConfigLR extends Configuracion {
     @Override
     protected void cargarValores() {
         // LR no usa .properties: leemos directo de las variables estáticas
-        rdVentana.setSelected(!pantallaCompleta);
-        rdPantallaCompleta.setSelected(pantallaCompleta);
         chkSonidoGeneral.setSelected(sonidoGeneralActivado);
         chkMusica.setSelected(musicaActivada);
         chkEfectos.setSelected(efectosActivados);
@@ -89,7 +73,6 @@ public class MenuConfigLR extends Configuracion {
 
     @Override
     protected void guardarValores() {
-        pantallaCompleta          = rdPantallaCompleta.isSelected();
         sonidoGeneralActivado     = chkSonidoGeneral.isSelected();
         musicaActivada            = chkMusica.isSelected();
         efectosActivados          = chkEfectos.isSelected();
@@ -113,8 +96,6 @@ public class MenuConfigLR extends Configuracion {
     protected void restablecerDefectos() {
         resetConfig(); // llama al método estático que ya existía
         // Refrescar los componentes con los valores reseteados
-        rdVentana.setSelected(!pantallaCompleta);
-        rdPantallaCompleta.setSelected(pantallaCompleta);
         chkSonidoGeneral.setSelected(sonidoGeneralActivado);
         chkMusica.setSelected(musicaActivada);
         chkEfectos.setSelected(efectosActivados);

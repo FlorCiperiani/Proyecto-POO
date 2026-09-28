@@ -10,14 +10,7 @@ public class MenuConfigSpace implements ActionListener {
 
     private JFrame frame;
 
-    // ── Controles ─────────────────────────────────────────────────────────────
-    private JTextField movIzquierda;
-    private JTextField movDerecha;
-    private JTextField teclaDisparo;
-
-    // ── Pantalla / Partida ────────────────────────────────────────────────────
-    private JRadioButton modoVentana;
-    private JRadioButton modoPantalla;
+    // ── Partida ──────────────────────────────────────────────────────────────
     private JCheckBox sonidoBox;
     private JComboBox<String> velocidadInvasores;
 
@@ -74,16 +67,6 @@ public class MenuConfigSpace implements ActionListener {
         };
 
         // ── Componentes ───────────────────────────────────────────────────────
-        movIzquierda = crearTextField("LEFT");
-        movDerecha   = crearTextField("RIGHT");
-        teclaDisparo = crearTextField("SPACE");
-
-        modoVentana  = crearRadio("Ventana", true);
-        modoPantalla = crearRadio("Pantalla completa", false);
-        ButtonGroup grupoPantalla = new ButtonGroup();
-        grupoPantalla.add(modoVentana);
-        grupoPantalla.add(modoPantalla);
-
         sonidoBox = new JCheckBox("", true);
         sonidoBox.setFont(FONT_CONFIG);
         sonidoBox.setForeground(COLOR_FG);
@@ -114,19 +97,9 @@ public class MenuConfigSpace implements ActionListener {
         gbc.anchor = GridBagConstraints.WEST;
         int f = 0;
 
-        seccion(config, gbc, "── Pantalla ──", f++);
-        label(config, gbc, "Modo:", 0, f);
-        comp(config, gbc, modoVentana, 1, f);
-        comp(config, gbc, modoPantalla, 2, f++);
-
         seccion(config, gbc, "── Sonido ──", f++);
         label(config, gbc, "Activado:", 0, f);
         comp(config, gbc, sonidoBox, 1, f++);
-
-       /*seccion(config, gbc, "── Visual ──", f++);
-        label(config, gbc, "Fondo:", 0, f); comp(config, gbc, comboGalaxia, 1, f++);
-        label(config, gbc, "Nave:", 0, f); comp(config, gbc, comboSkinNave, 1, f++);
-        label(config, gbc, "Invasores:", 0, f); comp(config, gbc, comboSkinInvasores, 1, f++); */ 
 
         // SECCIÓN PROYECTIL (VISIBLE Y MODIFICABLE)
         seccion(config, gbc, "── Visual ──", f++);
@@ -138,11 +111,6 @@ public class MenuConfigSpace implements ActionListener {
         comp(config, gbc, comboSkinInvasores, 1, f++);
         label(config, gbc, "Nave:", 0, f);
         comp(config, gbc, comboSkinNave, 1, f++);
-
-        seccion(config, gbc, "── Controles ──", f++);
-        label(config, gbc, "Izquierda:", 0, f); comp(config, gbc, movIzquierda, 1, f++);
-        label(config, gbc, "Derecha:", 0, f); comp(config, gbc, movDerecha, 1, f++);
-        label(config, gbc, "Disparo:", 0, f); comp(config, gbc, teclaDisparo, 1, f++);
 
         seccion(config, gbc, "── Música ──", f++);
         label(config, gbc, "Pista:", 0, f); comp(config, gbc, pistaMusical, 1, f++);
@@ -166,26 +134,10 @@ public class MenuConfigSpace implements ActionListener {
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
-    private JTextField crearTextField(String def) {
-        JTextField tf = new JTextField(def, 8);
-        tf.setFont(FONT_CONFIG);
-        tf.setForeground(COLOR_FG);
-        tf.setBackground(COLOR_BG);
-        tf.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 2));
-        return tf;
-    }
-
     private JComboBox<String> crearCombo(String[] opciones) {
         JComboBox<String> cb = new JComboBox<>(opciones);
         cb.setFont(FONT_CONFIG);
         return cb;
-    }
-
-    private JRadioButton crearRadio(String txt, boolean sel) {
-        JRadioButton rb = new JRadioButton(txt, sel);
-        rb.setFont(FONT_CONFIG);
-        rb.setOpaque(false);
-        return rb;
     }
 
     private JButton crearBoton(String txt) {
@@ -224,15 +176,8 @@ public class MenuConfigSpace implements ActionListener {
             p.load(in);
         } catch (IOException ignored) {}
 
-        movIzquierda.setText(p.getProperty("teclaIzquierda", "LEFT"));
-        movDerecha.setText(p.getProperty("teclaDerecha", "RIGHT"));
-        teclaDisparo.setText(p.getProperty("teclaDisparo", "SPACE"));
-
         comboTipoProyectil.setSelectedItem(p.getProperty("tipoProyectil", "Original"));
         comboVelocidadProyectil.setSelectedItem(p.getProperty("velocidadProyectil", "Media"));
-        boolean esCompleta = "true".equals(p.getProperty("pantallaCompleta", "false"));
-        modoPantalla.setSelected(esCompleta);
-        modoVentana.setSelected(!esCompleta);
 
         sonidoBox.setSelected(!"false".equals(p.getProperty("sonido", "true")));
 
@@ -255,10 +200,6 @@ public class MenuConfigSpace implements ActionListener {
         if (e.getSource() == reset) {
             comboTipoProyectil.setSelectedIndex(0);
             comboVelocidadProyectil.setSelectedIndex(1);
-            movIzquierda.setText("LEFT");
-            movDerecha.setText("RIGHT");
-            teclaDisparo.setText("SPACE");
-            modoVentana.setSelected(true);
             sonidoBox.setSelected(true);
             velocidadInvasores.setSelectedIndex(1); // Media
             comboGalaxia.setSelectedIndex(0);       // Original
@@ -271,10 +212,6 @@ public class MenuConfigSpace implements ActionListener {
         Properties p = new Properties();
         p.setProperty("tipoProyectil", (String) comboTipoProyectil.getSelectedItem());
         p.setProperty("velocidadProyectil", (String) comboVelocidadProyectil.getSelectedItem());
-        p.setProperty("teclaIzquierda",    movIzquierda.getText().toUpperCase().trim());
-        p.setProperty("teclaDerecha",      movDerecha.getText().toUpperCase().trim());
-        p.setProperty("teclaDisparo",      teclaDisparo.getText().toUpperCase().trim());
-        p.setProperty("pantallaCompleta",  String.valueOf(modoPantalla.isSelected()));
         p.setProperty("sonido",            String.valueOf(sonidoBox.isSelected()));
         p.setProperty("velocidadInvasores",(String) velocidadInvasores.getSelectedItem());
         p.setProperty("fondoGalaxia",      (String) comboGalaxia.getSelectedItem());
